@@ -2,16 +2,16 @@
 site_name: SkYe's Wiki
 site_description: SkYe's Wiki
 site_author: SkYe
-#site_url: https://wiki.mrskye.cn/
+site_url: https://wiki.mrskye.cn/
 remote_branch: gh-pages
 remote_name: origin
 #google_analytics: []
 
 nav:
   - Index: index.md
-  - 二进制:
+  - Pwn:
     - ELF安全防护机制:
-        - ELF安全防御机制小结: ELF Security protection/ELF Security protection summary.md
+        - ELF安全防御机制小结: ELFSecurityProtection/ELFSecurityProtectionSummary.md
   - About Me: about.md
 
 # Repository

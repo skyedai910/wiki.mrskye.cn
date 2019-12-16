@@ -6,4 +6,4 @@ mkdocs build
 echo '----ghp-import site----'
 ghp-import site
 echo '----上传到origin gh-pages----'
-git push origin gh-pages
+git push -f origin gh-pages
