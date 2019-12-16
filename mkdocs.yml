@@ -1,1 +1,50 @@
-site_name: My Docs
+# Project Information
+site_name: SkYe's Wiki
+site_description: SkYe's Wiki
+site_author: SkYe
+site_url: https://wiki.mrskye.cn/
+google_analytics: []
+
+nav:
+  - Index: index.md
+  - 二进制:
+    - ELF安全防护机制:
+        - ELF安全防御机制小结: ELF Security protection/ELF Security protection summary.md
+  - About Me: about.md
+
+# Repository
+repo_name: 'skyedai910'
+repo_url: 'https://github.com/skyedai910/wiki.mrskye.cn'
+edit_uri: 'blob/master/docs/'
+
+# Copyright
+copyright: 'Copyright &copy; 2018 - 2020 SkYe'
+
+# Customization
+extra:
+  search:
+    language: 'zh'
+  disqus: 'SkYe'
+  copyright: 'CC BY-NC-SA 4.0'
+extra_javascript:
+  - 'https://cdnjs.loli.net/ajax/libs/pangu/3.3.0/pangu.min.js'
+  - '_static/js/extra.js'
+  - 'https://cdnjs.loli.net/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'
+
+extra_css:
+  - '_static/css/extra.css'
+ 
+# Theme
+theme:
+  name: 'material'
+  language: 'zh'
+  palette:
+    primary: 'blue'
+    accent: 'red'
+  logo:
+    icon: 'school'
+  feature:
+    tabs: true
+  font:
+    text: 'Noto Sans'
+    code: 'Source Code Pro'
