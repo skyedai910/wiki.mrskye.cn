@@ -3,7 +3,7 @@ site_name: SkYe's Wiki
 site_description: SkYe's Wiki
 site_author: SkYe
 site_url: https://wiki.mrskye.cn/
-google_analytics: []
+#google_analytics: []
 
 nav:
   - Index: index.md
