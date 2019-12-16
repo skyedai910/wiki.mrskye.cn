@@ -2,7 +2,9 @@
 site_name: SkYe's Wiki
 site_description: SkYe's Wiki
 site_author: SkYe
-site_url: https://wiki.mrskye.cn/
+#site_url: https://wiki.mrskye.cn/
+remote_branch: gh-pages
+remote_name: origin
 #google_analytics: []
 
 nav:
@@ -13,7 +15,7 @@ nav:
   - About Me: about.md
 
 # Repository
-repo_name: 'skyedai910'
+repo_name: 'skyedai910/wiki.mrskye.cn'
 repo_url: 'https://github.com/skyedai910/wiki.mrskye.cn'
 edit_uri: 'blob/master/docs/'
 
