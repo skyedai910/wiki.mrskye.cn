@@ -3,6 +3,8 @@ site_name: SkYe's Wiki
 site_description: SkYe's Wiki
 site_author: SkYe
 site_url: https://wiki.mrskye.cn/
+remote_branch: gh-pages
+remote_name: origin
 #google_analytics: []
 
 nav:
