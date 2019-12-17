@@ -1,17 +1,24 @@
-# Welcome to MkDocs
+# **关于wiki**
+```
 
-For full documentation visit [mkdocs.org](https://mkdocs.org).
+  ___________   _____.___.         __      __.__ ____  __.__ 
+ /   _____/  | _\__  |   | ____   /  \    /  \__|    |/ _|__|
+ \_____  \|  |/ //   |   |/ __ \  \   \/\/   /  |      < |  |
+ /        \    < \____   \  ___/   \        /|  |    |  \|  |
+/_______  /__|_ \/ ______|\___  >   \__/\  / |__|____|__ \__|
+        \/     \/\/           \/         \/             \/   
 
-## Commands
+```
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs help` - Print this help message.
+Blog、各种笔记十分零散，Blog用的hexo next搭，分类功能有点鸡肋，就建一个知识WiKi分类归纳一下。构建知识库、以便于个人的查阅
 
-## Project layout
+## **WiKi文章的来源**
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+Blog、笔记、网上文章转载再修改等等。
+
+## **其他**
+
+WiKi用的是[mkdocs](https://github.com/mkdocs/mkdocs)，托管于[github pages](https://pages.github.com/)。
+
+[About me](about.md)
+

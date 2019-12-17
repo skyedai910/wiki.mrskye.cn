@@ -8,7 +8,7 @@ remote_name: origin
 google_analytics: ['UA-36723568-3', 'wiki.mrskye.cn']
 
 nav:
-  - Index: index.md
+  - About WiKi: index.md
   - Pwn:
     - ELF安全防护机制:
         - ELF安全防御机制小结: ELFSecurityProtection/ELFSecurityProtectionSummary.md
