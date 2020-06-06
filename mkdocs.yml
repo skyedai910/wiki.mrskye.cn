@@ -7,12 +7,29 @@ remote_branch: gh-pages
 remote_name: origin
 google_analytics: ['UA-36723568-3', 'wiki.mrskye.cn']
 
+# context
 nav:
-  - About WiKi: index.md
+  - Home: index.md
   - Pwn:
     - ELF安全防护机制:
         - ELF安全防御机制小结: ELFSecurityProtection/ELFSecurityProtectionSummary.md
   - About Me: about.md
+
+# Theme
+theme:
+  name: 'material'
+  language: 'zh'
+  palette:
+    primary: 'blue'
+    accent: 'red'
+  icon:
+    logo: 'material/school'
+  features:
+    - tabs
+    - instant
+  font:
+    text: 'Noto Sans'
+    code: 'Source Code Pro'
 
 # Repository
 repo_name: 'skyedai910/wiki.mrskye.cn'
@@ -20,7 +37,7 @@ repo_url: 'https://github.com/skyedai910/wiki.mrskye.cn'
 edit_uri: 'blob/master/docs/'
 
 # Copyright
-copyright: 'Copyright &copy; 2018 - 2020 SkYe'
+copyright: 'Copyright &copy; 2020 MrSkYe'
 
 # Customization
 extra:
@@ -36,17 +53,4 @@ extra_javascript:
 extra_css:
   - '_static/css/extra.css'
  
-# Theme
-theme:
-  name: 'material'
-  language: 'zh'
-  palette:
-    primary: 'blue'
-    accent: 'red'
-  logo:
-    icon: 'school'
-  feature:
-    tabs: true
-  font:
-    text: 'Noto Sans'
-    code: 'Source Code Pro'
+
