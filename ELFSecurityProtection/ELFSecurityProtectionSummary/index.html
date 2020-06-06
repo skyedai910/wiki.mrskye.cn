@@ -11,23 +11,23 @@
         <meta name="description" content="SkYe's Wiki">
       
       
-        <link rel="canonical" href="https://wiki.mrskye.cn/">
+        <link rel="canonical" href="https://wiki.mrskye.cn/ELFSecurityProtection/ELFSecurityProtectionSummary/">
       
       
         <meta name="author" content="SkYe">
       
-      <link rel="shortcut icon" href="assets/images/favicon.png">
+      <link rel="shortcut icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.2.2">
     
     
       
-        <title>SkYe's Wiki</title>
+        <title>ELF安全防御机制小结 - SkYe's Wiki</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.a2408e81.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.a2408e81.min.css">
       
-        <link rel="stylesheet" href="assets/stylesheets/palette.a46bcfb3.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.a46bcfb3.min.css">
       
       
         
@@ -45,7 +45,7 @@
     
     
     
-      <link rel="stylesheet" href="_static/css/extra.css">
+      <link rel="stylesheet" href="../../_static/css/extra.css">
     
     
       
@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#wiki" class="md-skip">
+        <a href="#elf" class="md-skip">
           跳转至
         </a>
       
@@ -98,7 +98,7 @@
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-              Home
+              ELF安全防御机制小结
             
           </span>
         </div>
@@ -160,14 +160,16 @@
         
           
 
-<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  
+
+<nav class="md-tabs md-tabs--active" aria-label="Tabs" data-md-component="tabs">
   <div class="md-tabs__inner md-grid">
     <ul class="md-tabs__list">
       
         
   <li class="md-tabs__item">
     
-      <a href="." class="md-tabs__link md-tabs__link--active">
+      <a href="../.." class="md-tabs__link">
         Home
       </a>
     
@@ -183,7 +185,7 @@
   
     <li class="md-tabs__item">
       
-        <a href="ELFSecurityProtection/ELFSecurityProtectionSummary/" class="md-tabs__link">
+        <a href="./" class="md-tabs__link md-tabs__link--active">
           Pwn
         </a>
       
@@ -237,60 +239,11 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-      
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        Home
-        <span class="md-nav__icon md-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9h14V7H3v2m0 4h14v-2H3v2m0 4h14v-2H3v2m16 0h2v-2h-2v2m0-10v2h2V7h-2m0 6h2v-2h-2v2z"/></svg>
-        </span>
-      </label>
-    
-    <a href="." title="Home" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../.." title="Home" class="md-nav__link">
       Home
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary" aria-label="目录">
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-      </span>
-      目录
-    </label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#wiki_1" class="md-nav__link">
-    WiKi文章的来源
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
-    其他
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
     
@@ -298,10 +251,12 @@
       
       
 
+  
 
-  <li class="md-nav__item md-nav__item--nested">
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2" checked>
     
     <label class="md-nav__link" for="nav-2">
       Pwn
@@ -323,10 +278,12 @@
           
           
 
+  
 
-  <li class="md-nav__item md-nav__item--nested">
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-1" type="checkbox" id="nav-2-1">
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-1" type="checkbox" id="nav-2-1" checked>
     
     <label class="md-nav__link" for="nav-2-1">
       ELF安全防护机制
@@ -348,11 +305,20 @@
           
           
 
+  
 
-  <li class="md-nav__item">
-    <a href="ELFSecurityProtection/ELFSecurityProtectionSummary/" title="ELF安全防御机制小结" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+    <a href="./" title="ELF安全防御机制小结" class="md-nav__link md-nav__link--active">
       ELF安全防御机制小结
     </a>
+    
   </li>
 
         
@@ -372,7 +338,7 @@
 
 
   <li class="md-nav__item">
-    <a href="about/" title="About Me" class="md-nav__link">
+    <a href="../../about/" title="About Me" class="md-nav__link">
       About Me
     </a>
   </li>
@@ -395,30 +361,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-      </span>
-      目录
-    </label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#wiki_1" class="md-nav__link">
-    WiKi文章的来源
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
-    其他
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -429,7 +371,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/skyedai910/wiki.mrskye.cn/blob/master/docs/index.md" title="编辑此页" class="md-content__button md-icon">
+                  <a href="https://github.com/skyedai910/wiki.mrskye.cn/blob/master/docs/ELFSecurityProtection/ELFSecurityProtectionSummary.md" title="编辑此页" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
@@ -437,28 +379,16 @@
                   
                 
                 
-                <h1 id="wiki"><strong>关于wiki</strong></h1>
-<pre><code>
-  ___________   _____.___.         __      __.__ ____  __.__ 
- /   _____/  | _\__  |   | ____   /  \    /  \__|    |/ _|__|
- \_____  \|  |/ //   |   |/ __ \  \   \/\/   /  |      &lt; |  |
- /        \    &lt; \____   \  ___/   \        /|  |    |  \|  |
-/_______  /__|_ \/ ______|\___  &gt;   \__/\  / |__|____|__ \__|
-        \/     \/\/           \/         \/             \/   
-
-</code></pre>
-
-<p>Blog、各种笔记十分零散，Blog用的hexo next搭，分类功能有点鸡肋，就建一个知识WiKi分类归纳一下。构建知识库、以便于个人的查阅</p>
-<h2 id="wiki_1"><strong>WiKi文章的来源</strong></h2>
-<p>Blog、笔记、网上文章转载再修改等等。</p>
-<h2 id="_1"><strong>其他</strong></h2>
-<p>WiKi用的是<a href="https://github.com/mkdocs/mkdocs">mkdocs</a>，托管于<a href="https://pages.github.com/">github pages</a>。</p>
-<p><a href="about/">About me</a></p>
+                <h1 id="elf">ELF安全防御机制小结</h1>
                 
               
               
                 
 
+
+  <h2 id="__comments">评论</h2>
+  <div id="disqus_thread"></div>
+  <script>var disqus_config=function(){this.page.url="https://wiki.mrskye.cn/ELFSecurityProtection/ELFSecurityProtectionSummary/",this.page.identifier="ELFSecurityProtection/ELFSecurityProtectionSummary/"};!function(){var e=document,i=e.createElement("script");i.src="//SkYe.disqus.com/embed.js",i.setAttribute("data-timestamp",+new Date),(e.head||e.body).appendChild(i)}()</script>
 
               
             </article>
@@ -472,14 +402,28 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
+          <a href="../.." title="Home" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+            </div>
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  上一页
+                </span>
+                Home
+              </div>
+            </div>
+          </a>
         
-          <a href="ELFSecurityProtection/ELFSecurityProtectionSummary/" title="ELF安全防御机制小结" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+        
+          <a href="../../about/" title="About Me" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
                   下一页
                 </span>
-                ELF安全防御机制小结
+                About Me
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">
@@ -510,22 +454,22 @@
       
     </div>
     
-      <script src="assets/javascripts/vendor.d710d30a.min.js"></script>
-      <script src="assets/javascripts/bundle.5f27aba8.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\uff0c\\u3002]+", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c"}</script>
+      <script src="../../assets/javascripts/vendor.d710d30a.min.js"></script>
+      <script src="../../assets/javascripts/bundle.5f27aba8.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\uff0c\\u3002]+", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c"}</script>
       
       <script>
         app = initialize({
-          base: ".",
+          base: "../..",
           features: ["tabs", "instant"],
           search: Object.assign({
-            worker: "assets/javascripts/worker/search.27c6a5e6.min.js"
+            worker: "../../assets/javascripts/worker/search.27c6a5e6.min.js"
           }, typeof search !== "undefined" && search)
         })
       </script>
       
         <script src="https://cdnjs.loli.net/ajax/libs/pangu/3.3.0/pangu.min.js"></script>
       
-        <script src="_static/js/extra.js"></script>
+        <script src="../../_static/js/extra.js"></script>
       
         <script src="https://cdnjs.loli.net/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
       
