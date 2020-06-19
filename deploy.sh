@@ -4,8 +4,8 @@
 
 echo '----mkdocs build----'
 mkdocs build
-echo '----复制谷歌搜索验证网页----'
-cp google88663f3caf9ed787.html ./site/google88663f3caf9ed787.html
+#echo '----复制谷歌搜索验证网页----'
+#cp google88663f3caf9ed787.html ./site/google88663f3caf9ed787.html
 echo '----ghp-import site----'
 ghp-import site
 echo '----上传到origin gh-pages----'

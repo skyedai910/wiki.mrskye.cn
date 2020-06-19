@@ -11,9 +11,17 @@ google_analytics: ['UA-36723568-3', 'wiki.mrskye.cn']
 nav:
   - Home: index.md
   - Pwn:
-    - ELF安全防护机制:
-        - ELF安全防御机制小结: ELFSecurityProtection/ELFSecurityProtectionSummary.md
-  - About Me: about.md
+    - 知识点&题目索引: knowledge_point_&_title_index.md
+    - 格式化字符串:
+      - 格式化字符串漏洞利用: fmtstr/fmtstr_exploit.md
+      - 格式化字符串漏洞例子: fmtstr/fmtstr_example.md
+    - 链接器:
+      - 静态链接程序利用: linker/statically_linked.md
+
+#file 
+docs:
+    CNAME
+    about.md
 
 # Theme
 theme:
@@ -23,7 +31,7 @@ theme:
     primary: 'blue'
     accent: 'red'
   icon:
-    logo: 'material/school'
+    logo: 'material/book'
   features:
     - tabs
     - instant
@@ -37,7 +45,7 @@ repo_url: 'https://github.com/skyedai910/wiki.mrskye.cn'
 edit_uri: 'blob/master/docs/'
 
 # Copyright
-copyright: 'Copyright &copy; 2020 MrSkYe'
+copyright: 'Copyright &copy; 2020 SkYe'
 
 # Customization
 extra:

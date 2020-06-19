@@ -10,15 +10,14 @@
 
 ```
 
-Blog、各种笔记十分零散，Blog用的hexo next搭，分类功能有点鸡肋，就建一个知识WiKi分类归纳一下。构建知识库、以便于个人的查阅
+## **Site**
 
-## **WiKi文章的来源**
+* Blog:[SkYe's Blog](https://www.mrskye.cn)
+* WiKi:[SkYe's WiKi](https://wiki.mrskye.cn)
+* Github:[@skyedai910](https://github.com/skyedai910)
+* CSDN:[@SkYe231](https://blog.csdn.net/weixin_43921239)
 
-Blog、笔记、网上文章转载再修改等等。
+## **Chart**
 
-## **其他**
-
-WiKi用的是[mkdocs](https://github.com/mkdocs/mkdocs)，托管于[github pages](https://pages.github.com/)。
-
-[About me](about.md)
+* Email:skye437231@gmail.com
 
