@@ -11,7 +11,7 @@ google_analytics: ['UA-36723568-3', 'wiki.mrskye.cn']
 nav:
   - Home: index.md
   - Pwn:
-    - 知识点&题目索引: knowledge_point_&_title_index.md
+    - 知识点&题目索引: KnowExam/Know&Exam.md
     - 格式化字符串:
       - 格式化字符串漏洞利用: fmtstr/fmtstr_exploit.md
       - 格式化字符串漏洞例子: fmtstr/fmtstr_example.md
