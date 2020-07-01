@@ -315,7 +315,7 @@
       
         <li class="md-nav__item">
   <a href="#rop" class="md-nav__link">
-    ROP
+    ROP（栈溢出）
   </a>
   
 </li>
@@ -323,6 +323,13 @@
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     栈迁移
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    格式化字符串
   </a>
   
 </li>
@@ -469,7 +476,7 @@
       
         <li class="md-nav__item">
   <a href="#rop" class="md-nav__link">
-    ROP
+    ROP（栈溢出）
   </a>
   
 </li>
@@ -477,6 +484,13 @@
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     栈迁移
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    格式化字符串
   </a>
   
 </li>
@@ -504,55 +518,104 @@
                 <h1 id="_1">知识点&amp;题目索引</h1>
 <h2 id="_2">整数溢出</h2>
 <ul>
-<li>
-<p>pwn2_sctf_2016</p>
+<li>pwn2_sctf_2016</li>
+</ul>
 <blockquote>
-<p>考点        ：整数溢出、ROP</p>
+<p>考         点：整数溢出、ROP</p>
 <p>做题笔记：</p>
 <p>实验环境：BUU</p>
 </blockquote>
-</li>
-</ul>
-<h2 id="rop">ROP</h2>
+<h2 id="rop">ROP（栈溢出）</h2>
 <ul>
 <li>
-<p>ez_pz_hackover_2016</p>
+<p>jarvisoj_level3</p>
+</li>
+<li>
+<p>jarvisoj_tell_me_something</p>
+</li>
+<li>
+<p>jarvisoj_level4</p>
+</li>
+<li>
+<p>bjdctf_2020_babyrop</p>
+</li>
+</ul>
+<blockquote>
+<p>考         点：简单ROP</p>
+<p>做题笔记：</p>
+<p>实验环境：BUU</p>
+</blockquote>
+<ul>
+<li>ez_pz_hackover_2016</li>
+</ul>
 <blockquote>
 <p>考         点：简单ROP、strcmp</p>
 <p>做题笔记：</p>
 <p>实验环境：BUU</p>
 </blockquote>
-</li>
-<li>
-<p>铁人三项(第五赛区)_2018_rop</p>
+<ul>
+<li>铁人三项(第五赛区)_2018_rop</li>
+</ul>
 <blockquote>
 <p>考         点：简单ROP、write</p>
 <p>做题笔记：</p>
 <p>实验环境：BUU</p>
 </blockquote>
-</li>
+<ul>
+<li>jarvisoj_level3_x64</li>
 </ul>
+<blockquote>
+<p>考         点：ret2csu、write</p>
+<p>做题笔记：</p>
+<p>实验环境：BUU</p>
+</blockquote>
 <h2 id="_3">栈迁移</h2>
 <ul>
-<li>
-<p>[Black Watch 入群题]PWN-spwn</p>
+<li>[Black Watch 入群题]PWN-spwn</li>
+</ul>
 <blockquote>
 <p>考         点：栈迁移</p>
 <p>做题笔记：</p>
 <p>实验环境：BUU</p>
 <p>备        注：这条题目注意 puts 和 write 所需栈空间的大小与写入 bss 的位置关系</p>
 </blockquote>
-</li>
-<li>
-<p>ciscn_2019_es_2</p>
+<ul>
+<li>ciscn_2019_es_2</li>
+</ul>
 <blockquote>
 <p>考         点：简单栈迁移</p>
 <p>做题笔记：</p>
 <p>实验环境：BUU</p>
 <p>备        注：注意 /bin/sh 写入位置与栈生长方向</p>
 </blockquote>
-</li>
+<h2 id="_4">格式化字符串</h2>
+<ul>
+<li>jarvisoj_fm</li>
 </ul>
+<blockquote>
+<p>考         点：格式化字符串、任意地址小数字覆盖</p>
+<p>做题笔记：</p>
+<p>实验环境：BUU</p>
+<p>备        注：可以思考一下如果要求覆盖的是 1 怎么构造</p>
+</blockquote>
+<ul>
+<li>[BJDCTF 2nd]r2t4</li>
+</ul>
+<blockquote>
+<p>考         点：格式化字符串、__stack_chk_fail</p>
+<p>做题笔记：</p>
+<p>实验环境：BUU</p>
+<p>备        注：与正常绕过 canary 不同的是，故意触发报错；留有后门，难度低于 redpwn2020 dead-canary</p>
+</blockquote>
+<ul>
+<li>redpwn2020 dead-canary</li>
+</ul>
+<blockquote>
+<p>考         点：格式化字符串、__stack_chk_fail </p>
+<p>做题笔记：<a href="https://blog.csdn.net/weixin_43921239/article/details/106951800">redpwnCTF 2020 pwn部分writeup</a></p>
+<p>实验环境：<a href="https://github.com/skyedai910/CTF_Warehouse/tree/master/2020_redpwnCTF/pwn/dead-canary">github</a></p>
+<p>备        注：与[BJDCTF 2nd]r2t4一样主动触发 canary ，没有留后门，需要自己构建 ROP 链（如果用onegadget不需要 ROP）</p>
+</blockquote>
                 
               
               
