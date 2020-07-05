@@ -336,21 +336,75 @@
           
           
 
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-3" type="checkbox" id="nav-2-3">
+    
+    <label class="md-nav__link" for="nav-2-3">
+      Glibc堆相关
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Glibc堆相关" data-md-level="2">
+      <label class="md-nav__title" for="nav-2-3">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Glibc堆相关
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/Introduction_heap/" title="堆介绍" class="md-nav__link">
+      堆介绍
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/heap_structure/" title="堆相关数据结构" class="md-nav__link">
+      堆相关数据结构
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
   
 
 
   <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-3" type="checkbox" id="nav-2-3" checked>
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-4" type="checkbox" id="nav-2-4" checked>
     
-    <label class="md-nav__link" for="nav-2-3">
+    <label class="md-nav__link" for="nav-2-4">
       链接器
       <span class="md-nav__icon md-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
       </span>
     </label>
     <nav class="md-nav" aria-label="链接器" data-md-level="2">
-      <label class="md-nav__title" for="nav-2-3">
+      <label class="md-nav__title" for="nav-2-4">
         <span class="md-nav__icon md-icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
         </span>
@@ -944,6 +998,7 @@ PIE:      No PIE (0x8048000)
 <p>之前遇到 get_started_3dsctf_2016 的时候情况与这条题目看上去类似，用的是 mprotect  给内存添加执行权限，然后写入 shellcode 。实际操作一下这条题目，bss 、 got.plt 两个段修改不成功，最后看大佬 wp 知道用 系统调用号 。之前也做过一条题目也是用系统调用号，可以套用那个思路。</p>
 <blockquote>
 <p>什么是系统调用？<a href="https://zh.wikipedia.org/wiki/系统调用">维基百科</a></p>
+<p>系统调用号有哪些？<a href="https://blog.csdn.net/xiaominthere/article/details/17287965">Linux系统调用 int 80h int 0x80</a></p>
 </blockquote>
 <p>就是我们最后执行这条命令：<code>int80(11,"/bin/sh",null,null)</code>。系统调用参数是读取寄存器中的（对这不是32位系统的栈传参）。</p>
 <p>四个参数对应寄存器是：eax、ebx、ecx、edx</p>
@@ -1002,7 +1057,7 @@ p.interactive()
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
-          <a href="../../fmtstr/fmtstr_example/" title="格式化字符串漏洞例子" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../../glibc-heap/heap_structure/" title="堆相关数据结构" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-footer-nav__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
             </div>
@@ -1011,7 +1066,7 @@ p.interactive()
                 <span class="md-footer-nav__direction">
                   上一页
                 </span>
-                格式化字符串漏洞例子
+                堆相关数据结构
               </div>
             </div>
           </a>

@@ -341,6 +341,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    骚东西
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -412,13 +419,67 @@
       <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-3" type="checkbox" id="nav-2-3">
     
     <label class="md-nav__link" for="nav-2-3">
+      Glibc堆相关
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Glibc堆相关" data-md-level="2">
+      <label class="md-nav__title" for="nav-2-3">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Glibc堆相关
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/Introduction_heap/" title="堆介绍" class="md-nav__link">
+      堆介绍
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/heap_structure/" title="堆相关数据结构" class="md-nav__link">
+      堆相关数据结构
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-4" type="checkbox" id="nav-2-4">
+    
+    <label class="md-nav__link" for="nav-2-4">
       链接器
       <span class="md-nav__icon md-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
       </span>
     </label>
     <nav class="md-nav" aria-label="链接器" data-md-level="2">
-      <label class="md-nav__title" for="nav-2-3">
+      <label class="md-nav__title" for="nav-2-4">
         <span class="md-nav__icon md-icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
         </span>
@@ -509,6 +570,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    骚东西
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -564,6 +632,9 @@
 <li>
 <p>jarvisoj_test_your_memory</p>
 </li>
+<li>
+<p>PicoCTF_2018_rop_chain</p>
+</li>
 </ul>
 <blockquote>
 <p>考         点：简单ROP</p>
@@ -579,10 +650,23 @@
 <p>实验环境：BUU</p>
 </blockquote>
 <ul>
-<li>铁人三项(第五赛区)_2018_rop</li>
+<li>
+<p>铁人三项(第五赛区)_2018_rop</p>
+</li>
+<li>
+<p>jarvisoj_level1</p>
+</li>
 </ul>
 <blockquote>
 <p>考         点：简单ROP、write</p>
+<p>做题笔记：</p>
+<p>实验环境：BUU</p>
+</blockquote>
+<ul>
+<li>bjdctf_2020_babyrop2</li>
+</ul>
+<blockquote>
+<p>考         点：ret2libc、格式化字符串绕过canary</p>
 <p>做题笔记：</p>
 <p>实验环境：BUU</p>
 </blockquote>
@@ -595,6 +679,15 @@
 <p>实验环境：BUU</p>
 </blockquote>
 <h2 id="_3">栈迁移</h2>
+<ul>
+<li>gyctf_2020_borrowstack</li>
+</ul>
+<blockquote>
+<p>考         点：栈迁移、onegedget</p>
+<p>做题笔记：https://www.mrskye.cn/archives/14/</p>
+<p>实验环境：BUU</p>
+<p>备        注：测试不能使用system('/bin/sh')，空间不足，详细看wp</p>
+</blockquote>
 <ul>
 <li>[Black Watch 入群题]PWN-spwn</li>
 </ul>
@@ -662,6 +755,32 @@
 <ul>
 <li>2017 湖湘杯 pwn300</li>
 </ul>
+<h2 id="_6">骚东西</h2>
+<ul>
+<li>pwnable_orw</li>
+</ul>
+<blockquote>
+<p>考         点：seccomp沙箱、shellcode</p>
+<p>做题笔记：</p>
+<p>实验环境：BUU</p>
+</blockquote>
+<ul>
+<li>bjdctf_2020_router</li>
+</ul>
+<blockquote>
+<p>考         点：linux 多指令执行</p>
+<p>做题笔记：</p>
+<p>实验环境：BUU</p>
+</blockquote>
+<ul>
+<li>jarvisoj_level1</li>
+</ul>
+<blockquote>
+<p>考         点：linux 多指令执行</p>
+<p>做题笔记：</p>
+<p>实验环境：BUU</p>
+<p>备        注：本地可只写shellcode、远程需要ret2libc</p>
+</blockquote>
                 
               
               
