@@ -288,13 +288,55 @@
       <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-2" type="checkbox" id="nav-2-2">
     
     <label class="md-nav__link" for="nav-2-2">
+      栈溢出
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="栈溢出" data-md-level="2">
+      <label class="md-nav__title" for="nav-2-2">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        栈溢出
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/hijack_fini_array_ROP/" title="劫持fini_array" class="md-nav__link">
+      劫持fini_array
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-3" type="checkbox" id="nav-2-3">
+    
+    <label class="md-nav__link" for="nav-2-3">
       格式化字符串
       <span class="md-nav__icon md-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
       </span>
     </label>
     <nav class="md-nav" aria-label="格式化字符串" data-md-level="2">
-      <label class="md-nav__title" for="nav-2-2">
+      <label class="md-nav__title" for="nav-2-3">
         <span class="md-nav__icon md-icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
         </span>
@@ -327,6 +369,18 @@
   </li>
 
         
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../fmtstr/Bilnd_Pwn/" title="格式化字符串盲打" class="md-nav__link">
+      格式化字符串盲打
+    </a>
+  </li>
+
+        
       </ul>
     </nav>
   </li>
@@ -341,16 +395,16 @@
 
   <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-3" type="checkbox" id="nav-2-3" checked>
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-4" type="checkbox" id="nav-2-4" checked>
     
-    <label class="md-nav__link" for="nav-2-3">
+    <label class="md-nav__link" for="nav-2-4">
       Glibc堆相关
       <span class="md-nav__icon md-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
       </span>
     </label>
     <nav class="md-nav" aria-label="Glibc堆相关" data-md-level="2">
-      <label class="md-nav__title" for="nav-2-3">
+      <label class="md-nav__title" for="nav-2-4">
         <span class="md-nav__icon md-icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
         </span>
@@ -661,16 +715,16 @@
 
   <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-4" type="checkbox" id="nav-2-4">
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-5" type="checkbox" id="nav-2-5">
     
-    <label class="md-nav__link" for="nav-2-4">
+    <label class="md-nav__link" for="nav-2-5">
       链接器
       <span class="md-nav__icon md-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
       </span>
     </label>
     <nav class="md-nav" aria-label="链接器" data-md-level="2">
-      <label class="md-nav__title" for="nav-2-4">
+      <label class="md-nav__title" for="nav-2-5">
         <span class="md-nav__icon md-icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
         </span>
@@ -1631,48 +1685,52 @@ typedef struct malloc_chunk *mfastbinptr;
 <li><code>malloc_state</code> 的初始化操作由函数 <code>malloc_init_state(av)</code> 完成，该函数先初始化除 <em>fast bin</em> 之外的所有的 <em>bin</em> (构建双链表，详情见后文<code>small bins</code>介绍)，再初始化 <em>fast bins</em>。</li>
 <li>当再次执行 <code>malloc</code> 函数的时候，此时 <em>fast bin</em> 相关数据不为空了，就开始使用 <em>fast bin</em>，这部分代码如下：</li>
 </ul>
-<p>```c
-static void *
+</blockquote>
+<pre><code class="c">static void *
 _int_malloc (mstate av, size_t bytes)
 {
   // …
-  /<em>
+  /*
      If the size qualifies as a fastbin, first check corresponding bin.
      This code is safe to execute even if av is not yet initialized, so we
      can try it without checking, which saves some time on this fast path.
-   </em>/</p>
-<p>//第一次执行malloc(fast chunk)时这里判断为false，因为此时get_max_fast ()为0</p>
-<p>if ((unsigned long) (nb) &lt;= (unsigned long) (get_max_fast ()))
+   */
+
+   //第一次执行malloc(fast chunk)时这里判断为false，因为此时get_max_fast ()为0
+
+   if ((unsigned long) (nb) &lt;= (unsigned long) (get_max_fast ()))
     {
       // use fast bin
-      idx = fastbin_index (nb);   <br />
-      mfastbinptr <em>fb = &amp;fastbin (av, idx);
-      mchunkptr pp = </em>fb;
+      idx = fastbin_index (nb);     
+      mfastbinptr *fb = &amp;fastbin (av, idx);
+      mchunkptr pp = *fb;
       do
         {
           victim = pp;
           if (victim == NULL)
             break;
-        }</p>
-<pre><code>  // remove chunk from fast bin    
-  while ((pp = catomic_compare_and_exchange_val_acq (fb, victim-&gt;fd, victim))!= victim);
-  if (victim != 0)
-    {
-      if (__builtin_expect (fastbin_index (chunksize (victim)) != idx, 0))
-        {
-          errstr = "malloc(): memory corruption (fast)";
-        errout:
-          malloc_printerr (check_action, errstr, chunk2mem (victim));
-          return NULL;
         }
-      check_remalloced_chunk (av, victim, nb);
-      void *p = chunk2mem (victim);
-      alloc_perturb (p, bytes);
-      return p;
+
+      // remove chunk from fast bin    
+      while ((pp = catomic_compare_and_exchange_val_acq (fb, victim-&gt;fd, victim))!= victim);
+      if (victim != 0)
+        {
+          if (__builtin_expect (fastbin_index (chunksize (victim)) != idx, 0))
+            {
+              errstr = &quot;malloc(): memory corruption (fast)&quot;;
+            errout:
+              malloc_printerr (check_action, errstr, chunk2mem (victim));
+              return NULL;
+            }
+          check_remalloced_chunk (av, victim, nb);
+          void *p = chunk2mem (victim);
+          alloc_perturb (p, bytes);
+          return p;
+        }
     }
-}
 </code></pre>
-<p>```</p>
+
+<blockquote>
 <p>得到第一个来自于 <em>fast bin</em> 的 <em>chunk</em> 之后，系统就将该 <em>chunk</em> 从对应的 <em>fast bin</em> 中移除，并将其地址返回给用户。</p>
 </blockquote>
 <p><strong>fastbin 的索引</strong></p>

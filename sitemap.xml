@@ -1,31 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url>
      <loc>https://wiki.mrskye.cn/</loc>
-     <lastmod>2020-07-05</lastmod>
+     <lastmod>2020-07-07</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://wiki.mrskye.cn/KnowExam/Know%26Exam/</loc>
-     <lastmod>2020-07-05</lastmod>
+     <lastmod>2020-07-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
+     <loc>https://wiki.mrskye.cn/stackoverflow/hijack_fini_array_ROP/</loc>
+     <lastmod>2020-07-07</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://wiki.mrskye.cn/fmtstr/fmtstr_exploit/</loc>
-     <lastmod>2020-07-05</lastmod>
+     <lastmod>2020-07-07</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://wiki.mrskye.cn/fmtstr/fmtstr_example/</loc>
-     <lastmod>2020-07-05</lastmod>
+     <lastmod>2020-07-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
+     <loc>https://wiki.mrskye.cn/fmtstr/Bilnd_Pwn/</loc>
+     <lastmod>2020-07-07</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://wiki.mrskye.cn/glibc-heap/Introduction_heap/</loc>
-     <lastmod>2020-07-05</lastmod>
+     <lastmod>2020-07-07</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://wiki.mrskye.cn/glibc-heap/heap_structure/</loc>
-     <lastmod>2020-07-05</lastmod>
+     <lastmod>2020-07-07</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://wiki.mrskye.cn/linker/statically_linked/</loc>
-     <lastmod>2020-07-05</lastmod>
+     <lastmod>2020-07-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
 </urlset>

