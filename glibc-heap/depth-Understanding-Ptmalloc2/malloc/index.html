@@ -11,7 +11,7 @@
         <meta name="description" content="SkYe's Wiki">
       
       
-        <link rel="canonical" href="https://wiki.mrskye.cn/glibc-heap/depth%20Understanding%20Ptmalloc2/malloc/">
+        <link rel="canonical" href="https://wiki.mrskye.cn/glibc-heap/depth-Understanding-Ptmalloc2/malloc/">
       
       
         <meta name="author" content="SkYe">
@@ -21,7 +21,7 @@
     
     
       
-        <title>申请内存块 - SkYe's Wiki</title>
+        <title>内存块申请操作 - SkYe's Wiki</title>
       
     
     
@@ -98,7 +98,7 @@
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-              申请内存块
+              内存块申请操作
             
           </span>
         </div>
@@ -160,14 +160,16 @@
         
           
 
-<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  
+
+<nav class="md-tabs md-tabs--active" aria-label="Tabs" data-md-component="tabs">
   <div class="md-tabs__inner md-grid">
     <ul class="md-tabs__list">
       
         
   <li class="md-tabs__item">
     
-      <a href="../../.." class="md-tabs__link md-tabs__link--active">
+      <a href="../../.." class="md-tabs__link">
         Home
       </a>
     
@@ -179,7 +181,7 @@
   
     <li class="md-tabs__item">
       
-        <a href="../../../KnowExam/Know%26Exam/" class="md-tabs__link">
+        <a href="../../../KnowExam/Know%26Exam/" class="md-tabs__link md-tabs__link--active">
           Pwn
         </a>
       
@@ -241,10 +243,12 @@
       
       
 
+  
 
-  <li class="md-nav__item md-nav__item--nested">
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2" checked>
     
     <label class="md-nav__link" for="nav-2">
       Pwn
@@ -386,10 +390,12 @@
           
           
 
+  
 
-  <li class="md-nav__item md-nav__item--nested">
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-4" type="checkbox" id="nav-2-4">
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-4" type="checkbox" id="nav-2-4" checked>
     
     <label class="md-nav__link" for="nav-2-4">
       Glibc堆相关
@@ -427,6 +433,590 @@
   <li class="md-nav__item">
     <a href="../../heap_structure/" title="堆相关数据结构" class="md-nav__link">
       堆相关数据结构
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-4-3" type="checkbox" id="nav-2-4-3" checked>
+    
+    <label class="md-nav__link" for="nav-2-4-3">
+      深入理解堆的实现
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="深入理解堆的实现" data-md-level="3">
+      <label class="md-nav__title" for="nav-2-4-3">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        深入理解堆的实现
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../basic/" title="堆基础操作" class="md-nav__link">
+      堆基础操作
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        内存块申请操作
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9h14V7H3v2m0 4h14v-2H3v2m0 4h14v-2H3v2m16 0h2v-2h-2v2m0-10v2h2V7h-2m0 6h2v-2h-2v2z"/></svg>
+        </span>
+      </label>
+    
+    <a href="./" title="内存块申请操作" class="md-nav__link md-nav__link--active">
+      内存块申请操作
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#__libc_malloc" class="md-nav__link">
+    __libc_malloc
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_int_malloc" class="md-nav__link">
+    _int_malloc
+  </a>
+  
+    <nav class="md-nav" aria-label="_int_malloc">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#arena" class="md-nav__link">
+    arena
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fast-bin" class="md-nav__link">
+    fast bin
+  </a>
+  
+    <nav class="md-nav" aria-label="fast bin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    小总结
+  </a>
+  
+    <nav class="md-nav" aria-label="小总结">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fast-bin-malloc" class="md-nav__link">
+    fast bin malloc 检查机制
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#small-bin" class="md-nav__link">
+    small bin
+  </a>
+  
+    <nav class="md-nav" aria-label="small bin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    小总结
+  </a>
+  
+    <nav class="md-nav" aria-label="小总结">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#small-bin-malloc" class="md-nav__link">
+    small bin malloc 检查机制
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#large-bin" class="md-nav__link">
+    large bin
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-unsorted-bin" class="md-nav__link">
+    大循环 - 遍历 unsorted bin
+  </a>
+  
+    <nav class="md-nav" aria-label="大循环 - 遍历 unsorted bin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unsorted-bin" class="md-nav__link">
+    unsorted bin 遍历
+  </a>
+  
+    <nav class="md-nav" aria-label="unsorted bin 遍历">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#small-request" class="md-nav__link">
+    SMALL REQUEST
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    初始取出
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chunk-exact-fit" class="md-nav__link">
+    取出 chunk 大小刚好合适 （EXACT FIT）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chunk-smallbin-place-chunk-in-small-bin" class="md-nav__link">
+    将取出来 chunk 放入到 smallbin （PLACE CHUNK IN SMALL BIN）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#place-chunk-in-large-bin" class="md-nav__link">
+    PLACE CHUNK IN LARGE BIN
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    最终取出
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#while" class="md-nav__link">
+    WHILE 迭代次数
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#large-chunk" class="md-nav__link">
+    large chunk
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chunk" class="md-nav__link">
+    寻找较大 chunk
+  </a>
+  
+    <nav class="md-nav" aria-label="寻找较大 chunk">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#map" class="md-nav__link">
+    找到一个合适的 MAP
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bin" class="md-nav__link">
+    找到合适的 BIN
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chunk_1" class="md-nav__link">
+    简单检查 CHUNK
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chunk_2" class="md-nav__link">
+    真正取出 CHUNK
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#top-chunk" class="md-nav__link">
+    使用 top chunk
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    堆内存不够
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_libc_calloc" class="md-nav__link">
+    _libc_calloc
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sysmalloc" class="md-nav__link">
+    sysmalloc
+  </a>
+  
+    <nav class="md-nav" aria-label="sysmalloc">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    基本定义
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mmap" class="md-nav__link">
+    考虑 mmap
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mmap_1" class="md-nav__link">
+    mmap 失败或者未分配堆
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    记录旧堆信息
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    检查旧堆信息 1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    检查旧堆信息 2
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#main_arena" class="md-nav__link">
+    非 main_arena
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#main_arena_1" class="md-nav__link">
+    Main_arena 处理
+  </a>
+  
+    <nav class="md-nav" aria-label="Main_arena 处理">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    计算内存
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    是否连续
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    对齐页大小
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    申请内存
+  </a>
+  
+    <nav class="md-nav" aria-label="申请内存">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    可能成功
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    失败
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    内存可能申请成功
+  </a>
+  
+    <nav class="md-nav" aria-label="内存可能申请成功">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1_1" class="md-nav__link">
+    情况 1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-" class="md-nav__link">
+    情况 2 - 意外内存耗尽
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    处理其他意外情况
+  </a>
+  
+    <nav class="md-nav" aria-label="处理其他意外情况">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    处理连续内存
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    处理不连续内存
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_19" class="md-nav__link">
+    调整
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_20" class="md-nav__link">
+    更新最大内存
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_21" class="md-nav__link">
+    分配内存块
+  </a>
+  
+    <nav class="md-nav" aria-label="分配内存块">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_22" class="md-nav__link">
+    获取大小
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#top" class="md-nav__link">
+    切分 TOP
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_23" class="md-nav__link">
+    捕捉所有错误
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../free/" title="内存块释放操作" class="md-nav__link">
+      内存块释放操作
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../off_by_one/" title="堆基础Off-By-One" class="md-nav__link">
+      堆基础Off-By-One
     </a>
   </li>
 
@@ -989,7 +1579,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/skyedai910/wiki.mrskye.cn/blob/master/docs/glibc-heap/depth Understanding Ptmalloc2/malloc.md" title="编辑此页" class="md-content__button md-icon">
+                  <a href="https://github.com/skyedai910/wiki.mrskye.cn/blob/master/docs/glibc-heap/depth-Understanding-Ptmalloc2/malloc.md" title="编辑此页" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
@@ -2360,7 +2950,7 @@ size_t _dl_pagesize = EXEC_PAGESIZE;
 
   <h2 id="__comments">评论</h2>
   <div id="disqus_thread"></div>
-  <script>var disqus_config=function(){this.page.url="https://wiki.mrskye.cn/glibc-heap/depth%20Understanding%20Ptmalloc2/malloc/",this.page.identifier="glibc-heap/depth%20Understanding%20Ptmalloc2/malloc/"};!function(){var e=document,i=e.createElement("script");i.src="//SkYe.disqus.com/embed.js",i.setAttribute("data-timestamp",+new Date),(e.head||e.body).appendChild(i)}()</script>
+  <script>var disqus_config=function(){this.page.url="https://wiki.mrskye.cn/glibc-heap/depth-Understanding-Ptmalloc2/malloc/",this.page.identifier="glibc-heap/depth-Understanding-Ptmalloc2/malloc/"};!function(){var e=document,i=e.createElement("script");i.src="//SkYe.disqus.com/embed.js",i.setAttribute("data-timestamp",+new Date),(e.head||e.body).appendChild(i)}()</script>
 
               
             </article>
@@ -2370,6 +2960,41 @@ size_t _dl_pagesize = EXEC_PAGESIZE;
       
         
 <footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
+        
+          <a href="../basic/" title="堆基础操作" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+            </div>
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  上一页
+                </span>
+                堆基础操作
+              </div>
+            </div>
+          </a>
+        
+        
+          <a href="../free/" title="内存块释放操作" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  下一页
+                </span>
+                内存块释放操作
+              </div>
+            </div>
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
