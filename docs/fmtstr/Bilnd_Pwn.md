@@ -1,4 +1,6 @@
-# Bilnd-格式化字符串盲打
+# 【转】Bilnd-格式化字符串盲打
+
+> 文章首发于[合天众智](https://www.mrskye.cn/go/aHR0cDovL3d3dy5oZWV0aWFuLmNvbS9pbmZvLzgyOA==)，转载到博客仅作备份
 
 ## 可能需要提前了解的知识
 
@@ -597,5 +599,6 @@ p.interactive()
 ## 参考
 
 * [ctf-wiki](https://ctf-wiki.github.io/ctf-wiki/pwn/linux/fmtstr/fmtstr_example-zh)
-* [pwn 盲打](https://www.anquanke.com/post/id/196722)
+* [leak me](https://momomoxiaoxi.com/2017/12/26/Blindfmtstr/)
+* [pwn-盲打](https://luobuming.github.io/2019/10/17/2019-10-17-pwn-盲打/#64位的利用手法)
 

@@ -9,15 +9,25 @@ google_analytics: ['UA-36723568-3', 'wiki.mrskye.cn']
 
 # context
 nav:
-  - Home: index.md
   - Pwn:
     - 知识点&题目索引: KnowExam/Know&Exam.md
+    - 栈溢出:
+      - 劫持fini_array: stackoverflow/hijack_fini_array_ROP.md
     - 格式化字符串:
       - 格式化字符串漏洞利用: fmtstr/fmtstr_exploit.md
       - 格式化字符串漏洞例子: fmtstr/fmtstr_example.md
+      - 格式化字符串盲打: fmtstr/Bilnd_Pwn.md
+    - Glibc堆相关:
+      - 堆介绍: glibc-heap/Introduction_heap.md
+      - 堆相关数据结构: glibc-heap/heap_structure.md
+      - 深入理解堆的实现: 
+        - 堆基础操作: glibc-heap/depth-Understanding-Ptmalloc2/basic.md
+        - 内存块申请操作: glibc-heap/depth-Understanding-Ptmalloc2/malloc.md
+        - 内存块释放操作: glibc-heap/depth-Understanding-Ptmalloc2/free.md
+      - 堆基础Off-By-One: glibc-heap/off_by_one.md
     - 链接器:
       - 静态链接程序利用: linker/statically_linked.md
-
+  - Home: index.md
 #file 
 docs:
     CNAME

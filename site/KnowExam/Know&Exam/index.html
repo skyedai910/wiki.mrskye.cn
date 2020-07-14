@@ -167,16 +167,6 @@
     <ul class="md-tabs__list">
       
         
-  <li class="md-tabs__item">
-    
-      <a href="../.." class="md-tabs__link">
-        Home
-      </a>
-    
-  </li>
-
-      
-        
   
   
     <li class="md-tabs__item">
@@ -187,6 +177,16 @@
       
     </li>
   
+
+      
+        
+  <li class="md-tabs__item">
+    
+      <a href="../.." class="md-tabs__link">
+        Home
+      </a>
+    
+  </li>
 
       
     </ul>
@@ -231,33 +231,21 @@
       
       
 
-
-  <li class="md-nav__item">
-    <a href="../.." title="Home" class="md-nav__link">
-      Home
-    </a>
-  </li>
-
-    
-      
-      
-      
-
   
 
 
   <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2" checked>
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1" type="checkbox" id="nav-1" checked>
     
-    <label class="md-nav__link" for="nav-2">
+    <label class="md-nav__link" for="nav-1">
       Pwn
       <span class="md-nav__icon md-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
       </span>
     </label>
     <nav class="md-nav" aria-label="Pwn" data-md-level="1">
-      <label class="md-nav__title" for="nav-2">
+      <label class="md-nav__title" for="nav-1">
         <span class="md-nav__icon md-icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
         </span>
@@ -315,7 +303,7 @@
       
         <li class="md-nav__item">
   <a href="#rop" class="md-nav__link">
-    ROP
+    ROP（栈溢出）
   </a>
   
 </li>
@@ -323,6 +311,27 @@
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     栈迁移
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    格式化字符串
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    静态编译
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    骚东西
   </a>
   
 </li>
@@ -341,16 +350,58 @@
 
   <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-2" type="checkbox" id="nav-2-2">
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-2" type="checkbox" id="nav-1-2">
     
-    <label class="md-nav__link" for="nav-2-2">
+    <label class="md-nav__link" for="nav-1-2">
+      栈溢出
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="栈溢出" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-2">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        栈溢出
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/hijack_fini_array_ROP/" title="劫持fini_array" class="md-nav__link">
+      劫持fini_array
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-3" type="checkbox" id="nav-1-3">
+    
+    <label class="md-nav__link" for="nav-1-3">
       格式化字符串
       <span class="md-nav__icon md-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
       </span>
     </label>
     <nav class="md-nav" aria-label="格式化字符串" data-md-level="2">
-      <label class="md-nav__title" for="nav-2-2">
+      <label class="md-nav__title" for="nav-1-3">
         <span class="md-nav__icon md-icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
         </span>
@@ -383,6 +434,18 @@
   </li>
 
         
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../fmtstr/Bilnd_Pwn/" title="格式化字符串盲打" class="md-nav__link">
+      格式化字符串盲打
+    </a>
+  </li>
+
+        
       </ul>
     </nav>
   </li>
@@ -395,16 +458,148 @@
 
   <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-3" type="checkbox" id="nav-2-3">
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-4" type="checkbox" id="nav-1-4">
     
-    <label class="md-nav__link" for="nav-2-3">
+    <label class="md-nav__link" for="nav-1-4">
+      Glibc堆相关
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Glibc堆相关" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-4">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Glibc堆相关
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/Introduction_heap/" title="堆介绍" class="md-nav__link">
+      堆介绍
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/heap_structure/" title="堆相关数据结构" class="md-nav__link">
+      堆相关数据结构
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-4-3" type="checkbox" id="nav-1-4-3">
+    
+    <label class="md-nav__link" for="nav-1-4-3">
+      深入理解堆的实现
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="深入理解堆的实现" data-md-level="3">
+      <label class="md-nav__title" for="nav-1-4-3">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        深入理解堆的实现
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/depth-Understanding-Ptmalloc2/basic/" title="堆基础操作" class="md-nav__link">
+      堆基础操作
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/depth-Understanding-Ptmalloc2/malloc/" title="内存块申请操作" class="md-nav__link">
+      内存块申请操作
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/depth-Understanding-Ptmalloc2/free/" title="内存块释放操作" class="md-nav__link">
+      内存块释放操作
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/off_by_one/" title="堆基础Off-By-One" class="md-nav__link">
+      堆基础Off-By-One
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-5" type="checkbox" id="nav-1-5">
+    
+    <label class="md-nav__link" for="nav-1-5">
       链接器
       <span class="md-nav__icon md-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
       </span>
     </label>
     <nav class="md-nav" aria-label="链接器" data-md-level="2">
-      <label class="md-nav__title" for="nav-2-3">
+      <label class="md-nav__title" for="nav-1-5">
         <span class="md-nav__icon md-icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
         </span>
@@ -432,6 +627,18 @@
         
       </ul>
     </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../.." title="Home" class="md-nav__link">
+      Home
+    </a>
   </li>
 
     
@@ -469,7 +676,7 @@
       
         <li class="md-nav__item">
   <a href="#rop" class="md-nav__link">
-    ROP
+    ROP（栈溢出）
   </a>
   
 </li>
@@ -477,6 +684,27 @@
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     栈迁移
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    格式化字符串
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    静态编译
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    骚东西
   </a>
   
 </li>
@@ -504,55 +732,218 @@
                 <h1 id="_1">知识点&amp;题目索引</h1>
 <h2 id="_2">整数溢出</h2>
 <ul>
-<li>
-<p>pwn2_sctf_2016</p>
+<li>bjdctf_2020_babystack2</li>
+</ul>
 <blockquote>
-<p>考点        ：整数溢出、ROP</p>
+<p>考         点：整数溢出</p>
 <p>做题笔记：</p>
 <p>实验环境：BUU</p>
 </blockquote>
-</li>
+<ul>
+<li>pwn2_sctf_2016</li>
 </ul>
-<h2 id="rop">ROP</h2>
+<blockquote>
+<p>考         点：整数溢出、ROP</p>
+<p>做题笔记：</p>
+<p>实验环境：BUU</p>
+</blockquote>
+<h2 id="rop">ROP（栈溢出）</h2>
 <ul>
 <li>
-<p>ez_pz_hackover_2016</p>
+<p>jarvisoj_level3</p>
+</li>
+<li>
+<p>jarvisoj_tell_me_something</p>
+</li>
+<li>
+<p>jarvisoj_level4</p>
+</li>
+<li>
+<p>bjdctf_2020_babyrop</p>
+</li>
+<li>
+<p>jarvisoj_test_your_memory</p>
+</li>
+<li>
+<p>PicoCTF_2018_rop_chain</p>
+</li>
+</ul>
+<blockquote>
+<p>考         点：简单ROP</p>
+<p>做题笔记：</p>
+<p>实验环境：BUU</p>
+</blockquote>
+<ul>
+<li>ez_pz_hackover_2016</li>
+</ul>
 <blockquote>
 <p>考         点：简单ROP、strcmp</p>
 <p>做题笔记：</p>
 <p>实验环境：BUU</p>
 </blockquote>
-</li>
+<ul>
 <li>
 <p>铁人三项(第五赛区)_2018_rop</p>
+</li>
+<li>
+<p>jarvisoj_level1</p>
+</li>
+</ul>
 <blockquote>
 <p>考         点：简单ROP、write</p>
 <p>做题笔记：</p>
 <p>实验环境：BUU</p>
 </blockquote>
-</li>
+<ul>
+<li>bjdctf_2020_babyrop2</li>
 </ul>
-<h2 id="_3">栈迁移</h2>
+<blockquote>
+<p>考         点：ret2libc、格式化字符串绕过canary</p>
+<p>做题笔记：</p>
+<p>实验环境：BUU</p>
+</blockquote>
+<ul>
+<li>jarvisoj_level3_x64</li>
+</ul>
+<blockquote>
+<p>考         点：ret2csu、write</p>
+<p>做题笔记：</p>
+<p>实验环境：BUU</p>
+</blockquote>
 <ul>
 <li>
-<p>[Black Watch 入群题]PWN-spwn</p>
+<p>pwnable.tw-3x17</p>
+</li>
+<li>
+<p>DASCTF五月赛-Memory Monster II</p>
+</li>
+</ul>
+<blockquote>
+<p>考         点：64位劫持 fini_array进行ROP</p>
+<p>做题笔记：</p>
+<p>实验环境：pwnable.tw、github</p>
+</blockquote>
+<h2 id="_3">栈迁移</h2>
+<ul>
+<li>gyctf_2020_borrowstack</li>
+</ul>
+<blockquote>
+<p>考         点：栈迁移、onegedget</p>
+<p>做题笔记：https://www.mrskye.cn/archives/14/</p>
+<p>实验环境：BUU</p>
+<p>备        注：测试不能使用system('/bin/sh')，空间不足，详细看wp</p>
+</blockquote>
+<ul>
+<li>[Black Watch 入群题]PWN-spwn</li>
+</ul>
 <blockquote>
 <p>考         点：栈迁移</p>
 <p>做题笔记：</p>
 <p>实验环境：BUU</p>
 <p>备        注：这条题目注意 puts 和 write 所需栈空间的大小与写入 bss 的位置关系</p>
 </blockquote>
-</li>
-<li>
-<p>ciscn_2019_es_2</p>
+<ul>
+<li>ciscn_2019_es_2</li>
+</ul>
 <blockquote>
 <p>考         点：简单栈迁移</p>
 <p>做题笔记：</p>
 <p>实验环境：BUU</p>
 <p>备        注：注意 /bin/sh 写入位置与栈生长方向</p>
 </blockquote>
-</li>
+<h2 id="_4">格式化字符串</h2>
+<ul>
+<li>jarvisoj_fm</li>
 </ul>
+<blockquote>
+<p>考         点：格式化字符串、任意地址小数字覆盖</p>
+<p>做题笔记：</p>
+<p>实验环境：BUU</p>
+<p>备        注：可以思考一下如果要求覆盖的是 1 怎么构造</p>
+</blockquote>
+<ul>
+<li>[RACTF]Finches in a Stack</li>
+</ul>
+<blockquote>
+<p>考         点：格式化字符串、绕过 canary </p>
+<p>做题笔记：https://www.mrskye.cn/archives/138/#FinchesinaStack</p>
+<p>实验环境：</p>
+<p>备        注：原题为 Ubuntu18，有后门</p>
+</blockquote>
+<ul>
+<li>[RACTF]Finches in a Pie</li>
+</ul>
+<blockquote>
+<p>考         点：格式化字符串、绕过 canary 、PIE</p>
+<p>做题笔记：https://www.mrskye.cn/archives/138/#FinchesinaStack</p>
+<p>实验环境：</p>
+<p>备        注：原题为 Ubuntu18，有后门</p>
+</blockquote>
+<ul>
+<li>[BJDCTF 2nd]r2t4</li>
+</ul>
+<blockquote>
+<p>考         点：格式化字符串、__stack_chk_fail</p>
+<p>做题笔记：</p>
+<p>实验环境：BUU</p>
+<p>备        注：与正常绕过 canary 不同的是，故意触发报错；留有后门，难度低于 redpwn2020 dead-canary</p>
+</blockquote>
+<ul>
+<li>redpwn2020 dead-canary</li>
+</ul>
+<blockquote>
+<p>考         点：格式化字符串、__stack_chk_fail </p>
+<p>做题笔记：<a href="https://blog.csdn.net/weixin_43921239/article/details/106951800">redpwnCTF 2020 pwn部分writeup</a></p>
+<p>实验环境：<a href="https://github.com/skyedai910/CTF_Warehouse/tree/master/2020_redpwnCTF/pwn/dead-canary">github</a></p>
+<p>备        注：与[BJDCTF 2nd]r2t4一样主动触发 canary ，没有留后门，需要自己构建 ROP 链（如果用onegadget不需要 ROP）</p>
+</blockquote>
+<h2 id="_5">静态编译</h2>
+<ul>
+<li>cmcc_simplerop</li>
+</ul>
+<blockquote>
+<p>考         点：系统调用号、简单栈溢出</p>
+<p>做题笔记：</p>
+<p>实验环境：BUU</p>
+</blockquote>
+<ul>
+<li>get_started_3dsctf_2016</li>
+</ul>
+<blockquote>
+<p>考         点：mprotect改内存权限、简单栈溢出</p>
+<p>做题笔记：</p>
+<p>实验环境：BUU</p>
+<p>备        注：本地可只用栈溢出、远程需要配合mprotect</p>
+</blockquote>
+<ul>
+<li>2017 湖湘杯 pwn300</li>
+</ul>
+<h2 id="_6">骚东西</h2>
+<ul>
+<li>pwnable_orw</li>
+</ul>
+<blockquote>
+<p>考         点：seccomp沙箱、shellcode</p>
+<p>做题笔记：</p>
+<p>实验环境：BUU</p>
+</blockquote>
+<ul>
+<li>bjdctf_2020_router</li>
+</ul>
+<blockquote>
+<p>考         点：linux 多指令执行</p>
+<p>做题笔记：</p>
+<p>实验环境：BUU</p>
+</blockquote>
+<ul>
+<li>jarvisoj_level1</li>
+</ul>
+<blockquote>
+<p>考         点：linux 多指令执行</p>
+<p>做题笔记：</p>
+<p>实验环境：BUU</p>
+<p>备        注：本地可只写shellcode、远程需要ret2libc</p>
+</blockquote>
                 
               
               
@@ -575,28 +966,14 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
-          <a href="../.." title="Home" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
-            <div class="md-footer-nav__button md-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-            </div>
-            <div class="md-footer-nav__title">
-              <div class="md-ellipsis">
-                <span class="md-footer-nav__direction">
-                  上一页
-                </span>
-                Home
-              </div>
-            </div>
-          </a>
         
-        
-          <a href="../../fmtstr/fmtstr_exploit/" title="格式化字符串漏洞利用" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../../stackoverflow/hijack_fini_array_ROP/" title="劫持fini_array" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
                   下一页
                 </span>
-                格式化字符串漏洞利用
+                劫持fini_array
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">
