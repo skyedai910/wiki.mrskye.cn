@@ -11,7 +11,7 @@
         <meta name="description" content="SkYe's Wiki">
       
       
-        <link rel="canonical" href="https://wiki.mrskye.cn/glibc-heap/depth%20Understanding%20Ptmalloc2/basic/">
+        <link rel="canonical" href="https://wiki.mrskye.cn/glibc-heap/depth%20Understanding%20Ptmalloc2/free/">
       
       
         <meta name="author" content="SkYe">
@@ -21,7 +21,7 @@
     
     
       
-        <title>基础操作 - SkYe's Wiki</title>
+        <title>释放内存块 - SkYe's Wiki</title>
       
     
     
@@ -98,7 +98,7 @@
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-              基础操作
+              释放内存块
             
           </span>
         </div>
@@ -509,15 +509,118 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#unlink" class="md-nav__link">
-    unlink
+  <a href="#__libc_free" class="md-nav__link">
+    __libc_free
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#malloc_printerr" class="md-nav__link">
-    malloc_printerr
+  <a href="#_int_free" class="md-nav__link">
+    _int_free
+  </a>
+  
+    <nav class="md-nav" aria-label="_int_free">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    简单的检查
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fast-bin" class="md-nav__link">
+    fast bin
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mmap-chunk" class="md-nav__link">
+    合并非 mmap 的空闲 chunk
+  </a>
+  
+    <nav class="md-nav" aria-label="合并非 mmap 的空闲 chunk">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    轻量级的检测
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    释放填充
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-chunk" class="md-nav__link">
+    后向合并 - 合并低地址 chunk
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#top-chunk-chunk" class="md-nav__link">
+    下一块不是 top chunk - 前向合并 - 合并高地址 chunk
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#top-chunk-top-chunk" class="md-nav__link">
+    下一块是 top chunk - 合并到 top chunk
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    向系统返还内存
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mmap-chunk_1" class="md-nav__link">
+    释放 mmap 的 chunk
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#systrim" class="md-nav__link">
+    systrim
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#heap_trim" class="md-nav__link">
+    heap_trim
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#munmap_chunk" class="md-nav__link">
+    munmap_chunk
   </a>
   
 </li>
@@ -534,7 +637,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/skyedai910/wiki.mrskye.cn/blob/master/docs/glibc-heap/depth Understanding Ptmalloc2/basic.md" title="编辑此页" class="md-content__button md-icon">
+                  <a href="https://github.com/skyedai910/wiki.mrskye.cn/blob/master/docs/glibc-heap/depth Understanding Ptmalloc2/free.md" title="编辑此页" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
@@ -542,165 +645,379 @@
                   
                 
                 
-                <h1 id="_1">基础操作</h1>
+                <h1 id="_1">释放内存块</h1>
 <blockquote>
+<p>Free Heap Memory</p>
 <p>绝大部分内容来自 CTF-WIKI ，内容引用用于学习记录</p>
 </blockquote>
-<h2 id="unlink">unlink</h2>
-<p>unlink 用来将一个双向链表（只存储空闲的 chunk）中的一个元素取出来，可能在以下地方使用</p>
-<ul>
-<li>
-<p>malloc</p>
-</li>
-<li>
-<p>从恰好大小合适的 large bin 中获取 chunk。</p>
-<ul>
-<li><strong>这里需要注意的是 fastbin 与 small bin 就没有使用 unlink[^1]，这就是为什么漏洞会经常出现在它们这里的原因。</strong></li>
-</ul>
-<p>[^1]:smallbin malloc 没有 unlink free 时会有，详细看图对比 largebin 和 smallbin，图片太大，放图片链接：<a href="https://cdn.jsdelivr.net/gh/skyedai910/Picbed/img/heap.png">head</a></p>
-<ul>
-<li>依次<strong>遍历处理</strong> unsorted bin 时也没有使用 unlink 。</li>
-</ul>
-</li>
-<li>
-<p>从比请求的 chunk 所在的 bin 大的 bin 中取 chunk。</p>
-</li>
-<li>
-<p>free</p>
-</li>
-<li>
-<p>后向合并，合并物理相邻低地址空闲 chunk。</p>
-</li>
-<li>
-<p>前向合并，合并物理相邻高地址空闲 chunk（除了 top chunk）。</p>
-</li>
-<li>
-<p>malloc_consolidate</p>
-</li>
-<li>
-<p>后向合并，合并物理相邻低地址空闲 chunk。</p>
-</li>
-<li>
-<p>前向合并，合并物理相邻高地址空闲 chunk（除了 top chunk）。</p>
-</li>
-<li>
-<p>realloc</p>
-</li>
-<li>
-<p>前向扩展，合并物理相邻高地址空闲 chunk（除了 top chunk）。</p>
-</li>
-</ul>
-<p>由于 unlink 使用非常频繁，所以 unlink 被实现为了一个宏，如下</p>
-<pre><code class="c">/* Take a chunk off a bin list */
-// unlink p
-#define unlink(AV, P, BK, FD) {                                            \
-    // 由于 P 已经在双向链表中，所以有两个地方记录其大小，所以检查一下其大小是否一致。
-    if (__builtin_expect (chunksize(P) != prev_size (next_chunk(P)), 0))      \
-      malloc_printerr (&quot;corrupted size vs. prev_size&quot;);               \
-    FD = P-&gt;fd;                                                                      \
-    BK = P-&gt;bk;                                                                      \
-    // 防止攻击者简单篡改空闲的 chunk 的 fd 与 bk 来实现任意写的效果。
-    if (__builtin_expect (FD-&gt;bk != P || BK-&gt;fd != P, 0))                      \
-      malloc_printerr (check_action, &quot;corrupted double-linked list&quot;, P, AV);  \
-    else {                                                                      \
-        FD-&gt;bk = BK;                                                              \
-        BK-&gt;fd = FD;                                                              \
-        // 下面主要考虑 P 对应的 nextsize 双向链表的修改
-        if (!in_smallbin_range (chunksize_nomask (P))                              \
-            // 如果P-&gt;fd_nextsize为 NULL，表明 P 未插入到 nextsize 链表中。
-            // 那么其实也就没有必要对 nextsize 字段进行修改了。
-            // 这里没有去判断 bk_nextsize 字段，可能会出问题。
-            &amp;&amp; __builtin_expect (P-&gt;fd_nextsize != NULL, 0)) {                      \
-            // 类似于小的 chunk 的检查思路
-            if (__builtin_expect (P-&gt;fd_nextsize-&gt;bk_nextsize != P, 0)              \
-                || __builtin_expect (P-&gt;bk_nextsize-&gt;fd_nextsize != P, 0))    \
-              malloc_printerr (check_action,                                      \
-                               &quot;corrupted double-linked list (not small)&quot;,    \
-                               P, AV);                                              \
-            // 这里说明 P 已经在 nextsize 链表中了。
-            // 如果 FD 没有在 nextsize 链表中
-            if (FD-&gt;fd_nextsize == NULL) {                                      \
-                // 如果 nextsize 串起来的双链表只有 P 本身，那就直接拿走 P
-                // 令 FD 为 nextsize 串起来的
-                if (P-&gt;fd_nextsize == P)                                      \
-                  FD-&gt;fd_nextsize = FD-&gt;bk_nextsize = FD;                      \
-                else {                                                              \
-                // 否则我们需要将 FD 插入到 nextsize 形成的双链表中
-                    FD-&gt;fd_nextsize = P-&gt;fd_nextsize;                              \
-                    FD-&gt;bk_nextsize = P-&gt;bk_nextsize;                              \
-                    P-&gt;fd_nextsize-&gt;bk_nextsize = FD;                              \
-                    P-&gt;bk_nextsize-&gt;fd_nextsize = FD;                              \
-                  }                                                              \
-              } else {                                                              \
-                // 如果在的话，直接拿走即可
-                P-&gt;fd_nextsize-&gt;bk_nextsize = P-&gt;bk_nextsize;                      \
-                P-&gt;bk_nextsize-&gt;fd_nextsize = P-&gt;fd_nextsize;                      \
-              }                                                                      \
-          }                                                                      \
-      }                                                                              \
-}
-</code></pre>
-
-<p>这里我们以 small bin 的 unlink 为例子介绍一下。对于 large bin 的 unlink，与其类似，只是多了一个 nextsize 的处理。</p>
-<p><img alt="img" src="https://ctf-wiki.github.io/ctf-wiki/pwn/linux/glibc-heap/implementation/figure/unlink_smallbin_intro.png" /></p>
-<p>可以看出， <strong>P 最后的 fd 和 bk 指针并没有发生变化</strong>，但是当我们去遍历整个双向链表时，已经遍历不到对应的链表了。这一点没有变化还是很有用处的，因为我们有时候可以使用这个方法来泄漏地址</p>
-<ul>
-<li>libc 地址</li>
-<li>P 位于双向链表头部，bk 泄漏</li>
-<li>P 位于双向链表尾部，fd 泄漏</li>
-<li>双向链表只包含一个空闲 chunk 时，P 位于双向链表中，fd 和 bk 均可以泄漏</li>
-<li>泄漏堆地址，双向链表包含多个空闲 chunk</li>
-<li>P 位于双向链表头部，fd 泄漏</li>
-<li>P 位于双向链表中，fd 和 bk 均可以泄漏</li>
-<li>P 位于双向链表尾部，bk 泄漏</li>
-</ul>
-<p><strong>注意</strong></p>
-<ul>
-<li>这里的头部指的是 bin 的 fd 指向的 chunk，即双向链表中最新加入的 chunk。</li>
-<li>这里的尾部指的是 bin 的 bk 指向的 chunk，即双向链表中最先加入的 chunk。</li>
-</ul>
-<p>同时，无论是对于 fd，bk 还是 fd_nextsize ，bk_nextsize，程序都会检测 fd 和 bk 是否满足对应的要求。</p>
-<pre><code class="c">// fd bk
-if (__builtin_expect (FD-&gt;bk != P || BK-&gt;fd != P, 0))                      \
-  malloc_printerr (check_action, &quot;corrupted double-linked list&quot;, P, AV);  \
-
-  // next_size related
-              if (__builtin_expect (P-&gt;fd_nextsize-&gt;bk_nextsize != P, 0)              \
-                || __builtin_expect (P-&gt;bk_nextsize-&gt;fd_nextsize != P, 0))    \
-              malloc_printerr (check_action,                                      \
-                               &quot;corrupted double-linked list (not small)&quot;,    \
-                               P, AV);
-</code></pre>
-
-<p>看起来似乎很正常。我们以 fd 和 bk 为例，P 的 forward chunk 的 bk 很自然是 P ，同样 P 的 backward chunk 的 fd 也很自然是 P 。如果没有做相应的检查的话，我们可以修改 P 的 fd 与 bk，从而可以很容易地达到任意地址写的效果。关于更加详细的例子，可以参见利用部分的 unlink 。</p>
-<p><strong>注意：堆的第一个 chunk 所记录的 prev_inuse 位默认为 1。</strong></p>
-<h2 id="malloc_printerr">malloc_printerr</h2>
-<p>在 glibc malloc 时检测到错误的时候，会调用 <code>malloc_printerr</code> 函数。</p>
-<pre><code class="c">static void malloc_printerr(const char *str) {
-  __libc_message(do_abort, &quot;%s\n&quot;, str);
-  __builtin_unreachable();
-}
-</code></pre>
-
-<p>主要会调用 <code>__libc_message</code> 来执行<code>abort</code> 函数，如下</p>
-<pre><code class="c++">  if ((action &amp; do_abort)) {
-    if ((action &amp; do_backtrace))
-      BEFORE_ABORT(do_abort, written, fd);
-
-    /* Kill the application.  */
-    abort();
-  }
-</code></pre>
-
-<p>在<code>abort</code> 函数里，在 glibc 还是 2.23 版本时，会 fflush stream。</p>
-<pre><code class="c">  /* Flush all streams.  We cannot close them now because the user
-     might have registered a handler for SIGABRT.  */
-  if (stage == 1)
+<h2 id="__libc_free">__libc_free</h2>
+<p>类似于 malloc，free 函数也有一层封装，命名格式与 malloc 基本类似。代码如下</p>
+<pre><code class="c">void __libc_free(void *mem) {
+    mstate    ar_ptr;
+    mchunkptr p; /* chunk corresponding to mem */
+    // 判断是否有钩子函数 __free_hook
+    void (*hook)(void *, const void *) = atomic_forced_read(__free_hook);
+    if (__builtin_expect(hook != NULL, 0)) {
+        //执行hook函数然后返回
+        (*hook)(mem, RETURN_ADDRESS(0));
+        return;
+    }
+    // free NULL没有作用
+    if (mem == 0) /* free(0) has no effect */
+        return;
+    // 将mem转换为chunk状态
+    p = mem2chunk(mem);
+    // 如果该块内存是mmap得到的
+    if (chunk_is_mmapped(p)) /* release mmapped memory. */
     {
-      ++stage;
-      fflush (NULL);
+        /* See if the dynamic brk/mmap threshold needs adjusting.
+       Dumped fake mmapped chunks do not affect the threshold.  */
+        if (!mp_.no_dyn_threshold &amp;&amp; chunksize_nomask(p) &gt; mp_.mmap_threshold &amp;&amp;
+            chunksize_nomask(p) &lt;= DEFAULT_MMAP_THRESHOLD_MAX &amp;&amp;
+            !DUMPED_MAIN_ARENA_CHUNK(p)) {
+            mp_.mmap_threshold = chunksize(p);
+            mp_.trim_threshold = 2 * mp_.mmap_threshold;
+            LIBC_PROBE(memory_mallopt_free_dyn_thresholds, 2,
+                       mp_.mmap_threshold, mp_.trim_threshold);
+        }
+        munmap_chunk(p);
+        return;
+    }
+    // 根据chunk获得分配区的指针
+    ar_ptr = arena_for_chunk(p);
+    // 执行释放
+    _int_free(ar_ptr, p, 0);
+}
+</code></pre>
+
+<h2 id="_int_free">_int_free</h2>
+<p>函数初始时刻定义了一系列的变量，并且得到了用户想要释放的 chunk 的大小</p>
+<pre><code class="c">static void _int_free(mstate av, mchunkptr p, int have_lock) {
+    INTERNAL_SIZE_T size;      /* its size */
+    mfastbinptr *   fb;        /* associated fastbin */
+    mchunkptr       nextchunk; /* next contiguous chunk */
+    INTERNAL_SIZE_T nextsize;  /* its size */
+    int             nextinuse; /* true if nextchunk is used */
+    INTERNAL_SIZE_T prevsize;  /* size of previous contiguous chunk */
+    mchunkptr       bck;       /* misc temp for linking */
+    mchunkptr       fwd;       /* misc temp for linking */
+
+    const char *errstr = NULL;
+    int         locked = 0;
+
+    size = chunksize(p);
+</code></pre>
+
+<h3 id="_2">简单的检查</h3>
+<pre><code class="c">    /* Little security check which won't hurt performance: the
+       allocator never wrapps around at the end of the address space.
+       Therefore we can exclude some size values which might appear
+       here by accident or by &quot;design&quot; from some intruder.  */
+    // 指针不能指向非法的地址, 必须小于等于-size，为什么？？？
+    // 指针必须得对齐，2*SIZE_SZ 这个对齐得仔细想想
+    if (__builtin_expect((uintptr_t) p &gt; (uintptr_t) -size, 0) ||
+        __builtin_expect(misaligned_chunk(p), 0)) {
+        errstr = &quot;free(): invalid pointer&quot;;
+    errout:
+        if (!have_lock &amp;&amp; locked) __libc_lock_unlock(av-&gt;mutex);
+        malloc_printerr(check_action, errstr, chunk2mem(p), av);
+        return;
+    }
+    /* We know that each chunk is at least MINSIZE bytes in size or a
+       multiple of MALLOC_ALIGNMENT.  */
+    // 大小没有最小的chunk大，或者说，大小不是MALLOC_ALIGNMENT的整数倍
+    if (__glibc_unlikely(size &lt; MINSIZE || !aligned_OK(size))) {
+        errstr = &quot;free(): invalid size&quot;;
+        goto errout;
+    }
+    // 检查该chunk是否处于使用状态，非调试状态下没有作用
+    check_inuse_chunk(av, p);
+</code></pre>
+
+<p>其中</p>
+<pre><code class="c">/* Check if m has acceptable alignment */
+
+#define aligned_OK(m) (((unsigned long) (m) &amp;MALLOC_ALIGN_MASK) == 0)
+
+#define misaligned_chunk(p)                                                    \
+    ((uintptr_t)(MALLOC_ALIGNMENT == 2 * SIZE_SZ ? (p) : chunk2mem(p)) &amp;       \
+     MALLOC_ALIGN_MASK)
+</code></pre>
+
+<h3 id="fast-bin">fast bin</h3>
+<p>如果上述检查都合格的话，判断当前的 bin 是不是在 fast bin 范围内，在的话就插入到 <strong>fastbin 头部</strong>，即成为对应 fastbin 链表的<strong>第一个 free chunk</strong>。</p>
+<pre><code class="c">    /*
+      If eligible, place chunk on a fastbin so it can be found
+      and used quickly in malloc.
+    */
+
+    if ((unsigned long) (size) &lt;= (unsigned long) (get_max_fast())
+
+#if TRIM_FASTBINS
+        /*
+      If TRIM_FASTBINS set, don't place chunks
+      bordering top into fastbins
+        */
+       //默认 #define TRIM_FASTBINS 0，因此默认情况下下面的语句不会执行
+       // 如果当前chunk是fast chunk，并且下一个chunk是top chunk，则不能插入
+       // 因为下一个chunk是topchunk 直接与 topchunk 合并
+        &amp;&amp; (chunk_at_offset(p, size) != av-&gt;top)
+#endif
+            ) {
+        // 下一个chunk的大小不能小于两倍的SIZE_SZ,并且
+        // 下一个chunk的大小不能大于system_mem， 一般为132k
+        // 如果出现这样的情况，就报错。
+        if (__builtin_expect(
+                chunksize_nomask(chunk_at_offset(p, size)) &lt;= 2 * SIZE_SZ, 0) ||
+            __builtin_expect(
+                chunksize(chunk_at_offset(p, size)) &gt;= av-&gt;system_mem, 0)) {
+            /* We might not have a lock at this point and concurrent
+               modifications
+               of system_mem might have let to a false positive.  Redo the test
+               after getting the lock.  */
+            if (have_lock || ({
+                    assert(locked == 0);
+                    __libc_lock_lock(av-&gt;mutex);
+                    locked = 1;
+                    chunksize_nomask(chunk_at_offset(p, size)) &lt;= 2 * SIZE_SZ ||
+                        chunksize(chunk_at_offset(p, size)) &gt;= av-&gt;system_mem;
+                })) {
+                errstr = &quot;free(): invalid next size (fast)&quot;;
+                goto errout;
+            }
+            if (!have_lock) {
+                __libc_lock_unlock(av-&gt;mutex);
+                locked = 0;
+            }
+        }
+        // 将chunk的mem部分全部设置为perturb_byte
+        free_perturb(chunk2mem(p), size - 2 * SIZE_SZ);
+        // 设置fast chunk的标记位
+        set_fastchunks(av);
+        // 根据大小获取fast bin的索引
+        unsigned int idx = fastbin_index(size);
+        // 获取对应fastbin的头指针，被初始化后为NULL。
+        fb               = &amp;fastbin(av, idx);
+
+        /* Atomically link P to its fastbin: P-&gt;FD = *FB; *FB = P;  */
+        // 使用原子操作将P插入到链表中
+        mchunkptr    old     = *fb, old2;
+        unsigned int old_idx = ~0u;
+        do {
+            /* Check that the top of the bin is not the record we are going to
+               add
+               (i.e., double free).  */
+            // so we can not double free one fastbin chunk
+            // 防止对 fast bin double free
+            // 防御方法是通过检查上一个chunk是否和新释放的chunk地址相同
+            // 绕过方法就是在中间夹杂一个其他chunk，比如需要doublefree A，释放顺序为：
+            // free A、free B、free A
+            if (__builtin_expect(old == p, 0)) {
+                errstr = &quot;double free or corruption (fasttop)&quot;;
+                goto errout;
+            }
+            /* Check that size of fastbin chunk at the top is the same as
+               size of the chunk that we are adding.  We can dereference OLD
+               only if we have the lock, otherwise it might have already been
+               deallocated.  See use of OLD_IDX below for the actual check.  */
+            if (have_lock &amp;&amp; old != NULL)
+                old_idx = fastbin_index(chunksize(old));
+            p-&gt;fd = old2 = old;
+        } while ((old = catomic_compare_and_exchange_val_rel(fb, p, old2)) !=
+                 old2);
+        // 确保fast bin的加入前与加入后相同
+        if (have_lock &amp;&amp; old != NULL &amp;&amp; __builtin_expect(old_idx != idx, 0)) {
+            errstr = &quot;invalid fastbin entry (free)&quot;;
+            goto errout;
+        }
     }
 </code></pre>
+
+<h3 id="mmap-chunk">合并非 mmap 的空闲 chunk</h3>
+<p><strong>只有不是 fast bin 的情况下才会触发 unlink</strong></p>
+<p>首先我们先说一下为什么会合并 chunk，这是为了避免 heap 中有太多零零碎碎的内存块，合并之后可以用来应对更大的内存块请求。合并的主要顺序为</p>
+<ul>
+<li>先考虑物理低地址空闲块</li>
+<li>后考虑物理高地址空闲块</li>
+</ul>
+<p><strong>合并后的 chunk 指向合并的 chunk 的低地址。</strong></p>
+<p>在没有锁的情况下，先获得锁。</p>
+<pre><code class="c">    /*
+      Consolidate other non-mmapped chunks as they arrive.
+    */
+
+    else if (!chunk_is_mmapped(p)) {
+        if (!have_lock) {
+            __libc_lock_lock(av-&gt;mutex);
+            locked = 1;
+        }
+        nextchunk = chunk_at_offset(p, size);
+</code></pre>
+
+<h4 id="_3">轻量级的检测</h4>
+<pre><code class="c">        /* Lightweight tests: check whether the block is already the
+           top block.  */
+        // 当前free的chunk不能是top chunk
+        if (__glibc_unlikely(p == av-&gt;top)) {
+            errstr = &quot;double free or corruption (top)&quot;;
+            goto errout;
+        }
+        // 当前free的chunk的下一个chunk不能超过arena的边界
+        /* Or whether the next chunk is beyond the boundaries of the arena.  */
+        if (__builtin_expect(contiguous(av) &amp;&amp;
+                                 (char *) nextchunk &gt;=
+                                     ((char *) av-&gt;top + chunksize(av-&gt;top)),
+                             0)) {
+            errstr = &quot;double free or corruption (out)&quot;;
+            goto errout;
+        }
+        // 当前要free的chunk的使用标记没有被标记，double free
+        /* Or whether the block is actually not marked used.  */
+        if (__glibc_unlikely(!prev_inuse(nextchunk))) {
+            errstr = &quot;double free or corruption (!prev)&quot;;
+            goto errout;
+        }
+        // 下一个chunk的大小
+        nextsize = chunksize(nextchunk);
+        // next chunk size valid check
+        // 判断下一个chunk的大小是否不大于2*SIZE_SZ，或者
+        // nextsize是否大于系统可提供的内存
+        if (__builtin_expect(chunksize_nomask(nextchunk) &lt;= 2 * SIZE_SZ, 0) ||
+            __builtin_expect(nextsize &gt;= av-&gt;system_mem, 0)) {
+            errstr = &quot;free(): invalid next size (normal)&quot;;
+            goto errout;
+        }
+</code></pre>
+
+<h4 id="_4">释放填充</h4>
+<pre><code class="c">        //将指针的mem部分全部设置为perturb_byte
+        free_perturb(chunk2mem(p), size - 2 * SIZE_SZ);
+</code></pre>
+
+<h4 id="-chunk">后向合并 - 合并低地址 chunk</h4>
+<pre><code class="c">        /* consolidate backward */
+        if (!prev_inuse(p)) {
+            prevsize = prev_size(p);
+            size += prevsize;
+            p = chunk_at_offset(p, -((long) prevsize));
+            unlink(av, p, bck, fwd);
+        }
+</code></pre>
+
+<h4 id="top-chunk-chunk">下一块不是 top chunk - 前向合并 - 合并高地址 chunk</h4>
+<p>需要注意的是，如果下一块不是 top chunk ，则合并高地址的 chunk ，并将合并后的 chunk 放入到 unsorted bin 中。</p>
+<pre><code class="c">        // 如果下一个chunk不是top chunk
+        if (nextchunk != av-&gt;top) {
+            /* get and clear inuse bit */
+            // 获取下一个 chunk 的使用状态
+            nextinuse = inuse_bit_at_offset(nextchunk, nextsize);
+            // 如果不在使用，合并，否则清空当前chunk的使用状态。
+            /* consolidate forward */
+            if (!nextinuse) {
+                unlink(av, nextchunk, bck, fwd);
+                size += nextsize;
+            } else
+                clear_inuse_bit_at_offset(nextchunk, 0);
+
+            /*
+          Place the chunk in unsorted chunk list. Chunks are
+          not placed into regular bins until after they have
+          been given one chance to be used in malloc.
+            */
+            // 把 chunk 放在 unsorted chunk 链表的头部
+            // unsorted bin 链头
+            bck = unsorted_chunks(av);
+            // unsorted bin 顺数第一个（最新放入）
+            fwd = bck-&gt;fd;
+            // 简单的检查
+            if (__glibc_unlikely(fwd-&gt;bk != bck)) {
+                errstr = &quot;free(): corrupted unsorted chunks&quot;;
+                goto errout;
+            }
+            p-&gt;fd = fwd;
+            p-&gt;bk = bck;
+            // 如果是 large chunk，那就设置nextsize指针字段为NULL。
+            if (!in_smallbin_range(size)) {
+                p-&gt;fd_nextsize = NULL;
+                p-&gt;bk_nextsize = NULL;
+            }
+            bck-&gt;fd = p;
+            fwd-&gt;bk = p;
+
+            set_head(p, size | PREV_INUSE);
+            set_foot(p, size);
+
+            check_free_chunk(av, p);
+        }
+</code></pre>
+
+<h4 id="top-chunk-top-chunk">下一块是 top chunk - 合并到 top chunk</h4>
+<pre><code class="c">        /*
+          If the chunk borders the current high end of memory,
+          consolidate into top
+        */
+        // 如果要释放的chunk的下一个chunk是top chunk，那就合并到 top chunk
+        else {
+            size += nextsize;
+            set_head(p, size | PREV_INUSE);
+            av-&gt;top = p;
+            check_chunk(av, p);
+        }
+</code></pre>
+
+<h4 id="_5">向系统返还内存</h4>
+<pre><code class="c">        /*
+          If freeing a large space, consolidate possibly-surrounding
+          chunks. Then, if the total unused topmost memory exceeds trim
+          threshold, ask malloc_trim to reduce top.
+
+          Unless max_fast is 0, we don't know if there are fastbins
+          bordering top, so we cannot tell for sure whether threshold
+          has been reached unless fastbins are consolidated.  But we
+          don't want to consolidate on each free.  As a compromise,
+          consolidation is performed if FASTBIN_CONSOLIDATION_THRESHOLD
+          is reached.
+        */
+         // 如果合并后的 chunk 的大小大于FASTBIN_CONSOLIDATION_THRESHOLD
+         // 一般合并到 top chunk 都会执行这部分代码。
+         // 那就向系统返还内存
+        if ((unsigned long) (size) &gt;= FASTBIN_CONSOLIDATION_THRESHOLD) {
+            // 如果有 fast chunk 就进行合并
+            if (have_fastchunks(av)) malloc_consolidate(av);
+            // 主分配区
+            if (av == &amp;main_arena) {
+#ifndef MORECORE_CANNOT_TRIM
+                // top chunk 大于当前的收缩阙值
+                if ((unsigned long) (chunksize(av-&gt;top)) &gt;=
+                    (unsigned long) (mp_.trim_threshold))
+                    systrim(mp_.top_pad, av);
+#endif      // 非主分配区，则直接收缩heap
+            } else {
+                /* Always try heap_trim(), even if the top chunk is not
+                   large, because the corresponding heap might go away.  */
+                heap_info *heap = heap_for_ptr(top(av));
+
+                assert(heap-&gt;ar_ptr == av);
+                heap_trim(heap, mp_.top_pad);
+            }
+        }
+
+        if (!have_lock) {
+            assert(locked);
+            __libc_lock_unlock(av-&gt;mutex);
+        }
+</code></pre>
+
+<h3 id="mmap-chunk_1">释放 mmap 的 chunk</h3>
+<pre><code class="c">    } else {
+        //  If the chunk was allocated via mmap, release via munmap().
+        munmap_chunk(p);
+    }
+</code></pre>
+
+<h2 id="systrim">systrim</h2>
+<h2 id="heap_trim">heap_trim</h2>
+<h2 id="munmap_chunk">munmap_chunk</h2>
                 
               
               
@@ -709,7 +1026,7 @@ if (__builtin_expect (FD-&gt;bk != P || BK-&gt;fd != P, 0))                     
 
   <h2 id="__comments">评论</h2>
   <div id="disqus_thread"></div>
-  <script>var disqus_config=function(){this.page.url="https://wiki.mrskye.cn/glibc-heap/depth%20Understanding%20Ptmalloc2/basic/",this.page.identifier="glibc-heap/depth%20Understanding%20Ptmalloc2/basic/"};!function(){var e=document,i=e.createElement("script");i.src="//SkYe.disqus.com/embed.js",i.setAttribute("data-timestamp",+new Date),(e.head||e.body).appendChild(i)}()</script>
+  <script>var disqus_config=function(){this.page.url="https://wiki.mrskye.cn/glibc-heap/depth%20Understanding%20Ptmalloc2/free/",this.page.identifier="glibc-heap/depth%20Understanding%20Ptmalloc2/free/"};!function(){var e=document,i=e.createElement("script");i.src="//SkYe.disqus.com/embed.js",i.setAttribute("data-timestamp",+new Date),(e.head||e.body).appendChild(i)}()</script>
 
               
             </article>

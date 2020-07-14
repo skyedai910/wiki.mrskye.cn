@@ -752,6 +752,231 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#sysmalloc" class="md-nav__link">
+    sysmalloc
+  </a>
+  
+    <nav class="md-nav" aria-label="sysmalloc">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    基本定义
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mmap" class="md-nav__link">
+    考虑 mmap
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mmap_1" class="md-nav__link">
+    mmap 失败或者未分配堆
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    记录旧堆信息
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    检查旧堆信息 1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    检查旧堆信息 2
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#main_arena" class="md-nav__link">
+    非 main_arena
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#main_arena_1" class="md-nav__link">
+    Main_arena 处理
+  </a>
+  
+    <nav class="md-nav" aria-label="Main_arena 处理">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    计算内存
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    是否连续
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    对齐页大小
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    申请内存
+  </a>
+  
+    <nav class="md-nav" aria-label="申请内存">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    可能成功
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    失败
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    内存可能申请成功
+  </a>
+  
+    <nav class="md-nav" aria-label="内存可能申请成功">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1_1" class="md-nav__link">
+    情况 1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-" class="md-nav__link">
+    情况 2 - 意外内存耗尽
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    处理其他意外情况
+  </a>
+  
+    <nav class="md-nav" aria-label="处理其他意外情况">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    处理连续内存
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    处理不连续内存
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_19" class="md-nav__link">
+    调整
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_20" class="md-nav__link">
+    更新最大内存
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_21" class="md-nav__link">
+    分配内存块
+  </a>
+  
+    <nav class="md-nav" aria-label="分配内存块">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_22" class="md-nav__link">
+    获取大小
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#top" class="md-nav__link">
+    切分 TOP
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_23" class="md-nav__link">
+    捕捉所有错误
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -773,6 +998,10 @@
                 
                 
                 <h1 id="_1">申请内存块</h1>
+<blockquote>
+<p>Allocate Heap Memory</p>
+<p>绝大部分内容来自 CTF-WIKI ，内容引用用于学习记录</p>
+</blockquote>
 <h2 id="__libc_malloc">__libc_malloc</h2>
 <p>一般我们会使用 malloc 函数来申请内存块，可是当仔细看 glibc 的源码实现时，其实并没有 malloc 函数。其实该函数真正调用的是 __libc_malloc 函数。为什么不直接写个 malloc 函数呢，因为有时候我们可能需要不同的名称。此外，__libc_malloc 函数只是用来简单封装 _int_malloc 函数。_int_malloc 才是申请内存块的核心。下面我们来仔细分析一下具体的实现。</p>
 <p>该函数会<strong>首先检查是否有内存分配函数的钩子函数（__malloc_hook）</strong>，这个主要用于用户自定义的堆分配函数，方便用户快速修改堆分配函数并进行测试。这里需要注意的是，<strong>用户申请的字节一旦进入申请内存函数中就变成了无符号整数</strong>。</p>
@@ -993,7 +1222,7 @@ void *__libc_malloc(size_t bytes) {//size_t 为当前程序位数最长的无符
 <li><code>bin-&gt;bk = bck;</code>  |  <code>bck-&gt;fd = bin;</code> ：修改链表将 victime 取出来（small bin 最后一个）</li>
 </ol>
 <h3 id="large-bin">large bin</h3>
-<p>当 fast bin、small bin 中的 chunk 都不能满足用户请求 chunk 大小时，就会考虑是不是 large bin。但是，其实在 large bin 中并没有直接去扫描对应 bin 中的 chunk，而是先利用 malloc_consolidate（参见 malloc_state 相关函数） 函数处理 fast bin 中的 chunk，将有可能能够合并的 chunk 先进行合并后放到 unsorted bin 中，不能够合并的就直接放到 unsorted bin 中，然后再在下面的大循环中进行相应的处理。<strong>为什么不直接从相应的 bin 中取出 large chunk 呢？这是 ptmalloc 的机制，它会在分配 large chunk 之前对堆中碎片 chunk 进行合并，以便减少堆中的碎片。</strong></p>
+<p>当 fast bin、small bin 中的 chunk 都不能满足用户请求 chunk 大小时，就会考虑是不是 large bin。但是，其实在 large bin 中并没有直接去扫描对应 bin 中的 chunk，而是<strong>先利用 malloc_consolidate（参见 malloc_state 相关函数） 函数处理 fast bin 中的 chunk，将有可能能够合并的 chunk 先进行合并后放到 unsorted bin 中，不能够合并的就直接放到 unsorted bin 中</strong>，然后再在下面的大循环中进行相应的处理。<strong>为什么不直接从相应的 bin 中取出 large chunk 呢？这是 ptmalloc 的机制，它会在分配 large chunk 之前对堆中碎片 chunk 进行合并，以便减少堆中的碎片。</strong></p>
 <pre><code class="c">/*
        If this is a large request, consolidate fastbins before continuing.
        While it might look excessive to kill all fastbins before
@@ -1015,12 +1244,12 @@ else {
 
 <h3 id="-unsorted-bin">大循环 - 遍历 unsorted bin</h3>
 <blockquote>
-<p>2020.07.06    这部分整体流程没有清楚</p>
+<p>2020.07.08 largebin 分配机制不太明白</p>
 </blockquote>
 <p><strong>如果程序执行到了这里，那么说明 与 chunk 大小正好一致的 bin (fast bin， small bin) 中没有 chunk 可以直接满足需求 ，但是 large chunk 则是在这个大循环中处理</strong>。</p>
 <p>在接下来的这个循环中，主要做了以下的操作</p>
 <ul>
-<li>按照 FIFO 的方式逐个将 unsorted bin 中的 chunk 取出来</li>
+<li><strong>按照 FIFO 的方式逐个将 unsorted bin 中的 chunk 取出来</strong></li>
 <li>如果是 small request，则考虑是不是恰好满足，是的话，直接返回。</li>
 <li>如果不是的话，放到对应的 bin 中。</li>
 <li>尝试从 large bin 中分配用户所需的内存</li>
@@ -1071,7 +1300,7 @@ while ((victim = unsorted_chunks(av)-&gt;bk) != unsorted_chunks(av)) {
                exception to best-fit, and applies only when there is
                no exact fit for a small chunk.
                */   
-
+//是否是smallbin范围；bck是否是链首；remainder是（分配完）剩余部分
 if (in_smallbin_range(nb) &amp;&amp; bck == unsorted_chunks(av) &amp;&amp;
     victim == av-&gt;last_remainder &amp;&amp;
     (unsigned long) (size) &gt; (unsigned long) (nb + MINSIZE)) {
@@ -1081,6 +1310,7 @@ if (in_smallbin_range(nb) &amp;&amp; bck == unsorted_chunks(av) &amp;&amp;
     // 获取新的 remainder 的位置
     remainder               = chunk_at_offset(victim, nb);
     // 更新 unsorted bin 的情况
+    // av是被取出chunk的下一个chunk（fd）
     unsorted_chunks(av)-&gt;bk = unsorted_chunks(av)-&gt;fd = remainder;
     // 更新 av 中记录的 last_remainder
     av-&gt;last_remainder                                = remainder;
@@ -1090,7 +1320,7 @@ if (in_smallbin_range(nb) &amp;&amp; bck == unsorted_chunks(av) &amp;&amp;
         remainder-&gt;fd_nextsize = NULL;
         remainder-&gt;bk_nextsize = NULL;
     }
-    // 设置victim的头部，
+    // 设置victim的头部，inuse
     set_head(victim, nb | PREV_INUSE |
              (av != &amp;main_arena ? NON_MAIN_ARENA : 0));
     // 设置 remainder 的头部
@@ -1147,7 +1377,7 @@ if (size == nb) {//大小正好合适
 <h5 id="place-chunk-in-large-bin">PLACE CHUNK IN LARGE BIN</h5>
 <p>把取出来的 chunk 放到对应的 large bin 中。</p>
 <blockquote>
-<p>这里应该是获取正确插入位置的指针 bck fwd。最后插入形式为：bck&lt;--&gt;victim&lt;--&gt;fwd。</p>
+<p>这里应该是获取正确插入位置的指针 bck、fwd。最后插入形式为：bck&lt;--&gt;victim&lt;--&gt;fwd。</p>
 <p>链表构建在：<a href="# 最终取出">最终取出</a></p>
 </blockquote>
 <pre><code class="c">            } else {
@@ -1239,6 +1469,7 @@ if (size == nb) {//大小正好合适
            If a large request, scan through the chunks of current bin in
            sorted order to find smallest that fits.  Use the skip list for this.
          */
+        //判断是否smallbin
         if (!in_smallbin_range(nb)) {
             bin = bin_at(av, idx);
             /* skip scan if empty or largest chunk is too small */
@@ -1263,7 +1494,7 @@ if (size == nb) {//大小正好合适
                     victim = victim-&gt;fd;
                 // 计算分配后剩余的大小
                 remainder_size = size - nb;
-                // 进行unlink
+                // 进行unlink（宏操作）
                 unlink(av, victim, bck, fwd);
 
                 /* Exhaust */
@@ -1320,7 +1551,8 @@ if (size == nb) {//大小正好合适
 </code></pre>
 
 <h4 id="chunk">寻找较大 chunk</h4>
-<p>如果走到了这里，那说明对于用户所需的 chunk，不能直接从其对应的合适的 bin 中获取 chunk，所以我们需要来查找比当前 bin 更大的 fast bin ， small bin 或者 large bin。</p>
+<p><strong>如果走到了这里，那说明对于用户所需的 chunk，不能直接从其对应的合适的 bin 中获取 chunk</strong>[^1]，所以我们需要来查找比当前 bin 更大的 fast bin ， small bin 或者 large bin。</p>
+<p>[^1]:这里意思是去对应 bin 取，没有办法取到。比如需要一个 0x100 的chunk ，去到大小为 0x100 的bin 中取，而该 bin 中没有空闲 chunk 。</p>
 <pre><code class="c">        /*
            Search for a chunk by scanning bins, starting with next largest
            bin. This search is strictly by best-fit; i.e., the smallest
@@ -1460,7 +1692,7 @@ if (size == nb) {//大小正好合适
 </code></pre>
 
 <h3 id="top-chunk">使用 top chunk</h3>
-<p>如果所有的 bin 中的 chunk 都没有办法直接满足要求（即不合并），或者说都没有空闲的 chunk。那么我们就只能使用 top chunk 了。</p>
+<p><strong>如果所有的 bin 中的 chunk 都没有办法直接满足要求（即不合并），或者说都没有空闲的 chunk。</strong>那么我们就只能使用 top chunk 了。</p>
 <pre><code class="c">    use_top:
         /*
            If large enough, split off the chunk bordering the end of memory
@@ -1533,6 +1765,592 @@ if (size == nb) {//大小正好合适
   set to zero.
 */
 void*  __libc_calloc(size_t, size_t);
+</code></pre>
+
+<blockquote>
+<p>2020.07.08 下面大概浏览一下未仔细品味</p>
+</blockquote>
+<h2 id="sysmalloc">sysmalloc</h2>
+<p>正如该函数头的注释所言，该函数用于当前堆内存不足时，需要向系统申请更多的内存。</p>
+<pre><code class="c">/*
+   sysmalloc handles malloc cases requiring more memory from the system.
+   On entry, it is assumed that av-&gt;top does not have enough
+   space to service request for nb bytes, thus requiring that av-&gt;top
+   be extended or replaced.
+ */
+</code></pre>
+
+<h3 id="_7">基本定义</h3>
+<pre><code class="c">static void *sysmalloc(INTERNAL_SIZE_T nb, mstate av) {
+  mchunkptr old_top;        /* incoming value of av-&gt;top */
+  INTERNAL_SIZE_T old_size; /* its size */
+  char *old_end;            /* its end address */
+
+  long size; /* arg to first MORECORE or mmap call */
+  char *brk; /* return value from MORECORE */
+
+  long correction; /* arg to 2nd MORECORE call */
+  char *snd_brk;   /* 2nd return val */
+
+  INTERNAL_SIZE_T front_misalign; /* unusable bytes at front of new space */
+  INTERNAL_SIZE_T end_misalign;   /* partial page left at end of new space */
+  char *aligned_brk;              /* aligned offset into brk */
+
+  mchunkptr p;                  /* the allocated/returned chunk */
+  mchunkptr remainder;          /* remainder frOm allocation */
+  unsigned long remainder_size; /* its size */
+
+  size_t pagesize = GLRO(dl_pagesize);
+  bool tried_mmap = false;
+</code></pre>
+
+<p>我们可以主要关注一下 <code>pagesize</code>，其</p>
+<pre><code class="c">#ifndef EXEC_PAGESIZE
+#define EXEC_PAGESIZE   4096
+#endif
+# define GLRO(name) _##name
+size_t _dl_pagesize = EXEC_PAGESIZE;
+</code></pre>
+
+<p>所以，<code>pagesize=4096=0x1000</code>。</p>
+<h3 id="mmap">考虑 mmap</h3>
+<p>正如开头注释所言如果满足如下任何一种条件</p>
+<ol>
+<li>没有分配堆。</li>
+<li>申请的内存大于 <code>mp_.mmap_threshold</code>，并且 mmap 的数量小于最大值，就可以尝试使用 mmap。</li>
+</ol>
+<p>默认情况下，临界值为</p>
+<pre><code class="c">static struct malloc_par mp_ = {
+    .top_pad = DEFAULT_TOP_PAD,
+    .n_mmaps_max = DEFAULT_MMAP_MAX,
+    .mmap_threshold = DEFAULT_MMAP_THRESHOLD,
+    .trim_threshold = DEFAULT_TRIM_THRESHOLD,
+#define NARENAS_FROM_NCORES(n) ((n) * (sizeof(long) == 4 ? 2 : 8))
+    .arena_test = NARENAS_FROM_NCORES(1)
+#if USE_TCACHE
+        ,
+    .tcache_count = TCACHE_FILL_COUNT,
+    .tcache_bins = TCACHE_MAX_BINS,
+    .tcache_max_bytes = tidx2usize(TCACHE_MAX_BINS - 1),
+    .tcache_unsorted_limit = 0 /* No limit.  */
+#endif
+};
+</code></pre>
+
+<p><code>DEFAULT_MMAP_THRESHOLD</code> 为 128*1024 字节，即 128 K。</p>
+<pre><code class="c">#ifndef DEFAULT_MMAP_THRESHOLD
+#define DEFAULT_MMAP_THRESHOLD DEFAULT_MMAP_THRESHOLD_MIN
+#endif
+/*
+  MMAP_THRESHOLD_MAX and _MIN are the bounds on the dynamically
+  adjusted MMAP_THRESHOLD.
+*/
+
+#ifndef DEFAULT_MMAP_THRESHOLD_MIN
+#define DEFAULT_MMAP_THRESHOLD_MIN (128 * 1024)
+#endif
+
+#ifndef DEFAULT_MMAP_THRESHOLD_MAX
+/* For 32-bit platforms we cannot increase the maximum mmap
+   threshold much because it is also the minimum value for the
+   maximum heap size and its alignment.  Going above 512k (i.e., 1M
+   for new heaps) wastes too much address space.  */
+#if __WORDSIZE == 32
+#define DEFAULT_MMAP_THRESHOLD_MAX (512 * 1024)
+#else
+#define DEFAULT_MMAP_THRESHOLD_MAX (4 * 1024 * 1024 * sizeof(long))
+#endif
+#endif
+</code></pre>
+
+<p>下面为这部分代码，目前不是我们关心的重点，可以暂时跳过。</p>
+<pre><code class="c">  /*
+     If have mmap, and the request size meets the mmap threshold, and
+     the system supports mmap, and there are few enough currently
+     allocated mmapped regions, try to directly map this request
+     rather than expanding top.
+   */
+
+  if (av == NULL ||
+      ((unsigned long)(nb) &gt;= (unsigned long)(mp_.mmap_threshold) &amp;&amp;
+       (mp_.n_mmaps &lt; mp_.n_mmaps_max))) {
+    char *mm; /* return value from mmap call*/
+
+  try_mmap:
+    /*
+       Round up size to nearest page.  For mmapped chunks, the overhead
+       is one SIZE_SZ unit larger than for normal chunks, because there
+       is no following chunk whose prev_size field could be used.
+
+       See the front_misalign handling below, for glibc there is no
+       need for further alignments unless we have have high alignment.
+     */
+    if (MALLOC_ALIGNMENT == 2 * SIZE_SZ)
+      size = ALIGN_UP(nb + SIZE_SZ, pagesize);
+    else
+      size = ALIGN_UP(nb + SIZE_SZ + MALLOC_ALIGN_MASK, pagesize);
+    tried_mmap = true;
+
+    /* Don't try if size wraps around 0 */
+    if ((unsigned long)(size) &gt; (unsigned long)(nb)) {
+      mm = (char *)(MMAP(0, size, PROT_READ | PROT_WRITE, 0));
+
+      if (mm != MAP_FAILED) {
+        /*
+           The offset to the start of the mmapped region is stored
+           in the prev_size field of the chunk. This allows us to adjust
+           returned start address to meet alignment requirements here
+           and in memalign(), and still be able to compute proper
+           address argument for later munmap in free() and realloc().
+         */
+
+        if (MALLOC_ALIGNMENT == 2 * SIZE_SZ) {
+          /* For glibc, chunk2mem increases the address by 2*SIZE_SZ and
+             MALLOC_ALIGN_MASK is 2*SIZE_SZ-1.  Each mmap'ed area is page
+             aligned and therefore definitely MALLOC_ALIGN_MASK-aligned.  */
+          assert(((INTERNAL_SIZE_T)chunk2mem(mm) &amp; MALLOC_ALIGN_MASK) == 0);
+          front_misalign = 0;
+        } else
+          front_misalign = (INTERNAL_SIZE_T)chunk2mem(mm) &amp; MALLOC_ALIGN_MASK;
+        if (front_misalign &gt; 0) {
+          correction = MALLOC_ALIGNMENT - front_misalign;
+          p = (mchunkptr)(mm + correction);
+          set_prev_size(p, correction);
+          set_head(p, (size - correction) | IS_MMAPPED);
+        } else {
+          p = (mchunkptr)mm;
+          set_prev_size(p, 0);
+          set_head(p, size | IS_MMAPPED);
+        }
+
+        /* update statistics */
+
+        int new = atomic_exchange_and_add(&amp;mp_.n_mmaps, 1) + 1;
+        atomic_max(&amp;mp_.max_n_mmaps, new);
+
+        unsigned long sum;
+        sum = atomic_exchange_and_add(&amp;mp_.mmapped_mem, size) + size;
+        atomic_max(&amp;mp_.max_mmapped_mem, sum);
+
+        check_chunk(av, p);
+
+        return chunk2mem(p);
+      }
+    }
+  }
+</code></pre>
+
+<h3 id="mmap_1">mmap 失败或者未分配堆</h3>
+<pre><code>  /* There are no usable arenas and mmap also failed.  */
+  if (av == NULL)
+    return 0;
+</code></pre>
+
+<p>如果是这两种情况中的任何一种，其实就可以退出了。。</p>
+<h3 id="_8">记录旧堆信息</h3>
+<pre><code class="c">  /* Record incoming configuration of top */
+
+  old_top = av-&gt;top;
+  old_size = chunksize(old_top);
+  old_end = (char *)(chunk_at_offset(old_top, old_size));
+
+  brk = snd_brk = (char *)(MORECORE_FAILURE);
+</code></pre>
+
+<h3 id="1">检查旧堆信息 1</h3>
+<pre><code class="c">  /*
+     If not the first time through, we require old_size to be
+     at least MINSIZE and to have prev_inuse set.
+   */
+
+  assert((old_top == initial_top(av) &amp;&amp; old_size == 0) ||
+         ((unsigned long)(old_size) &gt;= MINSIZE &amp;&amp; prev_inuse(old_top) &amp;&amp;
+          ((unsigned long)old_end &amp; (pagesize - 1)) == 0));
+</code></pre>
+
+<p>这个检查要求满足其中任何一个条件</p>
+<ol>
+<li><code>old_top == initial_top(av) &amp;&amp; old_size == 0</code>，即如果是第一次的话，堆的大小需要是 0。</li>
+<li>新的堆，那么</li>
+<li><code>(unsigned long)(old_size) &gt;= MINSIZE &amp;&amp; prev_inuse(old_top)</code>，堆的大小应该不小于 <code>MINSIZE</code>，并且前一个堆块应该处于使用中。</li>
+<li><code>((unsigned long)old_end &amp; (pagesize - 1)) == 0)</code>，堆的结束地址应该是页对齐的，由于页对齐的大小默认是 0x1000，所以低 12 个比特需要为 0。</li>
+</ol>
+<h3 id="2">检查旧堆信息 2</h3>
+<pre><code class="c">  /* Precondition: not enough current space to satisfy nb request */
+  assert((unsigned long)(old_size) &lt; (unsigned long)(nb + MINSIZE));
+</code></pre>
+
+<p>根据 malloc 中的定义</p>
+<pre><code class="c">static void *_int_malloc(mstate av, size_t bytes) {
+    INTERNAL_SIZE_T nb;  /* normalized request size */
+</code></pre>
+
+<p><code>nb</code> 应该是已经加上 chunk 头部的字节，为什么还要加上 <code>MINSIZE</code>呢？这是因为 top chunk 的大小应该至少预留 MINSIZE 空间，以便于合并。</p>
+<h3 id="main_arena">非 main_arena</h3>
+<p>这里暂时不是关心的重点，暂且不分析。</p>
+<pre><code class="c">  if (av != &amp;main_arena) {
+    heap_info *old_heap, *heap;
+    size_t old_heap_size;
+
+    /* First try to extend the current heap. */
+    old_heap = heap_for_ptr(old_top);
+    old_heap_size = old_heap-&gt;size;
+    if ((long)(MINSIZE + nb - old_size) &gt; 0 &amp;&amp;
+        grow_heap(old_heap, MINSIZE + nb - old_size) == 0) {
+      av-&gt;system_mem += old_heap-&gt;size - old_heap_size;
+      set_head(old_top,
+               (((char *)old_heap + old_heap-&gt;size) - (char *)old_top) |
+                   PREV_INUSE);
+    } else if ((heap = new_heap(nb + (MINSIZE + sizeof(*heap)), mp_.top_pad))) {
+      /* Use a newly allocated heap.  */
+      heap-&gt;ar_ptr = av;
+      heap-&gt;prev = old_heap;
+      av-&gt;system_mem += heap-&gt;size;
+      /* Set up the new top.  */
+      top(av) = chunk_at_offset(heap, sizeof(*heap));
+      set_head(top(av), (heap-&gt;size - sizeof(*heap)) | PREV_INUSE);
+
+      /* Setup fencepost and free the old top chunk with a multiple of
+         MALLOC_ALIGNMENT in size. */
+      /* The fencepost takes at least MINSIZE bytes, because it might
+         become the top chunk again later.  Note that a footer is set
+         up, too, although the chunk is marked in use. */
+      old_size = (old_size - MINSIZE) &amp; ~MALLOC_ALIGN_MASK;
+      set_head(chunk_at_offset(old_top, old_size + 2 * SIZE_SZ),
+               0 | PREV_INUSE);
+      if (old_size &gt;= MINSIZE) {
+        set_head(chunk_at_offset(old_top, old_size),
+                 (2 * SIZE_SZ) | PREV_INUSE);
+        set_foot(chunk_at_offset(old_top, old_size), (2 * SIZE_SZ));
+        set_head(old_top, old_size | PREV_INUSE | NON_MAIN_ARENA);
+        _int_free(av, old_top, 1);
+      } else {
+        set_head(old_top, (old_size + 2 * SIZE_SZ) | PREV_INUSE);
+        set_foot(old_top, (old_size + 2 * SIZE_SZ));
+      }
+    } else if (!tried_mmap)
+      /* We can at least try to use to mmap memory.  */
+      goto try_mmap;
+  }
+</code></pre>
+
+<h3 id="main_arena_1">Main_arena 处理</h3>
+<h4 id="_9">计算内存</h4>
+<p>计算可以满足请求的内存大小。</p>
+<pre><code class="c">else { /* av == main_arena */
+
+    /* Request enough space for nb + pad + overhead */
+    size = nb + mp_.top_pad + MINSIZE;
+</code></pre>
+
+<p>默认情况下 <code>top_pad</code>定义为</p>
+<pre><code class="c">#ifndef DEFAULT_TOP_PAD
+# define DEFAULT_TOP_PAD 131072
+#endif
+</code></pre>
+
+<p>即 131072 字节，0x20000 字节。</p>
+<h4 id="_10">是否连续</h4>
+<p>如果我们希望堆的空间连续的话，那么其实可以复用之前的内存。</p>
+<pre><code class="c">    /*
+       If contiguous, we can subtract out existing space that we hope to
+       combine with new space. We add it back later only if
+       we don't actually get contiguous space.
+     */
+
+    if (contiguous(av))
+      size -= old_size;
+</code></pre>
+
+<h4 id="_11">对齐页大小</h4>
+<pre><code class="c">    /*
+       Round to a multiple of page size.
+       If MORECORE is not contiguous, this ensures that we only call it
+       with whole-page arguments.  And if MORECORE is contiguous and
+       this is not first time through, this preserves page-alignment of
+       previous calls. Otherwise, we correct to page-align below.
+     */
+
+    size = ALIGN_UP(size, pagesize);
+</code></pre>
+
+<h4 id="_12">申请内存</h4>
+<pre><code class="c">    /*
+       Don't try to call MORECORE if argument is so big as to appear
+       negative. Note that since mmap takes size_t arg, it may succeed
+       below even if we cannot call MORECORE.
+     */
+
+    if (size &gt; 0) {
+      brk = (char *)(MORECORE(size));
+      LIBC_PROBE(memory_sbrk_more, 2, brk, size);
+    }
+</code></pre>
+
+<h5 id="_13">可能成功</h5>
+<pre><code class="c">    if (brk != (char *)(MORECORE_FAILURE)) {
+      /* Call the `morecore' hook if necessary.  */
+      void (*hook)(void) = atomic_forced_read(__after_morecore_hook);
+      if (__builtin_expect(hook != NULL, 0))
+        (*hook)();
+    }
+</code></pre>
+
+<p>这里竟然调用了一个 hook，有点意思。</p>
+<h5 id="_14">失败</h5>
+<p>失败，考虑 mmap。</p>
+<pre><code class="c">else {
+      /*
+         If have mmap, try using it as a backup when MORECORE fails or
+         cannot be used. This is worth doing on systems that have &quot;holes&quot; in
+         address space, so sbrk cannot extend to give contiguous space, but
+         space is available elsewhere.  Note that we ignore mmap max count
+         and threshold limits, since the space will not be used as a
+         segregated mmap region.
+       */
+
+      /* Cannot merge with old top, so add its size back in */
+      if (contiguous(av))
+        size = ALIGN_UP(size + old_size, pagesize);
+
+      /* If we are relying on mmap as backup, then use larger units */
+      if ((unsigned long)(size) &lt; (unsigned long)(MMAP_AS_MORECORE_SIZE))
+        size = MMAP_AS_MORECORE_SIZE;
+
+      /* Don't try if size wraps around 0 */
+      if ((unsigned long)(size) &gt; (unsigned long)(nb)) {
+        char *mbrk = (char *)(MMAP(0, size, PROT_READ | PROT_WRITE, 0));
+
+        if (mbrk != MAP_FAILED) {
+          /* We do not need, and cannot use, another sbrk call to find end */
+          brk = mbrk;
+          snd_brk = brk + size;
+
+          /*
+             Record that we no longer have a contiguous sbrk region.
+             After the first time mmap is used as backup, we do not
+             ever rely on contiguous space since this could incorrectly
+             bridge regions.
+           */
+          set_noncontiguous(av);
+        }
+      }
+    }
+</code></pre>
+
+<h4 id="_15">内存可能申请成功</h4>
+<pre><code class="c">    if (brk != (char *)(MORECORE_FAILURE)) {
+      if (mp_.sbrk_base == 0)
+        mp_.sbrk_base = brk;
+      av-&gt;system_mem += size;
+</code></pre>
+
+<h5 id="1_1">情况 1</h5>
+<pre><code class="c">      /*
+         If MORECORE extends previous space, we can likewise extend top size.
+       */
+
+      if (brk == old_end &amp;&amp; snd_brk == (char *)(MORECORE_FAILURE))
+        set_head(old_top, (size + old_size) | PREV_INUSE);
+</code></pre>
+
+<h5 id="2-">情况 2 - 意外内存耗尽</h5>
+<pre><code class="c">      else if (contiguous(av) &amp;&amp; old_size &amp;&amp; brk &lt; old_end)
+        /* Oops!  Someone else killed our space..  Can't touch anything.  */
+        malloc_printerr(&quot;break adjusted to free malloc space&quot;);
+</code></pre>
+
+<h5 id="_16">处理其他意外情况</h5>
+<pre><code class="c">      /*
+         Otherwise, make adjustments:
+
+       * If the first time through or noncontiguous, we need to call sbrk
+          just to find out where the end of memory lies.
+
+       * We need to ensure that all returned chunks from malloc will meet
+          MALLOC_ALIGNMENT
+
+       * If there was an intervening foreign sbrk, we need to adjust sbrk
+          request size to account for fact that we will not be able to
+          combine new space with existing space in old_top.
+
+       * Almost all systems internally allocate whole pages at a time, in
+          which case we might as well use the whole last page of request.
+          So we allocate enough more memory to hit a page boundary now,
+          which in turn causes future contiguous calls to page-align.
+       */
+
+      else {
+        front_misalign = 0;
+        end_misalign = 0;
+        correction = 0;
+        aligned_brk = brk;
+</code></pre>
+
+<h6 id="_17">处理连续内存</h6>
+<pre><code class="c">        /* handle contiguous cases */
+        if (contiguous(av)) {
+          /* Count foreign sbrk as system_mem.  */
+          if (old_size)
+            av-&gt;system_mem += brk - old_end;
+
+          /* Guarantee alignment of first new chunk made from this space */
+
+          front_misalign = (INTERNAL_SIZE_T)chunk2mem(brk) &amp; MALLOC_ALIGN_MASK;
+          if (front_misalign &gt; 0) {
+            /*
+               Skip over some bytes to arrive at an aligned position.
+               We don't need to specially mark these wasted front bytes.
+               They will never be accessed anyway because
+               prev_inuse of av-&gt;top (and any chunk created from its start)
+               is always true after initialization.
+             */
+
+            correction = MALLOC_ALIGNMENT - front_misalign;
+            aligned_brk += correction;
+          }
+
+          /*
+             If this isn't adjacent to existing space, then we will not
+             be able to merge with old_top space, so must add to 2nd request.
+           */
+
+          correction += old_size;
+
+          /* Extend the end address to hit a page boundary */
+          end_misalign = (INTERNAL_SIZE_T)(brk + size + correction);
+          correction += (ALIGN_UP(end_misalign, pagesize)) - end_misalign;
+
+          assert(correction &gt;= 0);
+          snd_brk = (char *)(MORECORE(correction));
+
+          /*
+             If can't allocate correction, try to at least find out current
+             brk.  It might be enough to proceed without failing.
+
+             Note that if second sbrk did NOT fail, we assume that space
+             is contiguous with first sbrk. This is a safe assumption unless
+             program is multithreaded but doesn't use locks and a foreign sbrk
+             occurred between our first and second calls.
+           */
+
+          if (snd_brk == (char *)(MORECORE_FAILURE)) {
+            correction = 0;
+            snd_brk = (char *)(MORECORE(0));
+          } else {
+            /* Call the `morecore' hook if necessary.  */
+            void (*hook)(void) = atomic_forced_read(__after_morecore_hook);
+            if (__builtin_expect(hook != NULL, 0))
+              (*hook)();
+          }
+        }
+</code></pre>
+
+<h6 id="_18">处理不连续内存</h6>
+<pre><code class="c">        /* handle non-contiguous cases */
+        else {
+          if (MALLOC_ALIGNMENT == 2 * SIZE_SZ)
+            /* MORECORE/mmap must correctly align */
+            assert(((unsigned long)chunk2mem(brk) &amp; MALLOC_ALIGN_MASK) == 0);
+          else {
+            front_misalign =
+                (INTERNAL_SIZE_T)chunk2mem(brk) &amp; MALLOC_ALIGN_MASK;
+            if (front_misalign &gt; 0) {
+              /*
+                 Skip over some bytes to arrive at an aligned position.
+                 We don't need to specially mark these wasted front bytes.
+                 They will never be accessed anyway because
+                 prev_inuse of av-&gt;top (and any chunk created from its start)
+                 is always true after initialization.
+               */
+
+              aligned_brk += MALLOC_ALIGNMENT - front_misalign;
+            }
+          }
+
+          /* Find out current end of memory */
+          if (snd_brk == (char *)(MORECORE_FAILURE)) {
+            snd_brk = (char *)(MORECORE(0));
+          }
+        }
+</code></pre>
+
+<h6 id="_19">调整</h6>
+<pre><code class="c">        /* Adjust top based on results of second sbrk */
+        if (snd_brk != (char *)(MORECORE_FAILURE)) {
+          av-&gt;top = (mchunkptr)aligned_brk;
+          set_head(av-&gt;top, (snd_brk - aligned_brk + correction) | PREV_INUSE);
+          av-&gt;system_mem += correction;
+
+          /*
+             If not the first time through, we either have a
+             gap due to foreign sbrk or a non-contiguous region.  Insert a
+             double fencepost at old_top to prevent consolidation with space
+             we don't own. These fenceposts are artificial chunks that are
+             marked as inuse and are in any case too small to use.  We need
+             two to make sizes and alignments work out.
+           */
+
+          if (old_size != 0) {
+            /*
+               Shrink old_top to insert fenceposts, keeping size a
+               multiple of MALLOC_ALIGNMENT. We know there is at least
+               enough space in old_top to do this.
+             */
+            old_size = (old_size - 4 * SIZE_SZ) &amp; ~MALLOC_ALIGN_MASK;
+            set_head(old_top, old_size | PREV_INUSE);
+
+            /*
+               Note that the following assignments completely overwrite
+               old_top when old_size was previously MINSIZE.  This is
+               intentional. We need the fencepost, even if old_top otherwise
+               gets lost.
+             */
+            set_head(chunk_at_offset(old_top, old_size),
+                     (2 * SIZE_SZ) | PREV_INUSE);
+            set_head(chunk_at_offset(old_top, old_size + 2 * SIZE_SZ),
+                     (2 * SIZE_SZ) | PREV_INUSE);
+
+            /* If possible, release the rest. */
+            if (old_size &gt;= MINSIZE) {
+              _int_free(av, old_top, 1);
+            }
+          }
+        }
+      }
+</code></pre>
+
+<p>需要注意的是，在这里程序将旧的 top chunk 进行了释放，那么其会根据大小进入不同的 bin 或 tcache 中。</p>
+<h4 id="_20">更新最大内存</h4>
+<pre><code class="c">  if ((unsigned long)av-&gt;system_mem &gt; (unsigned long)(av-&gt;max_system_mem))
+    av-&gt;max_system_mem = av-&gt;system_mem;
+  check_malloc_state(av);
+</code></pre>
+
+<h4 id="_21">分配内存块</h4>
+<h5 id="_22">获取大小</h5>
+<pre><code class="c">  /* finally, do the allocation */
+  p = av-&gt;top;
+  size = chunksize(p);
+</code></pre>
+
+<h5 id="top">切分 TOP</h5>
+<pre><code class="c">  /* check that one of the above allocation paths succeeded */
+  if ((unsigned long)(size) &gt;= (unsigned long)(nb + MINSIZE)) {
+    remainder_size = size - nb;
+    remainder = chunk_at_offset(p, nb);
+    av-&gt;top = remainder;
+    set_head(p, nb | PREV_INUSE | (av != &amp;main_arena ? NON_MAIN_ARENA : 0));
+    set_head(remainder, remainder_size | PREV_INUSE);
+    check_malloced_chunk(av, p, nb);
+    return chunk2mem(p);
+  }
+</code></pre>
+
+<h4 id="_23">捕捉所有错误</h4>
+<pre><code class="c">  /* catch all failure paths */
+  __set_errno(ENOMEM);
+  return 0;
 </code></pre>
                 
               
