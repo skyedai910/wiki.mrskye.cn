@@ -592,3 +592,16 @@ book1 结构体覆盖后指向的地址非常低，指向的地址变成是在�
 
 ![off-by-one-4](img\off-by-one-4.png)
 
+## 实例 2 : plaidctf 2015 plaiddb
+
+```
+    Arch:     amd64-64-little
+    RELRO:    Full RELRO
+    Stack:    Canary found
+    NX:       NX enabled
+    PIE:      PIE enabled
+    FORTIFY:  Enabled
+```
+
+可以看出，该程序是 64 位动态链接的。保护全部开启。
+
