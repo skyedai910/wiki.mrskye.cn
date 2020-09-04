@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#64-fini_array-rop" class="md-skip">
+        <a href="#_1" class="md-skip">
           跳转至
         </a>
       
@@ -294,8 +294,6 @@
     
     <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
     
-      
-    
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
         劫持fini_array
@@ -311,8 +309,6 @@
       
 <nav class="md-nav md-nav--secondary" aria-label="目录">
   
-  
-    
   
   
     <label class="md-nav__title" for="__toc">
@@ -414,13 +410,60 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    补充总结
+  </a>
+  
+    <nav class="md-nav" aria-label="补充总结">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fini_array" class="md-nav__link">
+    怎么找 fini_array ？
+  </a>
+  
+    <nav class="md-nav" aria-label="怎么找 fini_array ？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#64" class="md-nav__link">
+    64 位静态链接程序
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64_1" class="md-nav__link">
+    64 位动态链接程序
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    静态动态利用方式小结
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
+  <a href="#_10" class="md-nav__link">
     参考文章
   </a>
   
@@ -631,6 +674,18 @@
   </li>
 
         
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/extend%26overlapping/" title="Chunk Extend and Overlapping" class="md-nav__link">
+      Chunk Extend and Overlapping
+    </a>
+  </li>
+
+        
       </ul>
     </nav>
   </li>
@@ -708,8 +763,6 @@
                     
 <nav class="md-nav md-nav--secondary" aria-label="目录">
   
-  
-    
   
   
     <label class="md-nav__title" for="__toc">
@@ -811,13 +864,60 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    补充总结
+  </a>
+  
+    <nav class="md-nav" aria-label="补充总结">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fini_array" class="md-nav__link">
+    怎么找 fini_array ？
+  </a>
+  
+    <nav class="md-nav" aria-label="怎么找 fini_array ？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#64" class="md-nav__link">
+    64 位静态链接程序
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64_1" class="md-nav__link">
+    64 位动态链接程序
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    静态动态利用方式小结
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
+  <a href="#_10" class="md-nav__link">
     参考文章
   </a>
   
@@ -843,10 +943,12 @@
                   
                 
                 
-                <h1 id="64-fini_array-rop">劫持 64 位 fini_array 进行 ROP 攻击</h1>
+                  <h1>劫持fini_array</h1>
+                
+                <p>[scode type="lblue"]2020年8月6日 标题添加“静态程序”，补充与 64 位动态程序对比和利用方法差异小结[/scode]</p>
 <h2 id="_1">程序起点</h2>
 <p>程序的启动流程如图所示：</p>
-<p><img alt="" src="https://cdn.jsdelivr.net/gh/skyedai910/Picbed/img/20200627002443.png" /></p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-03-gAfdEK02MtTbddaQ.png" /></p>
 <p>可以看到 main 函数不是程序起点，之前写的 格式化字符串盲打 也分析过 text 段起点是 _start 函数 。_start 函数调用__libc_start_main 完成启动和退出工作。具体看看 _start 函数：</p>
 <pre><code class="c">.text:0000000000401A60                 public start
 .text:0000000000401A60 start           proc near               ; DATA XREF: LOAD:0000000000400018↑o
@@ -1151,7 +1253,67 @@ write(fini_array,p64(leave_ret) + p64(ret))
 p.interactive()
 </code></pre>
 
-<h2 id="_8">参考文章</h2>
+<h3 id="_8">补充总结</h3>
+<h5 id="fini_array">怎么找 fini_array ？</h5>
+<p>首先 fini_array 是 __libc_csu_fini 函数里面会用的一个列表，当程序退出时会调用这个数组存放的一个或两个函数，调用完成后才继续完成退出函数，这时才是真正退出程序。</p>
+<h6 id="64">64 位静态链接程序</h6>
+<p>fini_array 数组长度为 0x10 字节，里面放了两个函数地址，退出 main 函数会先执行 fini_array[1] ，然后执行 fini_array[0] 。</p>
+<p>在<a href="https://www.mrskye.cn/archives/173">劫持 64 位静态程序 fini_array 进行 ROP 攻击</a>里面接触的是 64 位静态编译的程序，程序是没有符号表的，寻找 fini_array 方法是：</p>
+<p>首先 <code>readelf -h 程序名</code> 查看程序加载入口地址。</p>
+<p>gdb 调试将断点打在入口地址 ，然后找到有三个传参的 mov 指令，mov r8 就是 __libc_csu_fini 的地址：</p>
+<pre><code class="shell">.text:0000000000401A60                 public start
+.text:0000000000401A60 start           proc near               ; DATA XREF: LOAD:0000000000400018↑o
+.text:0000000000401A60 ; __unwind {
+.text:0000000000401A60                 xor     ebp, ebp
+.text:0000000000401A62                 mov     r9, rdx
+.text:0000000000401A65                 pop     rsi
+.text:0000000000401A66                 mov     rdx, rsp
+.text:0000000000401A69                 and     rsp, 0FFFFFFFFFFFFFFF0h
+.text:0000000000401A6D                 push    rax
+.text:0000000000401A6E                 push    rsp
+.text:0000000000401A6F                 mov     r8, offset sub_402BD0 ; fini
+.text:0000000000401A76                 mov     rcx, offset loc_402B40 ; init
+.text:0000000000401A7D                 mov     rdi, offset main
+.text:0000000000401A84                 db      67h
+.text:0000000000401A84                 call    __libc_start_main
+.text:0000000000401A8A                 hlt
+.text:0000000000401A8A ; } // starts at 401A60
+.text:0000000000401A8A start           endp
+</code></pre>
+
+<p>然后 <code>x /20i addr</code> 查看该地址开始的汇编，找到 <code>lea    rbp,[rip+0xb***1] # 0x4***f0</code> ，这个地址就是 fini_array[1] 的地址：</p>
+<pre><code class="shell">pwndbg&gt; x/20i 0x402bd0
+  0x402bd0 &lt;__libc_csu_fini&gt;:    push   rbp
+  0x402bd1 &lt;__libc_csu_fini+1&gt;:    lea    rax,[rip+0xb24e8]        # 0x4***c0 
+  0x402bd8 &lt;__libc_csu_fini+8&gt;:    lea    rbp,[rip+0xb24d1]        # 0x4***b0 
+  0x402bdf &lt;__libc_csu_fini+15&gt;:    push   rbx
+  0x402be0 &lt;__libc_csu_fini+16&gt;:    sub    rax,rbp
+  0x402be3 &lt;__libc_csu_fini+19&gt;:    sub    rsp,0x8
+  0x402be7 &lt;__libc_csu_fini+23&gt;:    sar    rax,0x3
+  0x402beb &lt;__libc_csu_fini+27&gt;:    je     0x402c06 &lt;__libc_csu_fini+54&gt;
+  0x402bed &lt;__libc_csu_fini+29&gt;:    lea    rbx,[rax-0x1]
+  0x402bf1 &lt;__libc_csu_fini+33&gt;:    nop    DWORD PTR [rax+0x0]
+  0x402bf8 &lt;__libc_csu_fini+40&gt;:    call   QWORD PTR [rbp+rbx*8+0x0]
+  0x402bfc &lt;__libc_csu_fini+44&gt;:    sub    rbx,0x1
+  0x402c00 &lt;__libc_csu_fini+48&gt;:    cmp    rbx,0xffffffffffffffff
+  0x402c04 &lt;__libc_csu_fini+52&gt;:    jne    0x402bf8 &lt;__libc_csu_fini+40&gt;
+  0x402c06 &lt;__libc_csu_fini+54&gt;:    add    rsp,0x8
+  0x402c0a &lt;__libc_csu_fini+58&gt;:    pop    rbx
+  0x402c0b &lt;__libc_csu_fini+59&gt;:    pop    rbp
+  0x402c0c &lt;__libc_csu_fini+60&gt;:    jmp    0x48f52c &lt;_fini&gt;
+</code></pre>
+
+<h6 id="64_1">64 位动态链接程序</h6>
+<p>fini_array 数组长度为 0x8 字节，里面放了一个函数地址，退出 main 函数会执行 fini_array[0]。</p>
+<p>gdb 输入 <code>elf</code> 找 <code>.fini_array</code> ，开始地址就是 fini_array[0] </p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-06-qQxmRkH3KtjuybNr.png" /></p>
+<p>或者 IDA <code>ctrl+s</code> 找 .fini_array 分段 ：</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-06-ztIjbG96doGOhSfu.png" /></p>
+<p>64 位中只有 fini_array[0] ，没有 fini_array[1] ，也就是只能运行写入 fini_array 一次，然后就正常退出了。无法像静态编译那样重复调用。</p>
+<h6 id="_9">静态动态利用方式小结</h6>
+<p>动态程序目前就遇到 <code>2015 hacklu bookstore</code> 这一题，太菜了总结不出规律。</p>
+<p>静态程序基本上套路是劫持 fini_array + 循环写入，将 ROP 链布置到 fini_array + 0x10 ，写入完成后将栈迁移到 fini_array + 0x10 执行 ROP 链。静态程序的总结可以看看<a href="https://www.freebuf.com/articles/system/226003.html">淇淇师傅文章</a>。</p>
+<h2 id="_10">参考文章</h2>
 <ul>
 <li><a href="https://www.freebuf.com/articles/system/226003.html">详解64位静态编译程序的fini_array劫持及ROP攻击</a></li>
 </ul>

