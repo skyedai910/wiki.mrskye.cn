@@ -1,5 +1,55 @@
 # 知识点&题目索引
 
+## unlink
+
+* 2016 ZCTF note2
+
+    > 考         点：unlink、类型转换
+    >
+    > 做题笔记：
+    >
+    > 实验环境：BUU
+
+* 2014 HITCON stkof
+
+* Asis CTF 2016 b00ks
+
+    > 考         点：unlink
+    >
+    > 做题笔记：
+    >
+    > 实验环境：BUU
+
+## extend&overlapping
+
+* HITCON Trainging lab13
+
+    > 考         点：off-by-one
+    >
+    > 做题笔记：
+    >
+    > 实验环境：BUU
+
+* 2015 hacklu bookstore
+
+    > 考         点：off-by-one、UAF、格式化字符串、hijack fini_array
+    >
+    > 做题笔记：
+    >
+    > 实验环境：BUU
+
+## off-by-one
+
+* Asis CTF 2016 b00ks
+
+    > 考         点：off-by-one（、unlink）
+    >
+    > 做题笔记：
+    >
+    > 实验环境：BUU
+    >
+    > 备       注：16用unlink做，18用off-by-one做
+
 ## 整数溢出
 
 * bjdctf_2020_babystack2
@@ -165,6 +215,16 @@
   > 实验环境：[github](https://github.com/skyedai910/CTF_Warehouse/tree/master/2020_redpwnCTF/pwn/dead-canary)
   >
   > 备        注：与[BJDCTF 2nd]r2t4一样主动触发 canary ，没有留后门，需要自己构建 ROP 链（如果用onegadget不需要 ROP）
+  
+* DASCTF七月 虚假的签到题
+
+  > 考         点：格式化字符串
+  >
+  > 做题笔记：
+  >
+  > 实验环境：
+  >
+  > 备        注：题目不能用常规的栈溢出解决，程序退出时leave后面加了一条额外汇编指令，会修改栈顶。思路应该是修改puts@got为后门地址。
 
 ## 静态编译
 
@@ -215,4 +275,14 @@
   > 实验环境：BUU
   >
   > 备        注：本地可只写shellcode、远程需要ret2libc
+  
+* 2020_ciscn_babyjsc
+
+    > 考         点：python2 input 命令执行
+    >
+    > 做题笔记：
+    >
+    > 实验环境：Github
+    >
+    > 备        注：
 

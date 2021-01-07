@@ -1,10 +1,9 @@
-# 劫持 64 位 fini_array 进行 ROP 攻击
-
+[scode type="lblue"]2020年8月6日 标题添加“静态程序”，补充与 64 位动态程序对比和利用方法差异小结[/scode]
 ## 程序起点
 
 程序的启动流程如图所示：
 
-![](https://cdn.jsdelivr.net/gh/skyedai910/Picbed/img/20200627002443.png)
+![](https://mrskye.cn-gd.ufileos.com/img/2020-08-03-gAfdEK02MtTbddaQ.png)
 
 可以看到 main 函数不是程序起点，之前写的 格式化字符串盲打 也分析过 text 段起点是 \_start 函数 。\_start 函数调用\_\_libc\_start\_main 完成启动和退出工作。具体看看 _start 函数：
 
@@ -136,6 +135,7 @@ Stack:    No canary found
 NX:       NX enabled
 PIE:      No PIE (0x400000)
 ```
+
 ![](https://mrskye.cn-gd.ufileos.com/img/2020-07-07-dmQW7YTLcYVKJeGN.png)
 
 ### 漏洞函数
@@ -352,7 +352,87 @@ write(fini_array,p64(leave_ret) + p64(ret))
 p.interactive()
 ```
 
+### 补充总结
+
+##### 怎么找 fini_array ？
+
+首先 fini_array 是 \_\_libc_csu_fini 函数里面会用的一个列表，当程序退出时会调用这个数组存放的一个或两个函数，调用完成后才继续完成退出函数，这时才是真正退出程序。
+
+###### 64 位静态链接程序
+
+fini_array 数组长度为 0x10 字节，里面放了两个函数地址，退出 main 函数会先执行 fini_array[1] ，然后执行 fini_array[0] 。
+
+在[劫持 64 位静态程序 fini_array 进行 ROP 攻击](https://www.mrskye.cn/archives/173)里面接触的是 64 位静态编译的程序，程序是没有符号表的，寻找 fini_array 方法是：
+
+首先 ``readelf -h 程序名`` 查看程序加载入口地址。
+
+gdb 调试将断点打在入口地址 ，然后找到有三个传参的 mov 指令，mov r8 就是 \_\_libc_csu_fini 的地址：
+
+```shell
+.text:0000000000401A60                 public start
+.text:0000000000401A60 start           proc near               ; DATA XREF: LOAD:0000000000400018↑o
+.text:0000000000401A60 ; __unwind {
+.text:0000000000401A60                 xor     ebp, ebp
+.text:0000000000401A62                 mov     r9, rdx
+.text:0000000000401A65                 pop     rsi
+.text:0000000000401A66                 mov     rdx, rsp
+.text:0000000000401A69                 and     rsp, 0FFFFFFFFFFFFFFF0h
+.text:0000000000401A6D                 push    rax
+.text:0000000000401A6E                 push    rsp
+.text:0000000000401A6F                 mov     r8, offset sub_402BD0 ; fini
+.text:0000000000401A76                 mov     rcx, offset loc_402B40 ; init
+.text:0000000000401A7D                 mov     rdi, offset main
+.text:0000000000401A84                 db      67h
+.text:0000000000401A84                 call    __libc_start_main
+.text:0000000000401A8A                 hlt
+.text:0000000000401A8A ; } // starts at 401A60
+.text:0000000000401A8A start           endp
+```
+
+然后 ``x /20i addr`` 查看该地址开始的汇编，找到 ``lea    rbp,[rip+0xb***1] # 0x4***f0`` ，这个地址就是 fini_array[1] 的地址：
+
+```shell
+pwndbg> x/20i 0x402bd0
+  0x402bd0 <__libc_csu_fini>:    push   rbp
+  0x402bd1 <__libc_csu_fini+1>:    lea    rax,[rip+0xb24e8]        # 0x4***c0 
+  0x402bd8 <__libc_csu_fini+8>:    lea    rbp,[rip+0xb24d1]        # 0x4***b0 
+  0x402bdf <__libc_csu_fini+15>:    push   rbx
+  0x402be0 <__libc_csu_fini+16>:    sub    rax,rbp
+  0x402be3 <__libc_csu_fini+19>:    sub    rsp,0x8
+  0x402be7 <__libc_csu_fini+23>:    sar    rax,0x3
+  0x402beb <__libc_csu_fini+27>:    je     0x402c06 <__libc_csu_fini+54>
+  0x402bed <__libc_csu_fini+29>:    lea    rbx,[rax-0x1]
+  0x402bf1 <__libc_csu_fini+33>:    nop    DWORD PTR [rax+0x0]
+  0x402bf8 <__libc_csu_fini+40>:    call   QWORD PTR [rbp+rbx*8+0x0]
+  0x402bfc <__libc_csu_fini+44>:    sub    rbx,0x1
+  0x402c00 <__libc_csu_fini+48>:    cmp    rbx,0xffffffffffffffff
+  0x402c04 <__libc_csu_fini+52>:    jne    0x402bf8 <__libc_csu_fini+40>
+  0x402c06 <__libc_csu_fini+54>:    add    rsp,0x8
+  0x402c0a <__libc_csu_fini+58>:    pop    rbx
+  0x402c0b <__libc_csu_fini+59>:    pop    rbp
+  0x402c0c <__libc_csu_fini+60>:    jmp    0x48f52c <_fini>
+```
+
+###### 64 位动态链接程序
+
+fini_array 数组长度为 0x8 字节，里面放了一个函数地址，退出 main 函数会执行 fini_array[0]。
+
+gdb 输入 ``elf`` 找 ``.fini_array`` ，开始地址就是 fini_array[0] 
+
+![](https://mrskye.cn-gd.ufileos.com/img/2020-08-06-qQxmRkH3KtjuybNr.png)
+
+或者 IDA ``ctrl+s`` 找 .fini_array 分段 ：
+
+![](https://mrskye.cn-gd.ufileos.com/img/2020-08-06-ztIjbG96doGOhSfu.png)
+
+64 位中只有 fini_array[0] ，没有 fini_array[1] ，也就是只能运行写入 fini_array 一次，然后就正常退出了。无法像静态编译那样重复调用。
+
+###### 静态动态利用方式小结
+
+动态程序目前就遇到 ``2015 hacklu bookstore`` 这一题，太菜了总结不出规律。
+
+静态程序基本上套路是劫持 fini_array + 循环写入，将 ROP 链布置到 fini_array + 0x10 ，写入完成后将栈迁移到 fini_array + 0x10 执行 ROP 链。静态程序的总结可以看看[淇淇师傅文章](https://www.freebuf.com/articles/system/226003.html)。
+
 ## 参考文章
 
 * [详解64位静态编译程序的fini_array劫持及ROP攻击](https://www.freebuf.com/articles/system/226003.html)
-
