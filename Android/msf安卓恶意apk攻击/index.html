@@ -424,7 +424,7 @@ exploit <span class="c1">#开始监听</span>
       <script>
         app = initialize({
           base: "../..",
-          features: {'tabs': True},
+          features: ['tabs', 'instant'],
           search: Object.assign({
             worker: "../../assets/javascripts/worker/search.8c7e0a7e.min.js"
           }, typeof search !== "undefined" && search)
