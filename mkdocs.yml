@@ -1,75 +1,135 @@
 # Project Information
-site_name: SkYe's Wiki
-site_description: SkYe's Wiki
-site_author: SkYe
+site_name: SkYe Wiki
+site_description: SkYe Wiki
+site_author: SkYe231
 site_url: https://wiki.mrskye.cn/
+# 部分分支
 remote_branch: gh-pages
+# 远程仓库地址
 remote_name: origin
+#google网站分析
 google_analytics: ['UA-36723568-3', 'wiki.mrskye.cn']
 
-# context
+# 目录
 nav:
   - Pwn:
-    - 知识点&题目索引: KnowExam/Know&Exam.md
-    - 栈溢出:
-      - 劫持fini_array: stackoverflow/hijack_fini_array_ROP.md
+    - IO_FILE:
+          - libc2.24下IO_FILE的利用: Pwn/IO_FILE/glibc2.24下IO_FILE的利用.md
+          - Pwn_IO_FILE: Pwn/IO_FILE/Pwn_IO_FILE.md
+    - Heap:
+        - 堆基础知识: Pwn/glibc-heap/堆基础知识.md
+        - off_by_one: Pwn/glibc-heap/off_by_one.md
+        - fastbin attack: Pwn/glibc-heap/fastbin.md
+        - 堆重叠&拓展: Pwn/glibc-heap/堆重叠&拓展.md
+        - UAF: Pwn/glibc-heap/use_after_free.md
+        - Unlink: Pwn/glibc-heap/unlink.md
+        - realloc: Pwn/glibc-heap/realloc.md
+        - unsorted_bin_attack: Pwn/glibc-heap/unsorted_bin_attack.md
+        - libc2.29类unlink_attack: Pwn/glibc-heap/Libc2.29类unlink_attack.md
+        - 沙盒堆溢出: Pwn/glibc-heap/沙盒堆溢出.md
+        - House技术:
+            - House_Of_Force: Pwn/glibc-heap/House/House_Of_Force/House_Of_Force.md
+            - House_of_Lore: Pwn/glibc-heap/House/House_of_Lore/House_of_Lore.md
     - 格式化字符串:
-      - 格式化字符串漏洞利用: fmtstr/fmtstr_exploit.md
-      - 格式化字符串漏洞例子: fmtstr/fmtstr_example.md
-      - 格式化字符串盲打: fmtstr/Bilnd_Pwn.md
-    - Glibc堆相关:
-      - 堆介绍: glibc-heap/Introduction_heap.md
-      - 堆相关数据结构: glibc-heap/heap_structure.md
-      - 深入理解堆的实现: 
-        - 堆基础操作: glibc-heap/depth-Understanding-Ptmalloc2/basic.md
-        - 内存块申请操作: glibc-heap/depth-Understanding-Ptmalloc2/malloc.md
-        - 内存块释放操作: glibc-heap/depth-Understanding-Ptmalloc2/free.md
-      - 堆基础Off-By-One: glibc-heap/off_by_one.md
-      - Chunk Extend and Overlapping: glibc-heap/extend&overlapping.md
-    - 链接器:
-      - 静态链接程序利用: linker/statically_linked.md
-    - About: index.md
-#file 
-docs:
-    CNAME
-    about.md
+      - 格式化字符串漏洞基础例子: Pwn/fmtstr/格式化字符串漏洞基础例子.md
+      - 格式化字符串漏洞基础利用: Pwn/fmtstr/格式化字符串漏洞基础利用.md
+      - 格式化字符串盲打: Pwn/fmtstr/格式化字符串盲打/Bilnd_Pwn.md
+  - Stack:
+        - ROP:
+            - 蒸米ROP笔记: Pwn/stackoverflow/一步一步学ROP之Linux篇/一步一步学ROP之Linux篇-学习笔记.md
+            - 花式栈溢出技巧: Pwn/stackoverflow/花式栈溢出技巧.md
+            - SROP: Pwn/stackoverflow/SROP/srop.md
+        - Canary: Pwn/stackoverflow/Canary.md
+        - 栈迁移: Pwn/stackoverflow/栈迁移/栈迁移.md
+        - fini_array劫持: Pwn/stackoverflow/fini_array劫持/fini_array劫持.md
+  - Misc:
+    - 文件的结构: Misc/文件的结构.md
+    - ZIP压缩包伪加密: Misc/ZIP压缩包伪加密.md
+    - 内存取证-volatility: Misc/内存取证-volatility.md
+  - Crypto:
+    - CTF密码学中python库应用: Crypto/CTF密码学中python库应用.md
+    - yafu安装及使用: Crypto/yafu安装及使用.md
+    - RSA加密笔记: Crypto/RSA加密笔记.md
 
-# Theme
+# Theme Setting
 theme:
+  # 主题名称
   name: 'material'
   language: 'zh'
   palette:
-    primary: 'blue'
-    accent: 'red'
+    # 主体颜色
+    primary: 'white'
+    # 提醒颜色
+    accent: 'green'
   icon:
     logo: 'material/book'
   features:
     - tabs
     - instant
   font:
+    # 正文字体
     text: 'Noto Sans'
+    # 代码框字体
     code: 'Source Code Pro'
 
-# Repository
+# material主题markdown拓展
+markdown_extensions:
+  # 提示块
+  - admonition
+  # 代码高亮；显示行号
+  - codehilite:
+      guess_lang: false
+      linenums: true
+  # 锚点
+  - toc:
+      permalink: true
+  # 脚注
+  - footnotes
+  # 定义元数据，通过文章上下文控制，如disqus
+  - meta
+  - def_list
+  # 数学公式
+  - pymdownx.arithmatex
+  # 对加粗和斜体更好的检测
+  - pymdownx.betterem:
+      smart_enable: all
+  # 下划线上标
+  - pymdownx.caret
+  # 增加删除修改高亮注释，可修饰行和段落
+  - pymdownx.critic
+  # 提示块可折叠
+  - pymdownx.details
+  # emoji表情
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:pymdownx.emoji.to_png
+  # 行内代码高亮
+  - pymdownx.inlinehilite
+  # 自动识别超链接
+  - pymdownx.magiclink
+  # 文本高亮
+  - pymdownx.mark
+  # 符号转换
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  # 复选框checklist
+  - pymdownx.tasklist
+  - pymdownx.tilde
+
+# Repository 展示信息
 repo_name: 'skyedai910/wiki.mrskye.cn'
 repo_url: 'https://github.com/skyedai910/wiki.mrskye.cn'
 edit_uri: 'blob/master/docs/'
 
-# Copyright
-copyright: 'Copyright &copy; 2020 SkYe'
+# Copyright，支持HTML语法
+copyright: '<span>&copy; 2021</span>by <a href="https://www.mrskye.cn/" target="_blank">SkYe231</a> &nbsp;|&nbsp; <span><a href="http://beian.miit.gov.cn/" target="_blank">粤ICP备20056619号</a></span>'
 
 # Customization
 extra:
   search:
     language: 'zh'
-  disqus: 'SkYe'
+  disqus: []
   copyright: 'CC BY-NC-SA 4.0'
 extra_javascript:
-  - 'https://cdnjs.loli.net/ajax/libs/pangu/3.3.0/pangu.min.js'
-  - '_static/js/extra.js'
-  - 'https://cdnjs.loli.net/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'
-
+  
 extra_css:
-  - '_static/css/extra.css'
  
-

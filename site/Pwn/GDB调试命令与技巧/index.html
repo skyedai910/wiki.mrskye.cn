@@ -1,0 +1,1230 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="SkYe Wiki">
+      
+      
+      
+        <meta name="author" content="SkYe231">
+      
+      
+        <link rel="canonical" href="https://wiki.mrskye.cn/Pwn/GDB%E8%B0%83%E8%AF%95%E5%91%BD%E4%BB%A4%E4%B8%8E%E6%8A%80%E5%B7%A7/">
+      
+      <link rel="shortcut icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.2.4">
+    
+    
+      
+        <title>GDB调试命令与技巧 - SkYe Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.15aa0b43.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.75751829.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#ffffff">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:300,400,400i,700%7CSource+Code+Pro&display=fallback">
+        <style>body,input{font-family:"Noto Sans",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Source Code Pro",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+        
+<script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-36723568-3","wiki.mrskye.cn"),ga("set","anonymizeIp",!0),ga("send","pageview"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}),document.addEventListener("DOMContentSwitch",function(){ga("send","pageview",document.location.pathname)})</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="white" data-md-color-accent="green">
+      
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#x" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-header-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      <div class="md-header-nav__ellipsis">
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            SkYe Wiki
+          </span>
+        </div>
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            
+              GDB调试命令与技巧
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    SkYe Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1" type="checkbox" id="nav-1" >
+    
+    <label class="md-nav__link" for="nav-1">
+      Pwn
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Pwn" data-md-level="1">
+      <label class="md-nav__title" for="nav-1">
+        <span class="md-nav__icon md-icon"></span>
+        Pwn
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-1" type="checkbox" id="nav-1-1" >
+    
+    <label class="md-nav__link" for="nav-1-1">
+      IO_FILE
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="IO_FILE" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-1">
+        <span class="md-nav__icon md-icon"></span>
+        IO_FILE
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../IO_FILE/glibc2.24%E4%B8%8BIO_FILE%E7%9A%84%E5%88%A9%E7%94%A8/" class="md-nav__link">
+      libc2.24下IO_FILE的利用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../IO_FILE/Pwn_IO_FILE/" class="md-nav__link">
+      Pwn_IO_FILE
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-2" type="checkbox" id="nav-1-2" >
+    
+    <label class="md-nav__link" for="nav-1-2">
+      Heap
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Heap" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-2">
+        <span class="md-nav__icon md-icon"></span>
+        Heap
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../glibc-heap/%E5%A0%86%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" class="md-nav__link">
+      堆基础知识
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../glibc-heap/off_by_one/" class="md-nav__link">
+      off_by_one
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../glibc-heap/fastbin/" class="md-nav__link">
+      fastbin attack
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../glibc-heap/%E5%A0%86%E9%87%8D%E5%8F%A0%26%E6%8B%93%E5%B1%95/" class="md-nav__link">
+      堆重叠&拓展
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../glibc-heap/use_after_free/" class="md-nav__link">
+      UAF
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../glibc-heap/unlink/" class="md-nav__link">
+      Unlink
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../glibc-heap/realloc/" class="md-nav__link">
+      realloc
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../glibc-heap/unsorted_bin_attack/" class="md-nav__link">
+      unsorted_bin_attack
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../glibc-heap/Libc2.29%E7%B1%BBunlink_attack/" class="md-nav__link">
+      libc2.29类unlink_attack
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../glibc-heap/%E6%B2%99%E7%9B%92%E5%A0%86%E6%BA%A2%E5%87%BA/" class="md-nav__link">
+      沙盒堆溢出
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-2-11" type="checkbox" id="nav-1-2-11" >
+    
+    <label class="md-nav__link" for="nav-1-2-11">
+      House技术
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="House技术" data-md-level="3">
+      <label class="md-nav__title" for="nav-1-2-11">
+        <span class="md-nav__icon md-icon"></span>
+        House技术
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../glibc-heap/House/House_Of_Force/House_Of_Force/" class="md-nav__link">
+      House_Of_Force
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../glibc-heap/House/House_of_Lore/House_of_Lore/" class="md-nav__link">
+      House_of_Lore
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-3" type="checkbox" id="nav-1-3" >
+    
+    <label class="md-nav__link" for="nav-1-3">
+      格式化字符串
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="格式化字符串" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-3">
+        <span class="md-nav__icon md-icon"></span>
+        格式化字符串
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E4%BE%8B%E5%AD%90/" class="md-nav__link">
+      格式化字符串漏洞基础例子
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E5%88%A9%E7%94%A8/" class="md-nav__link">
+      格式化字符串漏洞基础利用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B2%E6%89%93/Bilnd_Pwn/" class="md-nav__link">
+      格式化字符串盲打
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2" >
+    
+    <label class="md-nav__link" for="nav-2">
+      Stack
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Stack" data-md-level="1">
+      <label class="md-nav__title" for="nav-2">
+        <span class="md-nav__icon md-icon"></span>
+        Stack
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-1" type="checkbox" id="nav-2-1" >
+    
+    <label class="md-nav__link" for="nav-2-1">
+      ROP
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="ROP" data-md-level="2">
+      <label class="md-nav__title" for="nav-2-1">
+        <span class="md-nav__icon md-icon"></span>
+        ROP
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../stackoverflow/%E4%B8%80%E6%AD%A5%E4%B8%80%E6%AD%A5%E5%AD%A6ROP%E4%B9%8BLinux%E7%AF%87/%E4%B8%80%E6%AD%A5%E4%B8%80%E6%AD%A5%E5%AD%A6ROP%E4%B9%8BLinux%E7%AF%87-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      蒸米ROP笔记
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../stackoverflow/%E8%8A%B1%E5%BC%8F%E6%A0%88%E6%BA%A2%E5%87%BA%E6%8A%80%E5%B7%A7/" class="md-nav__link">
+      花式栈溢出技巧
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../stackoverflow/SROP/srop/" class="md-nav__link">
+      SROP
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../stackoverflow/Canary/" class="md-nav__link">
+      Canary
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../stackoverflow/%E6%A0%88%E8%BF%81%E7%A7%BB/%E6%A0%88%E8%BF%81%E7%A7%BB/" class="md-nav__link">
+      栈迁移
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../stackoverflow/fini_array%E5%8A%AB%E6%8C%81/fini_array%E5%8A%AB%E6%8C%81/" class="md-nav__link">
+      fini_array劫持
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" >
+    
+    <label class="md-nav__link" for="nav-3">
+      Misc
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Misc" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        <span class="md-nav__icon md-icon"></span>
+        Misc
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../Misc/%E6%96%87%E4%BB%B6%E7%9A%84%E7%BB%93%E6%9E%84/" class="md-nav__link">
+      文件的结构
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../Misc/ZIP%E5%8E%8B%E7%BC%A9%E5%8C%85%E4%BC%AA%E5%8A%A0%E5%AF%86/" class="md-nav__link">
+      ZIP压缩包伪加密
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../Misc/%E5%86%85%E5%AD%98%E5%8F%96%E8%AF%81-volatility/" class="md-nav__link">
+      内存取证-volatility
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" >
+    
+    <label class="md-nav__link" for="nav-4">
+      Crypto
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Crypto" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon"></span>
+        Crypto
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../Crypto/CTF%E5%AF%86%E7%A0%81%E5%AD%A6%E4%B8%ADpython%E5%BA%93%E5%BA%94%E7%94%A8/" class="md-nav__link">
+      CTF密码学中python库应用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../Crypto/yafu%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8/" class="md-nav__link">
+      yafu安装及使用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../Crypto/RSA%E5%8A%A0%E5%AF%86%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      RSA加密笔记
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#x" class="md-nav__link">
+    x 查询指令
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    查看调用中的堆栈
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gdb-pie" class="md-nav__link">
+    GDB 调试 PIE 程序
+  </a>
+  
+    <nav class="md-nav" aria-label="GDB 调试 PIE 程序">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    方法一：
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    方法二：
+  </a>
+  
+    <nav class="md-nav" aria-label="方法二：">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    方式一：
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    方式二：
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    方法三：
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pwntools" class="md-nav__link">
+    与 Pwntools 联动
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pwntools-pie" class="md-nav__link">
+    Pwntools 调试 PIE 程序
+  </a>
+  
+    <nav class="md-nav" aria-label="Pwntools 调试 PIE 程序">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    传入明确地址
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    传入偏移量
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    单步跟还是会跳过一些指令
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gdb" class="md-nav__link">
+    脚本中 GDB 放置位置
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gdb_1" class="md-nav__link">
+    GDB 没有调试信息
+  </a>
+  
+    <nav class="md-nav" aria-label="GDB 没有调试信息">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    程序已完成
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    程序退出情况
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gdb_2" class="md-nav__link">
+    gdb 后无其他操作
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gdb_3" class="md-nav__link">
+    gdb 查询各内存段权限
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/skyedai910/wiki.mrskye.cn/blob/master/docs/Pwn/GDB调试命令与技巧.md" title="编辑此页" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  <h1>GDB调试命令与技巧</h1>
+                
+                <h2 id="x">x 查询指令<a class="headerlink" href="#x" title="Permanent link">&para;</a></h2>
+<p><code>x</code> 指令用于查看内存地址的值，<code>x</code>命令语法：</p>
+<div class="highlight"><pre><span></span><code>x/&lt;n/f/u&gt; &lt;target addr&gt;
+</code></pre></div>
+<ul>
+<li>n ：输出个数</li>
+<li>f ：显示格式。 在 pwn 题中通常都是使用 16 进制查看。</li>
+<li>x ：十六进制（常用）</li>
+<li>d ：十进制格式</li>
+<li>u ：十六进制格式显示无符号整型</li>
+<li>o ：八进制格式量 </li>
+<li>t ：二进制格式 </li>
+<li>c ：字符格式 </li>
+<li>f ：浮点数格式</li>
+<li>u ：查看字节单元数。在 pwn 题中，根据题目是 32 位还是 64 位灵活切换 w 和 g</li>
+<li>b ：单字节（8 位，1 个字节）</li>
+<li>h ：双字节（16 位，2 个字节）</li>
+<li>w ：字（32位，4 个字节）（常用）</li>
+<li>g ：大字（64 位，8 个字节）（常用）</li>
+</ul>
+<p>可能常用形式：</p>
+<p><code>x /20xg addr</code>    查 64 位程序内存信息</p>
+<p><code>x /20xw addr</code>    查 32 位程序内存信息</p>
+<h2 id="_1">查看调用中的堆栈<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>where</code>：显示调用堆栈</li>
+<li><code>frame</code>：显示调用堆栈顶部</li>
+<li><code>up</code>：向调用堆栈底部移动</li>
+<li><code>down</code>：向调用堆栈顶部移动</li>
+</ul>
+<h2 id="gdb-pie">GDB 调试 PIE 程序<a class="headerlink" href="#gdb-pie" title="Permanent link">&para;</a></h2>
+<h3 id="_2">方法一：<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>安装 pwndbg 插件，然后这样下断点：0x相对基址偏移就是 IDA 显示的三位数</p>
+<div class="highlight"><pre><span></span><code>b *<span class="nv">$rebase</span><span class="o">(</span>0x相对基址偏移<span class="o">)</span>
+</code></pre></div>
+<h3 id="_3">方法二：<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>在 /proc 目录中，每个进程都会在此目录下新建一个以进程 id 为名的文件夹，其中存储着进程的动态链接和地址的信息。
+在每个进程的 <em>map_file</em> 文件夹中，存储着各个地址段的动态链接文件（地址）。</p>
+<p>查找当前进程 pid 为 6158 :</p>
+<div class="highlight"><pre><span></span><code>$ ps -aux<span class="p">|</span>grep 程序名
+hu         <span class="m">6158</span>  <span class="m">0</span>.0  <span class="m">0</span>.0   <span class="m">4356</span>   <span class="m">632</span> pts/18   S+   <span class="m">07</span>:50   <span class="m">0</span>:00 ./程序名
+hu         <span class="m">6162</span>  <span class="m">0</span>.0  <span class="m">0</span>.0  <span class="m">21292</span>  <span class="m">1088</span> pts/20   S+   <span class="m">07</span>:51   <span class="m">0</span>:00 grep --color<span class="o">=</span>auto 程序名
+</code></pre></div>
+<p>知道 pid 之后有两种方式获取 elf 机制</p>
+<h4 id="_4">方式一：<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h4>
+<p>进入目录 /proc/{pid}/map_files 查询动态链接文件（地址）:</p>
+<div class="highlight"><pre><span></span><code>/proc/6158/map_files$ ls
+557d7b317000-557d7b319000  7f0d1da3c000-7f0d1dc3c000  7f0d1de6b000-7f0d1de6c000
+557d7b518000-557d7b519000  7f0d1dc3c000-7f0d1dc40000  7f0d1de6c000-7f0d1de6d000
+557d7b519000-557d7b51a000  7f0d1dc40000-7f0d1dc42000
+7f0d1d87c000-7f0d1da3c000  7f0d1dc46000-7f0d1dc6c000
+</code></pre></div>
+<p>第一个 0x557d7b317000 为 elf 基地址。</p>
+<p>真实地址为：0x557d7b317000  + 偏移（ida显示的三位地址）</p>
+<h4 id="_5">方式二：<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h4>
+<p>使用 /usr/bin 目录下 pmap 程序。</p>
+<p>*pmap + pid*命令可以将该进程的地址信息和相应地址段的权限打印出。</p>
+<div class="highlight"><pre><span></span><code>/usr/bin/pmap <span class="m">6158</span>
+</code></pre></div>
+<h3 id="_6">方法三：<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<p>IDA 远程调试</p>
+<h3 id="pwntools">与 Pwntools 联动<a class="headerlink" href="#pwntools" title="Permanent link">&para;</a></h3>
+<p>上面方法都是在命令行启动的 GDB 情况下，如果编写成 exp 脚本调试方法看<a href="# Pwntools 调试 PIE 程序">这里</a></p>
+<h2 id="pwntools-pie">Pwntools 调试 PIE 程序<a class="headerlink" href="#pwntools-pie" title="Permanent link">&para;</a></h2>
+<h3 id="_7">传入明确地址<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<p>也就是在 <code>gdb.attach(p,"b *真实地址")</code> 这样传参。这个真实地址寻址原理在 <a href="# GDB 调试 PIE 程序">GDB 调试 PIE 程序</a> 提及，在 exp 中就用 os 库执行命令获取并传参。</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># 脚本摘选自网络，未找到原作者</span>
+<span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="k">def</span> <span class="nf">DEBUG</span><span class="p">(</span><span class="n">bps</span><span class="o">=</span><span class="p">[],</span><span class="n">pie</span> <span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">cmd</span> <span class="o">=</span><span class="s1">&#39;set follow-fork-mode parent</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="c1">#cmd=&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">pie</span><span class="p">:</span>
+        <span class="n">base</span> <span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">popen</span><span class="p">(</span><span class="s2">&quot;pmap </span><span class="si">{}</span><span class="s2">|awk &#39;{{print $1}}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">pid</span><span class="p">))</span><span class="o">.</span><span class="n">readlines</span><span class="p">()[</span><span class="mi">1</span><span class="p">],</span><span class="mi">16</span><span class="p">)</span>
+        <span class="c1">#base =int(os.popen(&quot;pmap -x {0} &quot;.format(p.pid)).readlines()[2][:16],16)</span>
+        <span class="n">cmd</span> <span class="o">+=</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;b *</span><span class="si">{:#x}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">b</span><span class="o">+</span><span class="n">base</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bps</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cmd</span><span class="o">+=</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;b *$rebase(</span><span class="si">{:#x}</span><span class="s1">)</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bps</span><span class="p">])</span>
+
+    <span class="c1"># if bps !=[]:</span>
+    <span class="c1">#     cmd +=&#39;c&#39;</span>
+    <span class="n">gdb</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">cmd</span><span class="p">)</span>
+</code></pre></div>
+<p><code>base = int(os.popen(“pmap {}| awk ‘{{print $1}}’”.format(io.pid)).readlines()[1], 16)</code>获取 elf 基地址，根据传入偏移量，给<code>gdb.attach()</code>传入指令：<code>b *当前断点真实地址</code>。如果 pie 参数为假，传入指令：<code>b *$rebase(偏移量)</code>，偏移量是 ida 显示三位地址。</p>
+<h3 id="_8">传入偏移量<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
+<p>和<a href="#传入明确地址">传入明确地址</a> DEBUG 函数 pie 为假情况差不多。<em>但有帖子和我也试了一下，开启 pie 传入 gdb 命令</em> <code>b *$rebase(偏移量)</code> <em>还是能的。</em></p>
+<p>在你想打断点的前面调用 <code>gdb.attach(p,"b *$rebase(偏移量)")</code>，一般能停下来，但是会停在断点的前面，然后自己手动 step 单步过去咯。</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">gdb</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="s2">&quot;b *$rebase(偏移量)&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="_9">单步跟还是会跳过一些指令<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
+<p>比如说 <code>call xxx@plt</code> 调用 plt 时，step 不会跟进 plt 函数中，改用 <strong>si</strong> 。</p>
+<h2 id="gdb">脚本中 GDB 放置位置<a class="headerlink" href="#gdb" title="Permanent link">&para;</a></h2>
+<p><strong>调用 gdb 有一定时延</strong></p>
+<p>首先明确的在脚本中调用 gdb 并不是准确停在调用这一行，而是会执行到脚本的 下一（或几）行，举个例子：</p>
+<div class="highlight"><pre><span></span><code><span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;string1&#39;</span><span class="p">)</span>
+<span class="n">gdb</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;string2&#39;</span><span class="p">)</span>
+</code></pre></div>
+<p>log 中会看到 string2 已经输入了，gdb 才真正进入。</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="cpf">&lt;unistd.h&gt;</span><span class="cp"></span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="kt">char</span> <span class="n">string1</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="sc">&#39;h&#39;</span><span class="p">,</span><span class="sc">&#39;e&#39;</span><span class="p">,</span><span class="sc">&#39;l&#39;</span><span class="p">,</span><span class="sc">&#39;l&#39;</span><span class="p">,</span><span class="sc">&#39;o&#39;</span><span class="p">};</span>
+    <span class="kt">char</span> <span class="n">string2</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">=</span> <span class="p">{</span><span class="sc">&#39;h&#39;</span><span class="p">,</span><span class="sc">&#39;e&#39;</span><span class="p">,</span><span class="sc">&#39;l&#39;</span><span class="p">,</span><span class="sc">&#39;l&#39;</span><span class="p">,</span><span class="sc">&#39;o&#39;</span><span class="p">};</span>
+    <span class="n">read</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">string1</span><span class="p">,</span><span class="mi">5</span><span class="p">);</span>
+    <span class="n">read</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">string2</span><span class="p">,</span><span class="mi">5</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%s&quot;</span><span class="p">,</span><span class="n">string1</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%s&quot;</span><span class="p">,</span><span class="n">string1</span><span class="p">);</span>
+ <span class="p">}</span> 
+</code></pre></div>
+<p>假如想将上面这个程序，停在刚输入完而未进入 printf ，基于上面提及的特点，在最后一次输入前调用 gdb 。</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s2">&quot;./pwn&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">gdb</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mi">5</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>总结</strong>：就是在最后一条输入命令前打断点。因为有时延，所以相邻命令也被执行。这种方法应该是用于大部分栈题目。堆题目因为菜单停顿，就直接调用咯。</p>
+<h2 id="gdb_1">GDB 没有调试信息<a class="headerlink" href="#gdb_1" title="Permanent link">&para;</a></h2>
+<h3 id="_10">程序已完成<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
+<p>顾名思义，程序已经退出，gdb 当然找不到进程信息。这种情况的几种可能：**栈题目**或者线性的程序（执行完一系列操作就退出）退出了；gdb 调用后面没有其他操作。</p>
+<h3 id="_11">程序退出情况<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h3>
+<p>提前调用 gdb 咯。且不要再脚本末尾调用 gdb ，就是避免<a href="# gdb 后无其他操作">gdb 后无其他操作</a>。</p>
+<h3 id="gdb_2">gdb 后无其他操作<a class="headerlink" href="#gdb_2" title="Permanent link">&para;</a></h3>
+<p>可能在堆调试比较常见，就在 gdb.attach() 后面加一行无关操作，比如说调用题目输出函数等，或者直接 sleep(1) ，等 gdb 获取到进程信息就行。</p>
+<h2 id="gdb_3">gdb 查询各内存段权限<a class="headerlink" href="#gdb_3" title="Permanent link">&para;</a></h2>
+<p>在有些题目 ida 分析的内存段权限好像有错误，可以用 gdb 验证。（eg：get_started_3dsctf_2016）</p>
+<p>使用命令：</p>
+<div class="highlight"><pre><span></span><code>maintenance info sections
+</code></pre></div>
+<p>例子：</p>
+<div class="highlight"><pre><span></span><code>pwndbg&gt; maintenance info sections
+Exec file:
+    <span class="sb">`</span>/home/skye/buu/get_started_3dsctf_2016/get_started_3dsctf_2016<span class="err">&#39;</span>, file <span class="nb">type</span> elf32-i386.
+ <span class="o">[</span><span class="m">0</span><span class="o">]</span>     0x80480f4-&gt;0x8048114 at 0x000000f4: .note.ABI-tag ALLOC LOAD READONLY DATA HAS_CONTENTS
+</code></pre></div>
+<p>如果需要在其他窗口调试，需要获取 PID ，具体请看这里：<a href="https://www.coder.work/article/168338">GDB检查内存权限</a></p>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            <span>&copy; 2021</span>by <a href="https://www.mrskye.cn/" target="_blank">SkYe231</a> &nbsp;|&nbsp; <span><a href="http://beian.miit.gov.cn/" target="_blank">粤ICP备20056619号</a></span>
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../assets/javascripts/vendor.93c04032.min.js"></script>
+      <script src="../../assets/javascripts/bundle.83e5331e.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../..",
+          features: ['tabs', 'instant'],
+          search: Object.assign({
+            worker: "../../assets/javascripts/worker/search.8c7e0a7e.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>

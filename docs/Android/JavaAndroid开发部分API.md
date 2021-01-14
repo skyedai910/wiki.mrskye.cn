@@ -1,0 +1,201 @@
+# [JavaAndroid开发部分API](https://www.cnblogs.com/hujingnb/p/10282197.html)
+
+- 四大组件，都需要在清单文件中配置
+  - Activity: 用来提供一个能让用户操作并与之交互的界面　　
+    - onCreate(): 自动调用的方法, 在其中加载布局显示　　　　
+    - setContentView(int layoutId): 加载布局　　　　
+    - View findViewById(int id): 根据id找到对应的视图对象　　　　
+    - startActivity(Intent intent): 一般启动Activity　　　　
+    - startActivityForResult(int reqCode, Intent intent): 带回调启动Activity　　　　
+      - reqCode: 请求码　　　　　　
+    - onActivityResult(int reqCode, int resultCode, Intent data): 回调方法(使用startActivityForResult方法启动的Activity关闭时自动调用)，需重写　　　　
+      - reqCode: 请求码　　　　　　
+      - resultCode: 返回码　　　　　　
+    - setResult(int resultCode, Intent data): 当使用startActivityForResult方法启动的activity时，设置要返回的结果　　　　　　
+    - finish(): 结束当前Activity　　　　
+    - getIntent(): 得到启动Activity的意图　　　　
+    - startService(Intent): 开启服务　　　　
+    - bindService(...): 绑定服务，可以调用服务中的方法　　　　
+    - getContentResolver(): 获取的类可以使用uri对其他应用内容提供者进行操作　　　　
+      - uri的协议为content　　　　　　
+    - 路径:　　　　
+      - getFileDir(): 获取文件保存目录　　　　　　
+      - getCacheDir(): 获取缓存目录　　　　　　
+      - openFileOutput(String, int): 拿到File目录文件的输出流　　　　　　
+      - openFileInput(String, int): 拿到File目录文件的输入流　　　　　　
+    - runOnUiThread(Runnable): 可在子线程中调用，完成更新ui操作　　　　
+    - 生命周期方法: onCreate(),onStart(),onResume(),onPause(),onRestart(),onStop(),onDestory()　　　　
+  - BroadcastReceiver: 广播接收者,可监听手机的状态　　
+    - onReceive(Context, Intent): 当接收到事件时调用，监听的事件在清单文件中配置　　　　
+      - Intent.getAction(): 获取事件类型　　　　　　
+  - Service: 服务　　
+    - onBind(): 当绑定服务时调用,使用返回的对象可以调用服务中的对象　　　　
+    - onCreate(): 第一次创建服务时调用　　　　
+    - onStartCommand(..): 每次start服务时调用　　　　
+    - onDestroy(): 停止服务时调用　　　　
+  - ContentProvider：内容提供者，可以让其他应用访问自己的数据库　　
+    - UriMatcher：匹配uri的类　　　　
+      - new UriMatcher(UriMatcher.NO_MATCH)： 创建　　　　　　
+      - UriMatcher.addURI(String authorities, String path, int): 添加匹配路径，在数据库操作方法中使用UriMatcher.match(uri)方法进行返回码判断路径　　　　　　
+        - authorities: 清单文件中的authorities属性　　　　　　　　
+        - path: 请求路径　　　　　　　　
+        - int: 请求码　　　　　　　　
+- R: 应用的资源类　　
+  - R.drawable: 包含所有图片资源标识的内部类　　
+  - R.layout: 包含所有布局资源标识的内部类　　
+  - R.id: 包含所有视图id标识的内部类　　
+  - R.string: 包含所有字符串标识的内部类　　
+- Intent: Activity, Service和BroadcastReceiver这三个应用组件之间进行通信的信使
+  - Intent(Context context, Class clazz): 明确指定的目标组件的意图,当操作当前自己应用的组件时使用　　
+  - Intent(String action): 没有明确指定目标组件的意图,当操作其它应用的组件时使用　　
+    - action: 为Activity配置中的<intent-filter>标签中<action>标签的android:name属性　　　　
+      - Intent.ACTION_DIAL: 进入电话拨打界面的意图　　　　　　
+      - Intent.ACTION_SENDTO: 进入短信编辑界面的意图　　　　　　
+      - Intent.ACTION_CALL: 拨打电话的意图　　　　　　
+  - putExtra(String name, Xxx value): 保存额外数据　　
+  - Xxx getXxxExtra(String name): 获取额外数据　　
+  - setData(Uri data): 设置有特定格式的uri数据　　
+- View: 所有视图的根基类
+  - setonClickListener(OnClickListener listener): 给视图设置点击监听　　
+  - setOnLongClickListener(OnLongListener listener): 设置长按监听　　
+  - void setVisibility(int visibility): 设置试图的可见性　　
+    - visibility:　　　　
+      - View.VISIBLE: 可见　　　　　　
+      - View.INVISIBLE: 不可见，但占用屏幕空间　　　　　　
+      - View.GONE: 不可见，也不占用屏幕空间　　　　　　
+  - static View inflate(Context context, int resource, ViewGroup root): 动态加载布局文件　　
+    - 动态加载布局文件的其他两种方法　　　　
+      - LayoutInflater.from(Context).inflate(int, ViewGroup);　　　　　　
+      - LayoutInflater inflater = getSystemService(LAYOUT_INFLATER_SERVICE); inflater.inflater(int, ViewGroup);　　　　　　
+- Toast: 用来显示短时间提示文本的类
+  - static Toast makeText(Context context, CharSequence text, int duration) : 创建一个toast对象　　
+    - context: 可以传入Activity类　　　　
+    - text: 显示的文本　　　　
+    - duration: 持续的时间(LENGTH_SHORT或LENGTH_LONG)　　　　
+  - show(): 显示提示　　
+- AlertDialog: 显示在屏幕上的小对话框
+  - show(): 显示　　
+  - AlertDialog.Builder: AlertDialog内部类，用来创建AlertDialog　　
+    - create(): 创建AlertDialog对象　　　　
+    - show(): 创建alertDialog对象，同时将其显示出来　　　　
+    - setTitle(CharSequence): 设置标题　　　　
+    - setMessage(CharSequence): 设置内容　　　　
+    - setPositiveButton(String, OnClickListener): 设置正面按钮　　　　
+    - setNegativeButton(String, OnClickListener): 设置负面按钮　　　　
+    - dismiss(): 移除dialog　　　　
+    - setView(View): 设置dialog中的布局　　　　
+    - setSingleChoiceItems(CharSequence[], int, OnClickListener): 设置单选列表　　　　
+    - setMultiChoiceItems(...): 设置多选列表　　　　
+- ProgressDialog: 进度框　　
+  - show(Context, CharSequence, CharSequence): 像是dialog　　
+  - setProgressStyle(int style): 设置样式　　
+    - style: 样式，默认圆形进度　　　　
+      - ProgressDialog.STYLE_HORIZONTAL: 水平进度条样式　　　　　　
+  - dismiss(): 移除dialog　　
+- SmsManager: 发送短信的工具类
+  - static SmsManager getDefault() : 得到当前对象　　
+  - sendTextMessage(String destinationAddress, String scAddress, String text, PendingIntent sentIntent, PendingIntent deliveryIntent): 发送短信　　
+    - destinationAddress：电话号码　　　　
+    - scAddress：服务中心的地址，一般填null　　　　
+    - text：信息内容　　　　
+    - sentIntent　　　　
+    - deliveryIntent　　　　
+- SharedPreferences: 用于保存数据的类
+  - Activity.getSharedPreferences(String, int): 拿到SharedPreferences　　
+  - Editor edit(): 拿到编辑器　　
+    - Editor:　　　　
+      - putXxx(...): 向编辑器中放数据　　　　　　
+  - getXxx(...): 取出数据　　
+  - commit(): 提交数据，保存数据　　
+- OptionMenu: 底部菜单
+  - 在activity中重写onCreateOptionsMenu方法，即可定义底部菜单　　
+  - 向menu中添加menultem的方式　　
+    - 调用menu.add(...)方法　　　　
+    - 加载menu文件　　　　
+      - getMenulnflater().inflate(R.menu.main_option, menu);　　　　　　
+  - 重写onOptionsItemSelected方法，进行相应　　
+- ContextMenu: 上下文菜单
+  - setOnCreateContextMenuListener(listener)：为某个视图添加创建ContextMenu的监听(需要长按触发)　　
+  - onCreateContextMenu(menu, view, menuInfo)：定义上下文菜单　　
+    - 向menu中添加menultem的方式，同上　　　　
+  - onContextItemSelected(MenuItem item)当选择某个菜单项的回调方法
+- XmlSerializer: 写xml文件类，使用Xml类拿到
+  - setOutput(OutputStream, String): 指定输出流及编码　　
+  - startDocument(String, Boolean): 写xml文件的开头　　
+  - endDocument(): 写xml文件的结尾　　
+  - startTag(String, String): 写节点　　
+  - endTag(String, String): 结束节点　　
+  - text(String): 写标签体　　
+- XmlPullParser: 读xml文件，使用Xml类拿到
+  - setInput(InputStream, String): 指定输入流及编码　　
+  - getEventType(): 拿到当前事件类型　　
+    - START_TAG；开始标签　　　　
+    - TEXT: 文本内容　　　　
+    - END_TAG: 结束标签　　　　
+    - END_DOCUMENT: 文件结尾　　　　
+  - next(): 向后移动，并返回移动后的事件类型　　
+  - getName(): 拿到当前的开始标签或结束标签的名字　　
+  - getAttributeValue(int): 拿到属性值　　
+  - nextText(): 当前为开始标签时，拿到标签体内容　　
+- Xml：xml文件有关的工具类
+  - newSerializer(): 新建一个XmlSerializer类　　
+  - newPullParser(): 新建一个XmlPullParser类　　
+- SQLiteOpenHelper：使用数据库使用的类，抽象类，需自己实现，数据库以db为后缀
+  - SQLiteOpenHelper(Context, String, CursorFactory, int): 构造器，参数(上下文对象，数据库名称，null,版本)　　
+  - onCreate(SQLiteDatabase): 需重写，当数据库创建时调用(创建表)　　
+  - onUpgrade(SQLiteDatabase, int, int):需重写，当数据库版本升级时调用　　
+  - getWritableDatabase(): 拿到SQLiteDatabase对象　　
+  - getReadableDatabase(): 拿到SQLiteDatabase对象，当磁盘满了，返回只读的
+- SQLiteDatabase: 对数据库进行操作的类
+  - execSQL(String, [Object[]]): 执行sql语句，sql语句有占位符时使用obj数组　　
+  - rawQuery(String, String[]): 使用sql语句查询，返回Cursor结果集　　
+  - insert(String, String, ContentValues): 向数据库添加纪录(表名，null，map)　　
+  - delete(String, String, String[]): 删除数据(表名，条件，占位符)　　
+  - update(String, ContentValues, String, String[]): 更新数据(表名，map，条件，占位符)　　
+  - query(...): 查询数据库，返回Cursor对象　　
+  - close(): 关闭数据库　　
+  - beginTransaction(): 开启事务　　
+  - endTransaction(): 关闭事务　　
+  - setTransactionSuccessful(): 设置事务成功，即提交事务　　
+- Cursor: 数据库查询的结果集
+  - getCount(): 返回结果数　　
+  - getColunCount(): 返回结果列数　　
+  - getColumnNames(): 返回列名的数组　　
+  - getXxx(int): 拿到当前行的对应列的值(0开始)　　
+  - moveToFirst(): 移动到第一个结果　　
+  - moveToLast(): 移动到最后一个　　
+  - moveToNext(): 移动到下一个　　
+  - close(): 关闭　　
+- ArrayAdapter: ListAdapter子类，向ListView中添加项，只能添加一个组件
+- SimpleAdapter: ListAdapter子类，向ListView中添加项，可以添加多个组件，耗内存
+  - SimpleAdapter(Context, List<Map<String, ?>>, int, String[], int[]): 参数(上下文对象，需要显示的数据List，布局文件标识，map的key的数组，布局文件中子View的id数组)　　
+- BaseAdapter: ListAdapter子类，向ListView中添加项，
+  - 抽象类，需自己实现，ArrayAdapter和SimpleAdapter均是其实现类　　
+  - getCount(): 返回集合数据的数量　　
+  - getItem(int): 返回指定下标对应的数据对象　　
+  - getView(int, View, ViewGroup): 返回指定下标item的View对象　　
+- HttpURLConnection: 使用Http协议发送和接收数据
+  - 使用URL类创建　　
+  - setConnectTimeout(int): 设置链接的超时时间　　
+  - setRequestMethod(String): 设置请求类型　　
+  - setRequestProperty(String, String): 设置请求头信息　　
+    - Post提交时需要设置"Content-Type"和Content-Length"头信息　　　　　　
+  - setDoOupput(boolean): 设置允许输出操作，在post请求时使用　　
+  - getOupputStream(): 拿到输出流，在post请求时写入请求体　　
+  - getResponseCode(): 获取响应码　　
+  - getInputStream(): 获取服务器响应信息的输入流
+- HttpClient: 安卓提供的联网类
+  - 实现类: DefaultHttpClient...　　
+  - execute(HttpUriRequest): 执行url请求，返回HttpResponse对象　　
+    - HttpUriRequest　　　　
+      - 实现类: HttpGet, HttpPost...　　　　　　
+    - HttpResponse:　　　　
+      - getStatusLine().getStatusCode(): 获取响应码　　　　　　
+      - getEntity().getContent(): 获取相应流　　　　　　
+- URL:
+  - URL(String): 使用指定路径创建URL对象　　
+  - openConnection(): 打开链接，得到URLConnection对象　　
+- Handler: 可以执行更新ui操作的线程
+  - 在分线程中调用handler.sendMessage(Message),进行更新ui操作　　
+  - handleMessage(Message): 需重写，当sendMessage()调用时执行此方法　　
+  - postDelayed(Runnable, int): 在指定时间后执行操作

