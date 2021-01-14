@@ -1,0 +1,629 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="SkYe Wiki">
+      
+      
+      
+        <meta name="author" content="SkYe231">
+      
+      
+        <link rel="canonical" href="https://wiki.mrskye.cn/Re/VM%E9%80%86%E5%90%91%E4%BE%8B%E9%A2%98--%E5%8D%97%E9%82%AE%E5%B9%B3%E5%8F%B0/VM/">
+      
+      <link rel="shortcut icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.2.4">
+    
+    
+      
+        <title>VM虚拟机 - SkYe Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.15aa0b43.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.75751829.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#ffffff">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:300,400,400i,700%7CSource+Code+Pro&display=fallback">
+        <style>body,input{font-family:"Noto Sans",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Source Code Pro",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+        
+<script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-36723568-3","wiki.mrskye.cn"),ga("set","anonymizeIp",!0),ga("send","pageview"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}),document.addEventListener("DOMContentSwitch",function(){ga("send","pageview",document.location.pathname)})</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="white" data-md-color-accent="green">
+      
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#vm" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-header-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      <div class="md-header-nav__ellipsis">
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            SkYe Wiki
+          </span>
+        </div>
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            
+              VM虚拟机
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    SkYe Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1" type="checkbox" id="nav-1" >
+    
+    <label class="md-nav__link" for="nav-1">
+      Pwn
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Pwn" data-md-level="1">
+      <label class="md-nav__title" for="nav-1">
+        <span class="md-nav__icon md-icon"></span>
+        Pwn
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-1" type="checkbox" id="nav-1-1" >
+    
+    <label class="md-nav__link" for="nav-1-1">
+      格式化字符串
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="格式化字符串" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-1">
+        <span class="md-nav__icon md-icon"></span>
+        格式化字符串
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Pwn/fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E4%BE%8B%E5%AD%90/" class="md-nav__link">
+      格式化字符串漏洞基础例子
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Pwn/fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E5%88%A9%E7%94%A8/" class="md-nav__link">
+      格式化字符串漏洞基础利用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Pwn/fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B2%E6%89%93/Bilnd_Pwn/" class="md-nav__link">
+      格式化字符串盲打
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    介绍
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    题目类型
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    做题技巧
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    🌰例子
+  </a>
+  
+    <nav class="md-nav" aria-label="🌰例子">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rhvm" class="md-nav__link">
+    红帽杯RHVM
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pvp-game" class="md-nav__link">
+    红帽杯PVP GAME
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wxyvm1" class="md-nav__link">
+    南邮WxyVM1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wxyvm2" class="md-nav__link">
+    南邮WxyVM2
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/skyedai910/wiki.mrskye.cn/blob/master/docs/Re/VM逆向例题--南邮平台/VM.md" title="编辑此页" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="vm">VM虚拟机<a class="headerlink" href="#vm" title="Permanent link">&para;</a></h1>
+<h2 id="_1">介绍<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>VM就是虚拟机，类属于VMware之类的。而虚拟机是在程序中用代码来实现的一个虚拟系统，用这个虚拟系统来解释一串**字节码**。</p>
+<p>通俗的来说，VM就是自己设计一套的指令集和解析指令集的解释器。再简单一点就是自己实现一套汇编语言。</p>
+<p>VM设计的主要是的C语言解释器，<a href="https://lotabout.me/2015/write-a-C-interpreter-2/">手把手教C语言编译器虚拟器设计</a>。</p>
+<p>一般情况下，需要对整个虚拟解释器结构进行逆向，找出其中定义了什么函数，功能等等，还需要结合提供的字节码进行分析。</p>
+<blockquote>
+<p>字节码（Byte-code）是一种包含执行程序，由一序列 op 代码/数据对组成的二进制文件，是一种中间码。被看作是**包含一个<a href="https://baike.baidu.com/item/执行程序">执行程序</a>的二进制文件**，更像一个对象模型。字节码被这样叫是因为通常每个 opcode 是一字节长，但是指令码的长度是变化的。每个指令有从 0 到 255（或十六进制的： 00 到FF)的一字节<a href="https://baike.baidu.com/item/操作码">操作码</a>，被参数例如寄存器或内存地址跟随。</p>
+</blockquote>
+<p><img alt="img" src="https://gss1.bdstatic.com/-vo3dSag_xI4khGkpoWK1HF6hhy/baike/crop%3D0%2C17%2C512%2C338%3Bc0%3Dbaike80%2C5%2C5%2C80%2C26/sign=b769daa0c095d143ce39be634ec0ae33/b64543a98226cffcebd98911b1014a90f703eaa6.jpg" /></p>
+<h2 id="_2">题目类型<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>VM类题目现在主流是Pwn题，但也有在逆向的题目，少部分也有在杂项。</p>
+<p>虽然是有几个方向，但是基本归结起来是两类：</p>
+<ol>
+<li>
+<p>给出可执行程序和字节码，逆向虚拟引擎（定义的函数，进行的操作），结合题目提供的字节码，推出来flag</p>
+</li>
+<li>
+<p>只给出可执行程序，逆向虚拟引擎（定义的函数，进行的操作），构造字节码，读取flag</p>
+</li>
+</ol>
+<h2 id="_3">做题技巧<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p>来自<a href="https://radishes.top/">一筐萝卜</a></p>
+</blockquote>
+<p>当在打CTF拿到一个VM题的时候，思路一定清晰，不能盲目的去分析；</p>
+<ol>
+<li>分析虚拟机入口，找出来题目提供的字节码</li>
+<li>理清虚拟机的结构，逆向处各个handler的意思</li>
+<li>根据各个handler来将字节码还原成汇编代码</li>
+<li>根据汇编代码推出flag</li>
+</ol>
+<p>如果动态调试分析的时候，可能会很复杂，跳来跳去的，所以建议先用IDA来静态分析。</p>
+<p><img alt="" src="https://raw.githubusercontent.com/skyedai910/Picbed/master/img/20191210235228.png" /></p>
+<h2 id="_4">🌰例子<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h3 id="rhvm">红帽杯RHVM<a class="headerlink" href="#rhvm" title="Permanent link">&para;</a></h3>
+<p>初始化函数打开了 flag 文件，并使用 <a href="https://baike.baidu.com/item/dup2">dup2</a> 将<a href="https://baike.baidu.com/item/文件描述符">文件描述符</a>重定向到 563 。</p>
+<div class="highlight"><pre><span></span><code><span class="n">fd</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="s">&quot;/flag&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span> <span class="n">fd</span> <span class="o">==</span> <span class="mi">-1</span> <span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">puts</span><span class="p">(</span><span class="s">&quot;What?&quot;</span><span class="p">);</span>
+  <span class="n">exit</span><span class="p">(</span><span class="mi">-1</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="n">dup2</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="mi">563</span><span class="p">);</span>
+</code></pre></div>
+<p>在执行完 main 函数后会跳转到这里。如果将stdin的fileno修改为563，那么这里scanf会读取到flag，然后在下一行的printf输出flag。</p>
+<div class="highlight"><pre><span></span><code><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Could you tell me your name?&quot;</span><span class="p">);</span>
+<span class="n">__isoc99_scanf</span><span class="p">(</span><span class="s">&quot;%99s&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">v0</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye~ %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">v0</span><span class="p">);</span>
+<span class="n">puts</span><span class="p">(</span><span class="s">&quot;See you next time.&quot;</span><span class="p">);</span>
+<span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</code></pre></div>
+<p>找到VM定义的入口，逆向出虚拟引擎。找到引擎中定义的 MovDataToReg 和 MovRegToData 可以越界读取Data段。</p>
+<p>具体WP，<a href="http://dittozzz.top/2019/11/25/2019红帽杯final三道pwn的wp/">看这里</a>。</p>
+<h3 id="pvp-game">红帽杯PVP GAME<a class="headerlink" href="#pvp-game" title="Permanent link">&para;</a></h3>
+<p>程序读取输入后，对输入的字符串进行base64解码</p>
+<div class="highlight"><pre><span></span><code><span class="n">_BYTE</span> <span class="o">*</span><span class="kr">__fastcall</span> <span class="n">Base64Decode</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">src</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">int</span> <span class="n">v2</span><span class="p">;</span> <span class="c1">// [rsp+10h] [rbp-220h]</span>
+  <span class="kt">int</span> <span class="n">v3</span><span class="p">;</span> <span class="c1">// [rsp+14h] [rbp-21Ch]</span>
+  <span class="kt">signed</span> <span class="kr">__int64</span> <span class="n">OrignLen</span><span class="p">;</span> <span class="c1">// [rsp+18h] [rbp-218h]</span>
+  <span class="kt">signed</span> <span class="kr">__int64</span> <span class="n">len</span><span class="p">;</span> <span class="c1">// [rsp+20h] [rbp-210h]</span>
+  <span class="n">_BYTE</span> <span class="o">*</span><span class="n">dest</span><span class="p">;</span> <span class="c1">// [rsp+28h] [rbp-208h]</span>
+  <span class="kt">int</span> <span class="n">v7</span><span class="p">[</span><span class="mi">126</span><span class="p">];</span> <span class="c1">// [rsp+30h] [rbp-200h]</span>
+  <span class="kt">unsigned</span> <span class="kr">__int64</span> <span class="n">v8</span><span class="p">;</span> <span class="c1">// [rsp+228h] [rbp-8h]</span>
+
+  <span class="n">qmemcpy</span><span class="p">(</span><span class="n">v7</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">unk_1B60</span><span class="p">,</span> <span class="mh">0x1ECuLL</span><span class="p">);</span>
+  <span class="n">len</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">src</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="n">strstr</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="s">&quot;==&quot;</span><span class="p">)</span> <span class="p">)</span>                      <span class="c1">// base64</span>
+  <span class="p">{</span>
+    <span class="n">OrignLen</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">len</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="n">strchr</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="sc">&#39;=&#39;</span><span class="p">)</span> <span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">OrignLen</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">len</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">else</span>
+  <span class="p">{</span>
+    <span class="n">OrignLen</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">len</span> <span class="o">/</span> <span class="mi">4</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="n">dest</span> <span class="o">=</span> <span class="n">calloc</span><span class="p">(</span><span class="mi">1uLL</span><span class="p">,</span> <span class="n">OrignLen</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">dest</span><span class="p">[</span><span class="n">OrignLen</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">v2</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">v3</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">while</span> <span class="p">(</span> <span class="n">v2</span> <span class="o">&lt;</span> <span class="n">len</span> <span class="o">-</span> <span class="mi">2</span> <span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">dest</span><span class="p">[</span><span class="n">v3</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="kt">unsigned</span> <span class="kr">__int8</span><span class="p">)</span><span class="n">v7</span><span class="p">[(</span><span class="kt">unsigned</span> <span class="kr">__int8</span><span class="p">)</span><span class="n">src</span><span class="p">[</span><span class="n">v2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">&gt;&gt;</span> <span class="mi">4</span><span class="p">)</span> <span class="o">|</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">v7</span><span class="p">[(</span><span class="kt">unsigned</span> <span class="kr">__int8</span><span class="p">)</span><span class="n">src</span><span class="p">[</span><span class="n">v2</span><span class="p">]];</span>
+    <span class="n">dest</span><span class="p">[</span><span class="n">v3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="kt">unsigned</span> <span class="kr">__int8</span><span class="p">)</span><span class="n">v7</span><span class="p">[(</span><span class="kt">unsigned</span> <span class="kr">__int8</span><span class="p">)</span><span class="n">src</span><span class="p">[</span><span class="n">v2</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]]</span> <span class="o">&gt;&gt;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">|</span> <span class="mi">16</span> <span class="o">*</span> <span class="n">v7</span><span class="p">[(</span><span class="kt">unsigned</span> <span class="kr">__int8</span><span class="p">)</span><span class="n">src</span><span class="p">[</span><span class="n">v2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]];</span>
+    <span class="n">dest</span><span class="p">[</span><span class="n">v3</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">LOBYTE</span><span class="p">(</span><span class="n">v7</span><span class="p">[(</span><span class="kt">unsigned</span> <span class="kr">__int8</span><span class="p">)</span><span class="n">src</span><span class="p">[</span><span class="n">v2</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]])</span> <span class="o">|</span> <span class="p">((</span><span class="kt">unsigned</span> <span class="kr">__int8</span><span class="p">)</span><span class="n">v7</span><span class="p">[(</span><span class="kt">unsigned</span> <span class="kr">__int8</span><span class="p">)</span><span class="n">src</span><span class="p">[</span><span class="n">v2</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]]</span> <span class="o">&lt;&lt;</span> <span class="mi">6</span><span class="p">);</span>
+    <span class="n">v3</span> <span class="o">+=</span> <span class="mi">3</span><span class="p">;</span>
+    <span class="n">v2</span> <span class="o">+=</span> <span class="mi">4</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="n">dest</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>然后运行defence文件提供的字节码来对输入的code进行检查。最后运行输入的字节码。</p>
+<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="p">(</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;=</span> <span class="mi">15</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span> <span class="p">)</span>
+  <span class="n">RunOpcode</span><span class="p">(</span><span class="n">Defence</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="mf">24L</span><span class="n">L</span> <span class="o">*</span> <span class="n">j</span><span class="p">,</span> <span class="n">a4</span><span class="p">,</span> <span class="n">a5</span><span class="p">,</span> <span class="n">a6</span><span class="p">,</span> <span class="n">Code</span><span class="p">[</span><span class="n">j</span><span class="p">].</span><span class="n">opcode</span><span class="p">,</span> <span class="n">Code</span><span class="p">[</span><span class="n">j</span><span class="p">].</span><span class="n">arg1</span><span class="p">,</span> <span class="n">Code</span><span class="p">[</span><span class="n">j</span><span class="p">].</span><span class="n">arg2</span><span class="p">);</span>
+<span class="k">return</span> <span class="nf">puts</span><span class="p">(</span><span class="s">&quot;Game Over!&quot;</span><span class="p">);</span>
+</code></pre></div>
+<p>输入的字节码是压入数据和执行函数。因为程序开始就给出了 libc  的地址，所以就解题的关键就是逆向出虚拟引擎的内容。</p>
+<p>具体WP，<a href="http://dittozzz.top/2019/11/25/2019红帽杯final三道pwn的wp/">看这里</a>。</p>
+<h3 id="wxyvm1">南邮WxyVM1<a class="headerlink" href="#wxyvm1" title="Permanent link">&para;</a></h3>
+<p>从 main 函数看，就是将 input 加密后与 真·flag 的加密值对比，相同的输出 correct 。</p>
+<div class="highlight"><pre><span></span><code><span class="kr">__int64</span> <span class="kr">__fastcall</span> <span class="n">main</span><span class="p">(</span><span class="kr">__int64</span> <span class="n">a1</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">a2</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">a3</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">char</span> <span class="n">v4</span><span class="p">;</span> <span class="c1">// [rsp+Bh] [rbp-5h]</span>
+  <span class="kt">signed</span> <span class="kt">int</span> <span class="n">i</span><span class="p">;</span> <span class="c1">// [rsp+Ch] [rbp-4h]</span>
+
+  <span class="n">puts</span><span class="p">(</span><span class="s">&quot;[WxyVM 0.0.1]&quot;</span><span class="p">);</span>
+  <span class="n">puts</span><span class="p">(</span><span class="s">&quot;input your flag:&quot;</span><span class="p">);</span>
+  <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%s&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">input</span><span class="p">);</span>
+  <span class="n">v4</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="n">vm_start</span><span class="p">();</span><span class="c1">//input加密函数</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="n">strlen</span><span class="p">(</span><span class="o">&amp;</span><span class="n">input</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">24</span> <span class="p">)</span>
+    <span class="n">v4</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">for</span> <span class="p">(</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">23</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span> <span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="o">*</span><span class="p">(</span><span class="o">&amp;</span><span class="n">input</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span> <span class="o">!=</span> <span class="n">enc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span>
+      <span class="n">v4</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="n">v4</span> <span class="p">)</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">&quot;correct&quot;</span><span class="p">);</span>
+  <span class="k">else</span>
+    <span class="nf">puts</span><span class="p">(</span><span class="s">&quot;wrong&quot;</span><span class="p">);</span>
+  <span class="k">return</span> <span class="mf">0L</span><span class="n">L</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>也就是说将 vm_start 的加密原理搞出来就好了。函数里面调用了 byte_6010C0 这个数组的15000个元素，其中每三个为一组参加一次循环。byte_6010C0[i] 作为 switch 的操作指令，byte_6010C0[i + 1] 作为 input 的下标，byte_6010C0[i + 2] 作为进行操作的操作数。</p>
+<div class="highlight"><pre><span></span><code><span class="kr">__int64</span> <span class="nf">vm_start</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">v0</span><span class="p">;</span> <span class="c1">// ST04_4</span>
+  <span class="kr">__int64</span> <span class="n">result</span><span class="p">;</span> <span class="c1">// rax</span>
+  <span class="kt">signed</span> <span class="kt">int</span> <span class="n">i</span><span class="p">;</span> <span class="c1">// [rsp+0h] [rbp-10h]</span>
+  <span class="kt">char</span> <span class="n">v3</span><span class="p">;</span> <span class="c1">// [rsp+8h] [rbp-8h]</span>
+
+  <span class="k">for</span> <span class="p">(</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">14999</span><span class="p">;</span> <span class="n">i</span> <span class="o">+=</span> <span class="mi">3</span> <span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">v0</span> <span class="o">=</span> <span class="n">byte_6010C0</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="n">v3</span> <span class="o">=</span> <span class="n">byte_6010C0</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">];</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">v0</span><span class="p">;</span>
+    <span class="k">switch</span> <span class="p">(</span> <span class="n">v0</span> <span class="p">)</span>
+    <span class="p">{</span>
+      <span class="k">case</span> <span class="mi">1u</span><span class="o">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">byte_6010C0</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">];</span>
+        <span class="o">*</span><span class="p">(</span><span class="o">&amp;</span><span class="n">input</span> <span class="o">+</span> <span class="n">result</span><span class="p">)</span> <span class="o">+=</span> <span class="n">v3</span><span class="p">;</span>
+        <span class="k">break</span><span class="p">;</span>
+      <span class="k">case</span> <span class="mi">2u</span><span class="o">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">byte_6010C0</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">];</span>
+        <span class="o">*</span><span class="p">(</span><span class="o">&amp;</span><span class="n">input</span> <span class="o">+</span> <span class="n">result</span><span class="p">)</span> <span class="o">-=</span> <span class="n">v3</span><span class="p">;</span>
+        <span class="k">break</span><span class="p">;</span>
+      <span class="k">case</span> <span class="mi">3u</span><span class="o">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">byte_6010C0</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">];</span>
+        <span class="o">*</span><span class="p">(</span><span class="o">&amp;</span><span class="n">input</span> <span class="o">+</span> <span class="n">result</span><span class="p">)</span> <span class="o">^=</span> <span class="n">v3</span><span class="p">;</span>
+        <span class="k">break</span><span class="p">;</span>
+      <span class="k">case</span> <span class="mi">4u</span><span class="o">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">byte_6010C0</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">];</span>
+        <span class="o">*</span><span class="p">(</span><span class="o">&amp;</span><span class="n">input</span> <span class="o">+</span> <span class="n">result</span><span class="p">)</span> <span class="o">*=</span> <span class="n">v3</span><span class="p">;</span>
+        <span class="k">break</span><span class="p">;</span>
+      <span class="k">case</span> <span class="mi">5u</span><span class="o">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">byte_6010C0</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">];</span>
+        <span class="o">*</span><span class="p">(</span><span class="o">&amp;</span><span class="n">input</span> <span class="o">+</span> <span class="n">result</span><span class="p">)</span> <span class="o">^=</span> <span class="o">*</span><span class="p">(</span><span class="o">&amp;</span><span class="n">input</span> <span class="o">+</span> <span class="n">byte_6010C0</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]);</span>
+        <span class="k">break</span><span class="p">;</span>
+      <span class="k">default</span><span class="o">:</span>
+        <span class="k">continue</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>到这里基本已经清楚了，把数据都dump下来，写个脚本逆一下就ok了。然后还需要注意的是，这里的运算是以byte为单位，可能会产生溢出，所以应该每次操作之后模一下256。</p>
+<p>具体WP，<a href="https://www.52pojie.cn/forum.php?mod=viewthread&amp;tid=828110">看这里</a>。</p>
+<h3 id="wxyvm2">南邮WxyVM2<a class="headerlink" href="#wxyvm2" title="Permanent link">&para;</a></h3>
+<p>程序的基本情况与 WxyVM1 相同，最大的不同就是VM虚拟引擎。这道题使用的是 dword_69417c ~ dword_6941dc 数组的多次混合运算。</p>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            <span>&copy; 2021</span>by <a href="https://www.mrskye.cn/" target="_blank">SkYe231</a> &nbsp;|&nbsp; <span><a href="http://beian.miit.gov.cn/" target="_blank">粤ICP备20056619号</a></span>
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../../assets/javascripts/vendor.93c04032.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.83e5331e.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../../..",
+          features: {'tabs': True},
+          search: Object.assign({
+            worker: "../../../assets/javascripts/worker/search.8c7e0a7e.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>

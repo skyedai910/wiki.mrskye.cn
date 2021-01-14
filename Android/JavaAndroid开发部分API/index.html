@@ -1,0 +1,623 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="SkYe Wiki">
+      
+      
+      
+        <meta name="author" content="SkYe231">
+      
+      
+        <link rel="canonical" href="https://wiki.mrskye.cn/Android/JavaAndroid%E5%BC%80%E5%8F%91%E9%83%A8%E5%88%86API/">
+      
+      <link rel="shortcut icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.2.4">
+    
+    
+      
+        <title>[JavaAndroid开发部分API](https://www.cnblogs.com/hujingnb/p/10282197.html) - SkYe Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.15aa0b43.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.75751829.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#ffffff">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:300,400,400i,700%7CSource+Code+Pro&display=fallback">
+        <style>body,input{font-family:"Noto Sans",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Source Code Pro",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+        
+<script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-36723568-3","wiki.mrskye.cn"),ga("set","anonymizeIp",!0),ga("send","pageview"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}),document.addEventListener("DOMContentSwitch",function(){ga("send","pageview",document.location.pathname)})</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="white" data-md-color-accent="green">
+      
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#javaandroidapi" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-header-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      <div class="md-header-nav__ellipsis">
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            SkYe Wiki
+          </span>
+        </div>
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            
+              [JavaAndroid开发部分API](https://www.cnblogs.com/hujingnb/p/10282197.html)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    SkYe Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1" type="checkbox" id="nav-1" >
+    
+    <label class="md-nav__link" for="nav-1">
+      Pwn
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Pwn" data-md-level="1">
+      <label class="md-nav__title" for="nav-1">
+        <span class="md-nav__icon md-icon"></span>
+        Pwn
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-1" type="checkbox" id="nav-1-1" >
+    
+    <label class="md-nav__link" for="nav-1-1">
+      格式化字符串
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="格式化字符串" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-1">
+        <span class="md-nav__icon md-icon"></span>
+        格式化字符串
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../Pwn/fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E4%BE%8B%E5%AD%90/" class="md-nav__link">
+      格式化字符串漏洞基础例子
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../Pwn/fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E5%88%A9%E7%94%A8/" class="md-nav__link">
+      格式化字符串漏洞基础利用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../Pwn/fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B2%E6%89%93/Bilnd_Pwn/" class="md-nav__link">
+      格式化字符串盲打
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/skyedai910/wiki.mrskye.cn/blob/master/docs/Android/JavaAndroid开发部分API.md" title="编辑此页" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="javaandroidapi"><a href="https://www.cnblogs.com/hujingnb/p/10282197.html">JavaAndroid开发部分API</a><a class="headerlink" href="#javaandroidapi" title="Permanent link">&para;</a></h1>
+<ul>
+<li>四大组件，都需要在清单文件中配置</li>
+<li>Activity: 用来提供一个能让用户操作并与之交互的界面　　<ul>
+<li>onCreate(): 自动调用的方法, 在其中加载布局显示　　　　</li>
+<li>setContentView(int layoutId): 加载布局　　　　</li>
+<li>View findViewById(int id): 根据id找到对应的视图对象　　　　</li>
+<li>startActivity(Intent intent): 一般启动Activity　　　　</li>
+<li>startActivityForResult(int reqCode, Intent intent): 带回调启动Activity　　　　</li>
+<li>reqCode: 请求码　　　　　　</li>
+<li>onActivityResult(int reqCode, int resultCode, Intent data): 回调方法(使用startActivityForResult方法启动的Activity关闭时自动调用)，需重写　　　　</li>
+<li>reqCode: 请求码　　　　　　</li>
+<li>resultCode: 返回码　　　　　　</li>
+<li>setResult(int resultCode, Intent data): 当使用startActivityForResult方法启动的activity时，设置要返回的结果　　　　　　</li>
+<li>finish(): 结束当前Activity　　　　</li>
+<li>getIntent(): 得到启动Activity的意图　　　　</li>
+<li>startService(Intent): 开启服务　　　　</li>
+<li>bindService(...): 绑定服务，可以调用服务中的方法　　　　</li>
+<li>getContentResolver(): 获取的类可以使用uri对其他应用内容提供者进行操作　　　　</li>
+<li>uri的协议为content　　　　　　</li>
+<li>路径:　　　　</li>
+<li>getFileDir(): 获取文件保存目录　　　　　　</li>
+<li>getCacheDir(): 获取缓存目录　　　　　　</li>
+<li>openFileOutput(String, int): 拿到File目录文件的输出流　　　　　　</li>
+<li>openFileInput(String, int): 拿到File目录文件的输入流　　　　　　</li>
+<li>runOnUiThread(Runnable): 可在子线程中调用，完成更新ui操作　　　　</li>
+<li>生命周期方法: onCreate(),onStart(),onResume(),onPause(),onRestart(),onStop(),onDestory()　　　　</li>
+</ul>
+</li>
+<li>BroadcastReceiver: 广播接收者,可监听手机的状态　　<ul>
+<li>onReceive(Context, Intent): 当接收到事件时调用，监听的事件在清单文件中配置　　　　</li>
+<li>Intent.getAction(): 获取事件类型　　　　　　</li>
+</ul>
+</li>
+<li>Service: 服务　　<ul>
+<li>onBind(): 当绑定服务时调用,使用返回的对象可以调用服务中的对象　　　　</li>
+<li>onCreate(): 第一次创建服务时调用　　　　</li>
+<li>onStartCommand(..): 每次start服务时调用　　　　</li>
+<li>onDestroy(): 停止服务时调用　　　　</li>
+</ul>
+</li>
+<li>ContentProvider：内容提供者，可以让其他应用访问自己的数据库　　<ul>
+<li>UriMatcher：匹配uri的类　　　　</li>
+<li>new UriMatcher(UriMatcher.NO_MATCH)： 创建　　　　　　</li>
+<li>UriMatcher.addURI(String authorities, String path, int): 添加匹配路径，在数据库操作方法中使用UriMatcher.match(uri)方法进行返回码判断路径　　　　　　<ul>
+<li>authorities: 清单文件中的authorities属性　　　　　　　　</li>
+<li>path: 请求路径　　　　　　　　</li>
+<li>int: 请求码　　　　　　　　</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>R: 应用的资源类　　</li>
+<li>R.drawable: 包含所有图片资源标识的内部类　　</li>
+<li>R.layout: 包含所有布局资源标识的内部类　　</li>
+<li>R.id: 包含所有视图id标识的内部类　　</li>
+<li>R.string: 包含所有字符串标识的内部类　　</li>
+<li>Intent: Activity, Service和BroadcastReceiver这三个应用组件之间进行通信的信使</li>
+<li>Intent(Context context, Class clazz): 明确指定的目标组件的意图,当操作当前自己应用的组件时使用　　</li>
+<li>Intent(String action): 没有明确指定目标组件的意图,当操作其它应用的组件时使用　　<ul>
+<li>action: 为Activity配置中的<intent-filter>标签中<action>标签的android:name属性　　　　</li>
+<li>Intent.ACTION_DIAL: 进入电话拨打界面的意图　　　　　　</li>
+<li>Intent.ACTION_SENDTO: 进入短信编辑界面的意图　　　　　　</li>
+<li>Intent.ACTION_CALL: 拨打电话的意图　　　　　　</li>
+</ul>
+</li>
+<li>putExtra(String name, Xxx value): 保存额外数据　　</li>
+<li>Xxx getXxxExtra(String name): 获取额外数据　　</li>
+<li>setData(Uri data): 设置有特定格式的uri数据　　</li>
+<li>View: 所有视图的根基类</li>
+<li>setonClickListener(OnClickListener listener): 给视图设置点击监听　　</li>
+<li>setOnLongClickListener(OnLongListener listener): 设置长按监听　　</li>
+<li>void setVisibility(int visibility): 设置试图的可见性　　<ul>
+<li>visibility:　　　　</li>
+<li>View.VISIBLE: 可见　　　　　　</li>
+<li>View.INVISIBLE: 不可见，但占用屏幕空间　　　　　　</li>
+<li>View.GONE: 不可见，也不占用屏幕空间　　　　　　</li>
+</ul>
+</li>
+<li>static View inflate(Context context, int resource, ViewGroup root): 动态加载布局文件　　<ul>
+<li>动态加载布局文件的其他两种方法　　　　</li>
+<li>LayoutInflater.from(Context).inflate(int, ViewGroup);　　　　　　</li>
+<li>LayoutInflater inflater = getSystemService(LAYOUT_INFLATER_SERVICE); inflater.inflater(int, ViewGroup);　　　　　　</li>
+</ul>
+</li>
+<li>Toast: 用来显示短时间提示文本的类</li>
+<li>static Toast makeText(Context context, CharSequence text, int duration) : 创建一个toast对象　　<ul>
+<li>context: 可以传入Activity类　　　　</li>
+<li>text: 显示的文本　　　　</li>
+<li>duration: 持续的时间(LENGTH_SHORT或LENGTH_LONG)　　　　</li>
+</ul>
+</li>
+<li>show(): 显示提示　　</li>
+<li>AlertDialog: 显示在屏幕上的小对话框</li>
+<li>show(): 显示　　</li>
+<li>AlertDialog.Builder: AlertDialog内部类，用来创建AlertDialog　　<ul>
+<li>create(): 创建AlertDialog对象　　　　</li>
+<li>show(): 创建alertDialog对象，同时将其显示出来　　　　</li>
+<li>setTitle(CharSequence): 设置标题　　　　</li>
+<li>setMessage(CharSequence): 设置内容　　　　</li>
+<li>setPositiveButton(String, OnClickListener): 设置正面按钮　　　　</li>
+<li>setNegativeButton(String, OnClickListener): 设置负面按钮　　　　</li>
+<li>dismiss(): 移除dialog　　　　</li>
+<li>setView(View): 设置dialog中的布局　　　　</li>
+<li>setSingleChoiceItems(CharSequence[], int, OnClickListener): 设置单选列表　　　　</li>
+<li>setMultiChoiceItems(...): 设置多选列表　　　　</li>
+</ul>
+</li>
+<li>ProgressDialog: 进度框　　</li>
+<li>show(Context, CharSequence, CharSequence): 像是dialog　　</li>
+<li>setProgressStyle(int style): 设置样式　　<ul>
+<li>style: 样式，默认圆形进度　　　　</li>
+<li>ProgressDialog.STYLE_HORIZONTAL: 水平进度条样式　　　　　　</li>
+</ul>
+</li>
+<li>dismiss(): 移除dialog　　</li>
+<li>SmsManager: 发送短信的工具类</li>
+<li>static SmsManager getDefault() : 得到当前对象　　</li>
+<li>sendTextMessage(String destinationAddress, String scAddress, String text, PendingIntent sentIntent, PendingIntent deliveryIntent): 发送短信　　<ul>
+<li>destinationAddress：电话号码　　　　</li>
+<li>scAddress：服务中心的地址，一般填null　　　　</li>
+<li>text：信息内容　　　　</li>
+<li>sentIntent　　　　</li>
+<li>deliveryIntent　　　　</li>
+</ul>
+</li>
+<li>SharedPreferences: 用于保存数据的类</li>
+<li>Activity.getSharedPreferences(String, int): 拿到SharedPreferences　　</li>
+<li>Editor edit(): 拿到编辑器　　<ul>
+<li>Editor:　　　　</li>
+<li>putXxx(...): 向编辑器中放数据　　　　　　</li>
+</ul>
+</li>
+<li>getXxx(...): 取出数据　　</li>
+<li>commit(): 提交数据，保存数据　　</li>
+<li>OptionMenu: 底部菜单</li>
+<li>在activity中重写onCreateOptionsMenu方法，即可定义底部菜单　　</li>
+<li>向menu中添加menultem的方式　　<ul>
+<li>调用menu.add(...)方法　　　　</li>
+<li>加载menu文件　　　　</li>
+<li>getMenulnflater().inflate(R.menu.main_option, menu);　　　　　　</li>
+</ul>
+</li>
+<li>重写onOptionsItemSelected方法，进行相应　　</li>
+<li>ContextMenu: 上下文菜单</li>
+<li>setOnCreateContextMenuListener(listener)：为某个视图添加创建ContextMenu的监听(需要长按触发)　　</li>
+<li>onCreateContextMenu(menu, view, menuInfo)：定义上下文菜单　　<ul>
+<li>向menu中添加menultem的方式，同上　　　　</li>
+</ul>
+</li>
+<li>onContextItemSelected(MenuItem item)当选择某个菜单项的回调方法</li>
+<li>XmlSerializer: 写xml文件类，使用Xml类拿到</li>
+<li>setOutput(OutputStream, String): 指定输出流及编码　　</li>
+<li>startDocument(String, Boolean): 写xml文件的开头　　</li>
+<li>endDocument(): 写xml文件的结尾　　</li>
+<li>startTag(String, String): 写节点　　</li>
+<li>endTag(String, String): 结束节点　　</li>
+<li>text(String): 写标签体　　</li>
+<li>XmlPullParser: 读xml文件，使用Xml类拿到</li>
+<li>setInput(InputStream, String): 指定输入流及编码　　</li>
+<li>getEventType(): 拿到当前事件类型　　<ul>
+<li>START_TAG；开始标签　　　　</li>
+<li>TEXT: 文本内容　　　　</li>
+<li>END_TAG: 结束标签　　　　</li>
+<li>END_DOCUMENT: 文件结尾　　　　</li>
+</ul>
+</li>
+<li>next(): 向后移动，并返回移动后的事件类型　　</li>
+<li>getName(): 拿到当前的开始标签或结束标签的名字　　</li>
+<li>getAttributeValue(int): 拿到属性值　　</li>
+<li>nextText(): 当前为开始标签时，拿到标签体内容　　</li>
+<li>Xml：xml文件有关的工具类</li>
+<li>newSerializer(): 新建一个XmlSerializer类　　</li>
+<li>newPullParser(): 新建一个XmlPullParser类　　</li>
+<li>SQLiteOpenHelper：使用数据库使用的类，抽象类，需自己实现，数据库以db为后缀</li>
+<li>SQLiteOpenHelper(Context, String, CursorFactory, int): 构造器，参数(上下文对象，数据库名称，null,版本)　　</li>
+<li>onCreate(SQLiteDatabase): 需重写，当数据库创建时调用(创建表)　　</li>
+<li>onUpgrade(SQLiteDatabase, int, int):需重写，当数据库版本升级时调用　　</li>
+<li>getWritableDatabase(): 拿到SQLiteDatabase对象　　</li>
+<li>getReadableDatabase(): 拿到SQLiteDatabase对象，当磁盘满了，返回只读的</li>
+<li>SQLiteDatabase: 对数据库进行操作的类</li>
+<li>execSQL(String, [Object[]]): 执行sql语句，sql语句有占位符时使用obj数组　　</li>
+<li>rawQuery(String, String[]): 使用sql语句查询，返回Cursor结果集　　</li>
+<li>insert(String, String, ContentValues): 向数据库添加纪录(表名，null，map)　　</li>
+<li>delete(String, String, String[]): 删除数据(表名，条件，占位符)　　</li>
+<li>update(String, ContentValues, String, String[]): 更新数据(表名，map，条件，占位符)　　</li>
+<li>query(...): 查询数据库，返回Cursor对象　　</li>
+<li>close(): 关闭数据库　　</li>
+<li>beginTransaction(): 开启事务　　</li>
+<li>endTransaction(): 关闭事务　　</li>
+<li>setTransactionSuccessful(): 设置事务成功，即提交事务　　</li>
+<li>Cursor: 数据库查询的结果集</li>
+<li>getCount(): 返回结果数　　</li>
+<li>getColunCount(): 返回结果列数　　</li>
+<li>getColumnNames(): 返回列名的数组　　</li>
+<li>getXxx(int): 拿到当前行的对应列的值(0开始)　　</li>
+<li>moveToFirst(): 移动到第一个结果　　</li>
+<li>moveToLast(): 移动到最后一个　　</li>
+<li>moveToNext(): 移动到下一个　　</li>
+<li>close(): 关闭　　</li>
+<li>ArrayAdapter: ListAdapter子类，向ListView中添加项，只能添加一个组件</li>
+<li>SimpleAdapter: ListAdapter子类，向ListView中添加项，可以添加多个组件，耗内存</li>
+<li>SimpleAdapter(Context, List<Map\<String, ?>>, int, String[], int[]): 参数(上下文对象，需要显示的数据List，布局文件标识，map的key的数组，布局文件中子View的id数组)　　</li>
+<li>BaseAdapter: ListAdapter子类，向ListView中添加项，</li>
+<li>抽象类，需自己实现，ArrayAdapter和SimpleAdapter均是其实现类　　</li>
+<li>getCount(): 返回集合数据的数量　　</li>
+<li>getItem(int): 返回指定下标对应的数据对象　　</li>
+<li>getView(int, View, ViewGroup): 返回指定下标item的View对象　　</li>
+<li>HttpURLConnection: 使用Http协议发送和接收数据</li>
+<li>使用URL类创建　　</li>
+<li>setConnectTimeout(int): 设置链接的超时时间　　</li>
+<li>setRequestMethod(String): 设置请求类型　　</li>
+<li>setRequestProperty(String, String): 设置请求头信息　　<ul>
+<li>Post提交时需要设置"Content-Type"和Content-Length"头信息　　　　　　</li>
+</ul>
+</li>
+<li>setDoOupput(boolean): 设置允许输出操作，在post请求时使用　　</li>
+<li>getOupputStream(): 拿到输出流，在post请求时写入请求体　　</li>
+<li>getResponseCode(): 获取响应码　　</li>
+<li>getInputStream(): 获取服务器响应信息的输入流</li>
+<li>HttpClient: 安卓提供的联网类</li>
+<li>实现类: DefaultHttpClient...　　</li>
+<li>execute(HttpUriRequest): 执行url请求，返回HttpResponse对象　　<ul>
+<li>HttpUriRequest　　　　</li>
+<li>实现类: HttpGet, HttpPost...　　　　　　</li>
+<li>HttpResponse:　　　　</li>
+<li>getStatusLine().getStatusCode(): 获取响应码　　　　　　</li>
+<li>getEntity().getContent(): 获取相应流　　　　　　</li>
+</ul>
+</li>
+<li>URL:</li>
+<li>URL(String): 使用指定路径创建URL对象　　</li>
+<li>openConnection(): 打开链接，得到URLConnection对象　　</li>
+<li>Handler: 可以执行更新ui操作的线程</li>
+<li>在分线程中调用handler.sendMessage(Message),进行更新ui操作　　</li>
+<li>handleMessage(Message): 需重写，当sendMessage()调用时执行此方法　　</li>
+<li>postDelayed(Runnable, int): 在指定时间后执行操作</li>
+</ul>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            <span>&copy; 2021</span>by <a href="https://www.mrskye.cn/" target="_blank">SkYe231</a> &nbsp;|&nbsp; <span><a href="http://beian.miit.gov.cn/" target="_blank">粤ICP备20056619号</a></span>
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../assets/javascripts/vendor.93c04032.min.js"></script>
+      <script src="../../assets/javascripts/bundle.83e5331e.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../..",
+          features: {'tabs': True},
+          search: Object.assign({
+            worker: "../../assets/javascripts/worker/search.8c7e0a7e.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,581 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="SkYe Wiki">
+      
+      
+      
+        <meta name="author" content="SkYe231">
+      
+      
+        <link rel="canonical" href="https://wiki.mrskye.cn/Pwn/GOT%E4%B8%8EPLT/">
+      
+      <link rel="shortcut icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.2.4">
+    
+    
+      
+        <title>GOT与PLT - SkYe Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.15aa0b43.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.75751829.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#ffffff">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:300,400,400i,700%7CSource+Code+Pro&display=fallback">
+        <style>body,input{font-family:"Noto Sans",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Source Code Pro",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+        
+<script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-36723568-3","wiki.mrskye.cn"),ga("set","anonymizeIp",!0),ga("send","pageview"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}),document.addEventListener("DOMContentSwitch",function(){ga("send","pageview",document.location.pathname)})</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="white" data-md-color-accent="green">
+      
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-header-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      <div class="md-header-nav__ellipsis">
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            SkYe Wiki
+          </span>
+        </div>
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            
+              GOT与PLT
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    SkYe Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1" type="checkbox" id="nav-1" >
+    
+    <label class="md-nav__link" for="nav-1">
+      Pwn
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Pwn" data-md-level="1">
+      <label class="md-nav__title" for="nav-1">
+        <span class="md-nav__icon md-icon"></span>
+        Pwn
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-1" type="checkbox" id="nav-1-1" >
+    
+    <label class="md-nav__link" for="nav-1-1">
+      格式化字符串
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="格式化字符串" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-1">
+        <span class="md-nav__icon md-icon"></span>
+        格式化字符串
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E4%BE%8B%E5%AD%90/" class="md-nav__link">
+      格式化字符串漏洞基础例子
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E5%88%A9%E7%94%A8/" class="md-nav__link">
+      格式化字符串漏洞基础利用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B2%E6%89%93/Bilnd_Pwn/" class="md-nav__link">
+      格式化字符串盲打
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    重定向
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#relocations" class="md-nav__link">
+    重定位表（relocations）
+  </a>
+  
+    <nav class="md-nav" aria-label="重定位表（relocations）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#got" class="md-nav__link">
+    .got
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gotplt" class="md-nav__link">
+    .got.plt
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plt" class="md-nav__link">
+    .plt
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pltgot" class="md-nav__link">
+    .plt.got
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    实例
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pwning-relocations" class="md-nav__link">
+    Pwning Relocations
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    参考文章
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/skyedai910/wiki.mrskye.cn/blob/master/docs/Pwn/GOT与PLT.md" title="编辑此页" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  <h1>GOT与PLT</h1>
+                
+                <h2 id="_1">重定向<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>二进制文件有两种类型：静态链接和动态链接。静态链接二进制文件包含运行需要的全部代码，不要加载外部库。动态链接没有包含全部代码，需要加载系统库来运行。</p>
+<p>假设动态链接二进制文件加载（调用）系统库使用硬编码地址（绝对地址），那么系统库发生变化，二进制文件内的硬编码地址很可能全部改变。所以提出了一个**重定向**机制。</p>
+<p><code>.got</code>、<code>.plt</code>、<code>.got.plt</code>、<code>链接器</code>等是重定向的组成成分。</p>
+<h2 id="relocations">重定位表（relocations）<a class="headerlink" href="#relocations" title="Permanent link">&para;</a></h2>
+<h3 id="got"><strong>.got</strong><a class="headerlink" href="#got" title="Permanent link">&para;</a></h3>
+<p>全局偏移表。用于记录在 ELF （二进制）文件中所用到的共享库中函数（或字符串）的绝对地址。</p>
+<p>在程序刚开始运行时，GOT 表为空的，当函数*第一次被调用*时会动态解析符号的绝对地址然后转去执行，并将被解析符号的绝对地址记录在 GOT 中；第二次调用同一函数时，由于 GOT 中已经记录了其绝对地址，直接转去执行即可（不用重新解析）。（结合 <strong>.got.plt</strong> 理解）</p>
+<h3 id="gotplt"><strong>.got.plt</strong><a class="headerlink" href="#gotplt" title="Permanent link">&para;</a></h3>
+<p>got 表中的一部分。用于重定向请求到 .got 上的对应偏移或者返回 .plt 中激活链接器寻找函数在 系统库 中的地址。</p>
+<p>开始运行是 .got.plt 不为空。当 got 表中没有函数的记录值时，会把从 .plt 进入 .got.plt 的进程重定向到 .plt 中激活链接器，寻址完成后，.got 记录函数在系统库偏移，.got.plt 会记录函数在 .got 偏移。</p>
+<h3 id="plt">.plt<a class="headerlink" href="#plt" title="Permanent link">&para;</a></h3>
+<p>程序链接表。是调用系统库函数最开始的入口。它有两个功能，在 .got.plt 节中拿到地址，并跳转；当 .got.plt 没有所需地址的时，触发「链接器」去找到所需函数地址。</p>
+<h3 id="pltgot">.plt.got<a class="headerlink" href="#pltgot" title="Permanent link">&para;</a></h3>
+<p>没有太准确的相关资料，在 stackoverflow 上面有一个<a href="https://stackoverflow.com/questions/58076539/plt-plt-got-what-is-different">帖子</a>提及，原文如下：</p>
+<blockquote>
+<p>The difference is that .got.plt is runtime-writable, while .got is not if you enable a defense against GOT overwriting attacks called RELRO (relocations read-only). To enable RELRO, you use the ld option -z relro. RELRO places GOT entries that must be runtime-writable for lazy binding in .got.plt, and all others in the read-only .got section</p>
+</blockquote>
+<p>没太看懂，大概说 .got.plt 在运行时是可读写。但是当开启 RELRO 时，.got 是不可写的。</p>
+<p>调用系统库函数</p>
+<p><img alt="" src="https://mrskye.cn-gd.ufileos.com/img/2020-04-24-eCAUdO88GUhYXSRv.png" /></p>
+<h2 id="_2">实例<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p>引用自：<a href="https://systemoverlord.com/2017/03/19/got-and-plt-for-pwning.html">GOT and PLT for pwning</a></p>
+</blockquote>
+<p>源码如下：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Build with: gcc -m32 -no-pie -g -o plt plt.c</span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">puts</span><span class="p">(</span><span class="s">&quot;Hello world!&quot;</span><span class="p">);</span>
+  <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1">#pwndbg&gt; info files</span>
+pwndbg&gt; maintenance info sections
+
+There are <span class="m">36</span> section headers, starting at offset 0x1fb4:
+
+Section Headers:
+  <span class="o">[</span>Nr<span class="o">]</span> Name              Type            Addr     Off    Size   ES Flg Lk Inf Al
+  <span class="o">[</span><span class="m">12</span><span class="o">]</span> .plt              PROGBITS        080482f0 0002f0 <span class="m">000040</span> <span class="m">04</span>  AX  <span class="m">0</span>   <span class="m">0</span> <span class="m">16</span>
+  <span class="o">[</span><span class="m">13</span><span class="o">]</span> .plt.got          PROGBITS        <span class="m">08048330</span> <span class="m">000330</span> <span class="m">000008</span> <span class="m">00</span>  AX  <span class="m">0</span>   <span class="m">0</span>  <span class="m">8</span>
+  <span class="o">[</span><span class="m">14</span><span class="o">]</span> .text             PROGBITS        <span class="m">08048340</span> <span class="m">000340</span> 0001a2 <span class="m">00</span>  AX  <span class="m">0</span>   <span class="m">0</span> <span class="m">16</span>
+  <span class="o">[</span><span class="m">23</span><span class="o">]</span> .got              PROGBITS        08049ffc 000ffc <span class="m">000004</span> <span class="m">04</span>  WA  <span class="m">0</span>   <span class="m">0</span>  <span class="m">4</span>
+  <span class="o">[</span><span class="m">24</span><span class="o">]</span> .got.plt          PROGBITS        0804a000 <span class="m">001000</span> <span class="m">000018</span> <span class="m">04</span>  WA  <span class="m">0</span>   <span class="m">0</span>  <span class="m">4</span>
+</code></pre></div>
+<p>gdb 反编译 main 函数，call 函数下断点，单步调试</p>
+<div class="highlight"><pre><span></span><code>pwndbg&gt; disass main
+Dump of assembler code <span class="k">for</span> <span class="k">function</span> main:
+   0x0804843b &lt;+0&gt;: lea    ecx,<span class="o">[</span>esp+0x4<span class="o">]</span>
+   0x0804843f &lt;+4&gt;: and    esp,0xfffffff0
+   0x08048442 &lt;+7&gt;: push   DWORD PTR <span class="o">[</span>ecx-0x4<span class="o">]</span>
+   0x08048445 &lt;+10&gt;:    push   ebp
+   0x08048446 &lt;+11&gt;:    mov    ebp,esp
+   0x08048448 &lt;+13&gt;:    push   ebx
+   0x08048449 &lt;+14&gt;:    push   ecx
+   0x0804844a &lt;+15&gt;:    call   0x8048370 &lt;__x86.get_pc_thunk.bx&gt;
+   0x0804844f &lt;+20&gt;:    add    ebx,0x1bb1
+   0x08048455 &lt;+26&gt;:    sub    esp,0xc
+   0x08048458 &lt;+29&gt;:    lea    eax,<span class="o">[</span>ebx-0x1b00<span class="o">]</span>
+   0x0804845e &lt;+35&gt;:    push   eax
+   0x0804845f &lt;+36&gt;:    call   0x8048300 &lt;puts@plt&gt;
+   0x08048464 &lt;+41&gt;:    add    esp,0x10
+   0x08048467 &lt;+44&gt;:    sub    esp,0xc
+   0x0804846a &lt;+47&gt;:    push   0x0
+   0x0804846c &lt;+49&gt;:    call   0x8048310 &lt;exit@plt&gt;
+End of assembler dump.
+pwndbg&gt; <span class="nb">break</span> *0x0804845f
+Breakpoint <span class="m">1</span> at 0x804845f: file plt.c, line <span class="m">7</span>.
+pwndbg&gt; r
+Breakpoint *0x0804845f
+pwndbg&gt; x/i <span class="nv">$pc</span>
+<span class="o">=</span>&gt; 0x804845f &lt;main+36&gt;: call   0x8048300 &lt;puts@plt&gt;
+</code></pre></div>
+<p>debug 到 call 函数，用 si 单步入进入 plt 函数里面，否则直接调 puts 代码。可以用<code>x/i $pc</code>查汇编，或者<code>disass 0x8048300</code>反编译一样能看到跳转的 .got.plt 地址 0x804a00c 。</p>
+<div class="highlight"><pre><span></span><code>pwndbg&gt; si
+pwndbg&gt; x/i <span class="nv">$pc</span>
+<span class="o">=</span>&gt; 0x8048300 &lt;puts@plt&gt;:    jmp    DWORD PTR ds:0x804a00c
+</code></pre></div>
+<p>查询 .got.plt 的跳转地址，是跳转回 .plt 。因为第一次调用 .got 表没有记录，需要跳转 .plt 激活链接器寻址。</p>
+<div class="highlight"><pre><span></span><code>pwndbg&gt; x/wx 0x804a00c
+0x804a00c:  0x08048306
+pwndbg&gt; si
+0x08048306 <span class="k">in</span> puts@plt <span class="o">()</span>
+pwndbg&gt; x/2i <span class="nv">$pc</span>
+<span class="o">=</span>&gt; 0x8048306 &lt;puts@plt+6&gt;:  push   0x0
+   0x804830b &lt;puts@plt+11&gt;: jmp    0x80482f0
+</code></pre></div>
+<p>然后线程会进入系统库函数中（libc），并且 .got 记录 libc 地址，.got.plt 记录在 .got 中偏移。</p>
+<h2 id="pwning-relocations">Pwning Relocations<a class="headerlink" href="#pwning-relocations" title="Permanent link">&para;</a></h2>
+<p>通常就是控制程序执行流程嘛，但是通常某一部分不会同时开启写和执行权限，也就是 NX 保护嘛。</p>
+<p>然后<code>.got.plt</code>是一个函数指针数组（库），就覆盖其中值控制执行流程。</p>
+<p>对应的保护措施就是 RELRO ：partial and full RELRO。</p>
+<p>Partial RELRO (enabled with <code>-Wl,-z,relro</code>):</p>
+<ul>
+<li>Maps the <code>.got</code> section as read-only (but <em>not</em> <code>.got.plt</code>)</li>
+<li>Rearranges sections to reduce the likelihood of global variables overflowing into control structures.</li>
+</ul>
+<p>Full RELRO (enabled with <code>-Wl,-z,relro,-z,now</code>):</p>
+<ul>
+<li>Does the steps of Partial RELRO, plus:</li>
+<li>Causes the linker to resolve all symbols at link time (before starting execution) and then remove write permissions from <code>.got</code>.</li>
+<li><code>.got.plt</code> is merged into <code>.got</code> with full RELRO, so you won’t see this section name.</li>
+</ul>
+<h2 id="_3">参考文章<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<ul>
+<li>
+<p><a href="https://bitguard.wordpress.com/2016/11/26/an-example-of-how-procedure-linkage-table-works/"><strong>An example of how Procedure Linkage Table Works</strong></a></p>
+</li>
+<li>
+<p><a href="https://stackoverflow.com/questions/58076539/plt-plt-got-what-is-different"><strong>.plt .plt.got what is different?</strong></a></p>
+</li>
+<li>
+<p><a href="https://systemoverlord.com/2017/03/19/got-and-plt-for-pwning.html"><strong>GOT and PLT for pwning</strong></a> </p>
+</li>
+</ul>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            <span>&copy; 2021</span>by <a href="https://www.mrskye.cn/" target="_blank">SkYe231</a> &nbsp;|&nbsp; <span><a href="http://beian.miit.gov.cn/" target="_blank">粤ICP备20056619号</a></span>
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../assets/javascripts/vendor.93c04032.min.js"></script>
+      <script src="../../assets/javascripts/bundle.83e5331e.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../..",
+          features: {'tabs': True},
+          search: Object.assign({
+            worker: "../../assets/javascripts/worker/search.8c7e0a7e.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>
